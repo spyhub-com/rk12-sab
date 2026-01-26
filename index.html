@@ -1,87 +1,397 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8">
-  <title>[ MM ] 🌴 • RK12</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>[ MM ] 🌴 • RK12</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;800&display=swap" rel="stylesheet">
+
+<style>
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:'Orbitron',sans-serif;
+}
+
+body{
+background:radial-gradient(circle at top,#1b0033,#050010,#000);
+color:white;
+overflow-x:hidden;
+}
+
+canvas{
+position:fixed;
+top:0;
+left:0;
+z-index:-1;
+}
+
+/* NAVBAR */
+nav{
+position:fixed;
+top:0;
+width:100%;
+display:flex;
+justify-content:space-around;
+align-items:center;
+background:rgba(0,0,0,0.5);
+backdrop-filter:blur(10px);
+padding:15px;
+z-index:10;
+}
+
+nav button{
+position:relative;
+background:rgba(127,0,255,0.3);
+border:none;
+padding:12px 26px;
+border-radius:30px;
+color:white;
+font-weight:bold;
+cursor:pointer;
+overflow:hidden;
+letter-spacing:1px;
+box-shadow:
+0 0 15px rgba(0,229,255,0.3),
+0 0 30px rgba(127,0,255,0.2);
+animation:gradientMove 5s ease infinite;
+transition:0.4s;
+display:flex;
+align-items:center;
+justify-content:center;
+}
+
+nav button::before{
+content:"";
+position:absolute;
+inset:0;
+border-radius:30px;
+padding:2px;
+background:linear-gradient(120deg,#00e5ff,#7f00ff,#00e5ff);
+-webkit-mask:
+linear-gradient(#000 0 0) content-box,
+linear-gradient(#000 0 0);
+-webkit-mask-composite:xor;
+mask-composite:exclude;
+opacity:0.5;
+}
+
+nav button:hover{
+transform:scale(1.1);
+box-shadow:
+0 0 25px #00e5ff,
+0 0 50px #7f00ff;
+}
+
+/* SECTIONS */
+section{
+min-height:100vh;
+padding:100px 20px 40px;
+display:flex;
+flex-direction:column;
+justify-content:center;
+align-items:center;
+text-align:center;
+animation:fade 1.5s;
+}
+
+h1{
+font-size:2.5em;
+background:linear-gradient(90deg,#7f00ff,#00e5ff);
+-webkit-background-clip:text;
+color:transparent;
+text-shadow:0 0 25px #7f00ff;
+}
+
+p{
+max-width:800px;
+margin-top:20px;
+font-size:1.1em;
+line-height:1.8;
+color:#ddd;
+}
+
+/* FEATURES */
+.features{
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:20px;
+margin-top:40px;
+width:100%;
+max-width:600px;
+}
+
+.feature{
+padding:20px;
+border-radius:20px;
+background:rgba(255,255,255,0.05);
+box-shadow:0 0 20px rgba(0,229,255,0.3);
+display:flex;
+align-items:center;
+gap:10px;
+}
+
+.feature::before{
+content:"";
+width:12px;
+height:12px;
+border-radius:50%;
+background:linear-gradient(45deg,#00e5ff,#0055ff,#00e5ff);
+animation:blink 1s infinite;
+display:inline-block;
+}
+
+/* BOT */
+.status{
+margin-top:20px;
+display:flex;
+align-items:center;
+gap:10px;
+}
+
+.dot{
+width:15px;
+height:15px;
+border-radius:50%;
+background:lime;
+animation:blink 1s infinite;
+}
+
+/* FORM */
+form{
+display:flex;
+flex-direction:column;
+gap:15px;
+width:100%;
+max-width:500px;
+margin-top:30px;
+}
+
+input,textarea{
+padding:12px;
+border-radius:10px;
+border:none;
+outline:none;
+background:rgba(255,255,255,0.1);
+color:white;
+}
+
+/* BUTTONS GALAXY LUXE */
+button.submit{
+position:relative;
+background:rgba(127,0,255,0.3);
+border:none;
+padding:12px 26px;
+border-radius:30px;
+color:white;
+font-weight:bold;
+cursor:pointer;
+overflow:hidden;
+letter-spacing:1px;
+box-shadow:
+0 0 15px rgba(0,229,255,0.3),
+0 0 30px rgba(127,0,255,0.2);
+animation:gradientMove 5s ease infinite;
+transition:0.4s;
+display:flex;
+align-items:center;
+justify-content:center;
+}
+
+button.submit::before{
+content:"";
+position:absolute;
+inset:0;
+border-radius:30px;
+padding:2px;
+background:linear-gradient(120deg,#00e5ff,#7f00ff,#00e5ff);
+-webkit-mask:
+linear-gradient(#000 0 0) content-box,
+linear-gradient(#000 0 0);
+-webkit-mask-composite:xor;
+mask-composite:exclude;
+opacity:0.5;
+}
+
+button.submit:hover{
+transform:scale(1.1);
+box-shadow:
+0 0 25px #00e5ff,
+0 0 50px #7f00ff;
+}
+
+/* FOOTER */
+footer{
+padding:30px;
+text-align:center;
+background:rgba(0,0,0,0.6);
+}
+
+.legal{
+margin-top:20px;
+font-size:0.8em;
+color:#aaa;
+}
+
+/* ANIMATIONS */
+@keyframes fade{
+from{opacity:0;transform:translateY(50px);}
+to{opacity:1;transform:translateY(0);}
+}
+
+@keyframes blink{
+0%,100%{opacity:1;}
+50%{opacity:0;}
+}
+
+@keyframes gradientMove{
+0%{background-position:0% 50%;}
+50%{background-position:100% 50%;}
+100%{background-position:0% 50%;}
+}
+
+/* MOBILE */
+@media(max-width:600px){
+h1{font-size:2em;}
+.features{grid-template-columns:1fr;}
+}
+</style>
 </head>
 <body>
 
-  <!-- ================== HEADER ================== -->
-  <header>
-    <h1>[ MM ] 🌴 • RK12</h1>
-    <h2>Serveur Discord de trade sécurisé, middleman et chill</h2>
-    <p>
-      Bienvenue sur [ MM ] 🌴 • RK12, un serveur Discord dédié aux trades sécurisés avec middleman,
-      une communauté chill et beaucoup de fonctionnalités.
-    </p>
-  </header>
+<canvas id="space"></canvas>
 
-  <!-- ================== FEATURES ================== -->
-  <section>
-    <ul>
-      <li>✅ Trades sécurisés</li>
-      <li>✅ Middleman</li>
-      <li>✅ Communauté chill</li>
-      <li>✅ Bot Discord</li>
-      <li>✅ Plein de fonctionnalités</li>
-    </ul>
-  </section>
+<nav>
+<button onclick="scrollToSection('home')">Accueil</button>
+<button onclick="scrollToSection('bot')">Bot</button>
+<button onclick="scrollToSection('middleman')">Recrutement</button>
+<button onclick="scrollToSection('owner')">Owner</button>
+</nav>
 
-  <!-- ================== OWNER ================== -->
-  <section>
-    <h3>Owner</h3>
-    <p>Owner : X77.EXE</p>
-  </section>
+<section id="home">
+<h1>[ MM ] 🌴 • RK12</h1>
+<p>Serveur Discord premium dédié aux trades sécurisés avec système de middleman fiable, une communauté chill et des outils modernes.</p>
 
-  <!-- ================== BOT ================== -->
-  <section>
-    <h3>Notre bot</h3>
-    <p>Notre bot est utilisé dans plus de 20 serveurs</p>
-    <p>Statut : 🟢 En ligne</p>
+<div class="features">
+<div class="feature">Trades sécurisés</div>
+<div class="feature">Middleman certifiés</div>
+<div class="feature">Communauté active</div>
+<div class="feature">Bot automatique</div>
+</div>
+</section>
 
-    <a href="https://discord.com/oauth2/authorize?client_id=1455663944797782169&scope=bot%20applications.commands&permissions=0">
-      Inviter le bot
-    </a>
-  </section>
+<section id="bot">
+<h1>Notre Bot</h1>
+<p>Notre bot est utilisé dans plus de 20 serveurs et gère la sécurité des trades automatiquement.</p>
+<div class="status">
+<div class="dot"></div>
+<span>Bot en ligne</span>
+</div>
+<br>
+<a href="https://discord.com/oauth2/authorize?client_id=1455663944797782169&scope=bot%20applications.commands&permissions=0">
+<button class="submit">Inviter le bot</button>
+</a>
+</section>
 
-  <!-- ================== FORMULAIRE ================== -->
-  <section>
-    <h3>Candidature Middleman</h3>
+<section id="middleman">
+<h1>Candidature Middleman</h1>
 
-    <form>
-      <label>Prénom :</label><br>
-      <input type="text" name="prenom"><br><br>
+<form id="form">
+<input placeholder="Prénom" id="prenom" required>
+<input placeholder="Pseudo Discord" id="pseudo" required>
+<input placeholder="Âge" id="age" required>
+<input placeholder="Heures de jeu / semaine" id="heures" required>
+<input placeholder="Déjà middleman ?" id="exp" required>
+<textarea placeholder="Pourquoi veux-tu être middleman ?" id="why" required></textarea>
+<textarea placeholder="Pourquoi es-tu digne de confiance ?" id="trust" required></textarea>
+<input placeholder="Caution proposée" id="caution" required>
+<button class="submit" type="submit">Envoyer la candidature</button>
+</form>
+</section>
 
-      <label>Pseudo Discord :</label><br>
-      <input type="text" name="pseudo"><br><br>
+<section id="owner">
+<h1>Owner</h1>
+<p>Owner officiel du serveur : <strong>X77.EXE</strong></p>
+</section>
 
-      <label>Âge :</label><br>
-      <input type="number" name="age"><br><br>
+<footer>
+© [ MM ] 🌴 • RK12 - Owner : X77.EXE <br><br>
+<a href="https://discord.gg">
+<button class="submit">Rejoindre le Discord</button>
+</a>
+<div class="legal">
+Mentions légales : Ce site présente le serveur Discord [ MM ] 🌴 • RK12 à titre informatif. Toute reproduction ou utilisation sans autorisation est interdite.
+</div>
+</footer>
 
-      <label>Combien d’heures de jeu par semaine ?</label><br>
-      <input type="text" name="heures"><br><br>
+<script>
+function scrollToSection(id){
+document.getElementById(id).scrollIntoView({behavior:"smooth"});
+}
 
-      <label>As-tu déjà été middleman avant ?</label><br>
-      <input type="text" name="experience"><br><br>
+/* ENVOI FORMULAIRE AU WEBHOOK DISCORD EN MARKDOWN */
+document.getElementById("form").addEventListener("submit", function(e){
+e.preventDefault();
 
-      <label>Pourquoi veux-tu être middleman ?</label><br>
-      <textarea name="raison"></textarea><br><br>
+let data = {
+content:
+`📩 **Nouvelle candidature Middleman**
 
-      <label>Es-tu digne de confiance ? Pourquoi ?</label><br>
-      <textarea name="confiance"></textarea><br><br>
+👤 Prénom : ${prenom.value}
+🎮 Pseudo : ${pseudo.value}
+🎂 Âge : ${age.value}
+⏱ Heures : ${heures.value}
+🧠 Expérience : ${exp.value}
+💬 Motivation : ${why.value}
+🔒 Confiance : ${trust.value}
+💰 Caution : ${caution.value}`
+};
 
-      <label>Quelle caution peux-tu déposer ?</label><br>
-      <input type="text" name="caution"><br><br>
+fetch("https://discord.com/api/webhooks/1463264046320058479/YYruYYsvkbR0UBTwwB_1gXKsFvQXZzvWMPblcEOmWIhoWhKON8tSGvE48H5Js_eKjaRi", {
+method: "POST",
+headers: {"Content-Type": "application/json"},
+body: JSON.stringify(data)
+});
 
-      <button type="submit">Envoyer la candidature</button>
-    </form>
-  </section>
+alert("Candidature envoyée !");
+this.reset();
+});
 
-  <!-- ================== FOOTER ================== -->
-  <footer>
-    <p>© [ MM ] 🌴 • RK12 - Owner : X77.EXE</p>
-    <a href="https://discord.gg/">Rejoindre le serveur Discord</a>
-  </footer>
+/* GALAXY PARTICLES */
+const canvas=document.getElementById("space");
+const ctx=canvas.getContext("2d");
+canvas.width=innerWidth;
+canvas.height=innerHeight;
+
+let stars=[];
+for(let i=0;i<150;i++){
+stars.push({
+x:Math.random()*canvas.width,
+y:Math.random()*canvas.height,
+r:Math.random()*2,
+v:Math.random()*0.5+0.2
+});
+}
+
+function animate(){
+ctx.clearRect(0,0,canvas.width,canvas.height);
+ctx.fillStyle="white";
+stars.forEach(s=>{
+ctx.beginPath();
+ctx.arc(s.x,s.y,s.r,0,Math.PI*2);
+ctx.fill();
+s.y+=s.v;
+if(s.y>canvas.height){
+s.y=0;
+s.x=Math.random()*canvas.width;
+}
+});
+requestAnimationFrame(animate);
+}
+animate();
+</script>
 
 </body>
 </html>
