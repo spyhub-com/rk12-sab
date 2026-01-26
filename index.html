@@ -1,78 +1,87 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <meta charset="UTF-8">
-    <title>[ MM ] 🌴 • RK12</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8">
+  <title>[ MM ] 🌴 • RK12</title>
 </head>
 <body>
 
-<!-- ================= HEADER ================= -->
-<header class="header">
-    <h1 class="title">[ MM ] 🌴 • RK12</h1>
-    <p class="subtitle">Serveur Discord de trade sécurisé, middleman et chill</p>
-</header>
-
-<!-- ================= PRESENTATION ================= -->
-<section class="presentation">
+  <!-- ================== HEADER ================== -->
+  <header>
+    <h1>[ MM ] 🌴 • RK12</h1>
+    <h2>Serveur Discord de trade sécurisé, middleman et chill</h2>
     <p>
-        Bienvenue sur <strong>[ MM ] 🌴 • RK12</strong>, un serveur Discord dédié aux trades sécurisés avec middleman,
-        une communauté chill et beaucoup de fonctionnalités.
+      Bienvenue sur [ MM ] 🌴 • RK12, un serveur Discord dédié aux trades sécurisés avec middleman,
+      une communauté chill et beaucoup de fonctionnalités.
     </p>
+  </header>
 
-    <ul class="features">
-        <li>✅ Trades sécurisés</li>
-        <li>✅ Middleman</li>
-        <li>✅ Communauté chill</li>
-        <li>✅ Bot Discord</li>
-        <li>✅ Plein de fonctionnalités</li>
+  <!-- ================== FEATURES ================== -->
+  <section>
+    <ul>
+      <li>✅ Trades sécurisés</li>
+      <li>✅ Middleman</li>
+      <li>✅ Communauté chill</li>
+      <li>✅ Bot Discord</li>
+      <li>✅ Plein de fonctionnalités</li>
     </ul>
-</section>
+  </section>
 
-<!-- ================= OWNER ================= -->
-<section class="owner">
-    <h2>👑 Owner</h2>
-    <p>Owner : <strong>X77.EXE</strong></p>
-</section>
+  <!-- ================== OWNER ================== -->
+  <section>
+    <h3>Owner</h3>
+    <p>Owner : X77.EXE</p>
+  </section>
 
-<!-- ================= BOT ================= -->
-<section class="bot">
-    <h2>🤖 Notre bot</h2>
-    <p>Notre bot est utilisé dans plus de <strong>20 serveurs</strong></p>
-    <div class="status">
-        <span class="dot"></span> En ligne
-    </div>
-    <a class="btn" href="https://discord.com/oauth2/authorize?client_id=1455663944797782169&scope=bot%20applications.commands&permissions=0" target="_blank">
-        Inviter le bot
+  <!-- ================== BOT ================== -->
+  <section>
+    <h3>Notre bot</h3>
+    <p>Notre bot est utilisé dans plus de 20 serveurs</p>
+    <p>Statut : 🟢 En ligne</p>
+
+    <a href="https://discord.com/oauth2/authorize?client_id=1455663944797782169&scope=bot%20applications.commands&permissions=0">
+      Inviter le bot
     </a>
-</section>
+  </section>
 
-<!-- ================= FORM ================= -->
-<section class="form-section">
-    <h2>📨 Candidature Middleman</h2>
+  <!-- ================== FORMULAIRE ================== -->
+  <section>
+    <h3>Candidature Middleman</h3>
 
-    <form id="middlemanForm">
-        <input type="text" placeholder="Prénom" id="prenom" required>
-        <input type="text" placeholder="Pseudo Discord" id="pseudo" required>
-        <input type="number" placeholder="Âge" id="age" required>
-        <input type="text" placeholder="Heures de jeu par semaine" id="heures" required>
-        <input type="text" placeholder="As-tu déjà été middleman ?" id="deja" required>
-        <textarea placeholder="Pourquoi veux-tu être middleman ?" id="pourquoi" required></textarea>
-        <textarea placeholder="Es-tu digne de confiance ? Pourquoi ?" id="confiance" required></textarea>
-        <input type="number" placeholder="Caution (montant obligatoire)" id="caution" required>
-        <button type="submit">Envoyer la candidature</button>
+    <form>
+      <label>Prénom :</label><br>
+      <input type="text" name="prenom"><br><br>
+
+      <label>Pseudo Discord :</label><br>
+      <input type="text" name="pseudo"><br><br>
+
+      <label>Âge :</label><br>
+      <input type="number" name="age"><br><br>
+
+      <label>Combien d’heures de jeu par semaine ?</label><br>
+      <input type="text" name="heures"><br><br>
+
+      <label>As-tu déjà été middleman avant ?</label><br>
+      <input type="text" name="experience"><br><br>
+
+      <label>Pourquoi veux-tu être middleman ?</label><br>
+      <textarea name="raison"></textarea><br><br>
+
+      <label>Es-tu digne de confiance ? Pourquoi ?</label><br>
+      <textarea name="confiance"></textarea><br><br>
+
+      <label>Quelle caution peux-tu déposer ?</label><br>
+      <input type="text" name="caution"><br><br>
+
+      <button type="submit">Envoyer la candidature</button>
     </form>
+  </section>
 
-    <p id="statusMsg"></p>
-</section>
-
-<!-- ================= FOOTER ================= -->
-<footer>
+  <!-- ================== FOOTER ================== -->
+  <footer>
     <p>© [ MM ] 🌴 • RK12 - Owner : X77.EXE</p>
-    <a class="btn" href="https://discord.gg/" target="_blank">Rejoindre le serveur Discord</a>
-</footer>
+    <a href="https://discord.gg/">Rejoindre le serveur Discord</a>
+  </footer>
 
-<script src="script.js"></script>
 </body>
 </html>
