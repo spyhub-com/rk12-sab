@@ -19,7 +19,6 @@
     --muted: #6b6b80;
     --danger: #f87171;
     --ok: #34d399;
-    --radius: 10px;
     --mono: 'JetBrains Mono', monospace;
     --display: 'Space Grotesk', sans-serif;
   }
@@ -27,365 +26,183 @@
   *{ box-sizing: border-box; margin:0; padding:0; }
 
   html,body{
-    height:100%;
+    min-height:100%;
     background: var(--bg);
     color: var(--text);
     font-family: var(--display);
-    overflow: hidden;
   }
 
   body{
     background-image:
-      radial-gradient(circle at 15% 0%, rgba(139,92,246,0.12), transparent 45%),
-      radial-gradient(circle at 85% 100%, rgba(34,211,238,0.08), transparent 45%);
+      radial-gradient(circle at 15% 0%, rgba(139,92,246,0.10), transparent 45%),
+      radial-gradient(circle at 85% 100%, rgba(34,211,238,0.07), transparent 45%);
     display:flex;
     flex-direction:column;
+    min-height:100vh;
   }
 
-  /* ---------- HEADER ---------- */
   header{
     display:flex;
     align-items:center;
     justify-content:space-between;
-    padding: 14px 22px;
+    gap:12px;
+    padding: 14px 20px;
     border-bottom: 1px solid var(--border);
     background: rgba(18,18,26,0.7);
     backdrop-filter: blur(10px);
+    position:sticky;
+    top:0;
     z-index: 10;
+    flex-wrap:wrap;
   }
 
-  .brand{
-    display:flex;
-    align-items:center;
-    gap:12px;
-  }
+  .brand{ display:flex; align-items:center; gap:12px; }
 
   .brand-mark{
-    width:34px;
-    height:34px;
-    border-radius:8px;
+    width:34px; height:34px; border-radius:8px;
     background: linear-gradient(135deg, var(--violet), var(--cyan));
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    font-weight:700;
-    font-size:16px;
-    color:#0a0a0f;
+    display:flex; align-items:center; justify-content:center;
+    font-weight:700; font-size:16px; color:#0a0a0f;
     box-shadow: 0 0 18px rgba(139,92,246,0.5);
     flex-shrink:0;
   }
 
-  .brand-text{
-    display:flex;
-    flex-direction:column;
-    line-height:1.1;
-  }
-
-  .brand-text .name{
-    font-weight:700;
-    font-size:16px;
-    letter-spacing:0.2px;
-  }
-
+  .brand-text{ display:flex; flex-direction:column; line-height:1.1; }
+  .brand-text .name{ font-weight:700; font-size:16px; }
   .brand-text .name span{
     background: linear-gradient(90deg, var(--violet), var(--cyan));
-    -webkit-background-clip:text;
-    background-clip:text;
-    color:transparent;
+    -webkit-background-clip:text; background-clip:text; color:transparent;
   }
-
   .brand-text .tagline{
-    font-family: var(--mono);
-    font-size:10.5px;
-    color: var(--muted);
-    letter-spacing:0.5px;
-    text-transform:uppercase;
+    font-family: var(--mono); font-size:10.5px; color: var(--muted);
+    letter-spacing:0.5px; text-transform:uppercase;
   }
 
-  .header-actions{
-    display:flex;
-    align-items:center;
-    gap:10px;
-  }
+  button{ font-family: var(--display); cursor:pointer; border:none; outline:none; }
 
-  .pill{
-    font-family: var(--mono);
-    font-size:11px;
-    padding:6px 11px;
-    border-radius:999px;
-    border:1px solid var(--border);
-    color: var(--muted);
-    display:flex;
-    align-items:center;
-    gap:6px;
-    white-space:nowrap;
-  }
-
-  .pill .dot{
-    width:6px;height:6px;border-radius:50%;
-    background: var(--ok);
-    box-shadow: 0 0 8px var(--ok);
-  }
-
-  button{
-    font-family: var(--display);
-    cursor:pointer;
-    border:none;
-    outline:none;
-  }
+  .header-actions{ display:flex; gap:8px; }
 
   .btn{
-    font-size:13px;
-    font-weight:600;
-    padding:9px 16px;
-    border-radius:8px;
-    display:flex;
-    align-items:center;
-    gap:7px;
-    transition: transform .15s ease, box-shadow .15s ease, background .15s ease;
+    font-size:13px; font-weight:600; padding:10px 16px; border-radius:8px;
+    display:flex; align-items:center; justify-content:center; gap:7px;
+    transition: transform .15s ease, box-shadow .15s ease, border-color .15s ease;
+    white-space:nowrap;
   }
   .btn:active{ transform: scale(0.96); }
 
-  .btn-primary{
-    background: linear-gradient(135deg, var(--violet), #7c3aed);
-    color:#fff;
-    box-shadow: 0 0 0 rgba(139,92,246,0);
-  }
-  .btn-primary:hover{
-    box-shadow: 0 4px 22px rgba(139,92,246,0.45);
-  }
+  .btn-primary{ background: linear-gradient(135deg, var(--violet), #7c3aed); color:#fff; }
+  .btn-primary:hover{ box-shadow: 0 4px 22px rgba(139,92,246,0.45); }
+  .btn-primary:disabled{ opacity:0.5; cursor:not-allowed; box-shadow:none; }
 
-  .btn-ghost{
-    background: var(--panel-2);
-    color: var(--text);
-    border:1px solid var(--border);
-  }
+  .btn-ghost{ background: var(--panel-2); color: var(--text); border:1px solid var(--border); }
   .btn-ghost:hover{ border-color: var(--violet-dim); }
 
-  /* ---------- MAIN LAYOUT ---------- */
-  main{
-    flex:1;
-    display:flex;
-    overflow:hidden;
+  .banner{
+    padding:9px 20px;
+    background: rgba(139,92,246,0.08);
+    border-bottom:1px solid var(--border);
+    font-family: var(--mono);
+    font-size:11px;
+    color: var(--muted);
+    text-align:center;
   }
 
-  .pane{
-    flex:1;
-    display:flex;
-    flex-direction:column;
-    min-width:0;
-  }
+  main{ flex:1; display:flex; min-height:0; }
 
-  .pane-editor{
-    border-right:1px solid var(--border);
-  }
+  .pane{ flex:1; display:flex; flex-direction:column; min-width:0; min-height: 300px; }
+  .pane-editor{ border-right:1px solid var(--border); }
 
   .pane-header{
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-    padding:10px 16px;
-    border-bottom:1px solid var(--border);
+    display:flex; align-items:center; justify-content:space-between;
+    padding:10px 16px; border-bottom:1px solid var(--border);
     background: rgba(255,255,255,0.015);
   }
 
   .pane-title{
-    font-family: var(--mono);
-    font-size:11.5px;
-    text-transform:uppercase;
-    letter-spacing:1px;
-    color: var(--muted);
-    display:flex;
-    align-items:center;
-    gap:8px;
+    font-family: var(--mono); font-size:11.5px; text-transform:uppercase;
+    letter-spacing:1px; color: var(--muted); display:flex; align-items:center; gap:8px;
   }
 
-  .traffic-lights{
-    display:flex;
-    gap:6px;
-  }
-  .traffic-lights span{
-    width:9px;height:9px;border-radius:50%;
-    display:inline-block;
-  }
+  .traffic-lights{ display:flex; gap:6px; }
+  .traffic-lights span{ width:9px; height:9px; border-radius:50%; display:inline-block; }
   .tl-r{ background:#ff5f57; }
   .tl-y{ background:#febc2e; }
   .tl-g{ background:#28c840; }
 
-  .editor-wrap{
-    flex:1;
-    position:relative;
-    display:flex;
-    overflow:hidden;
-  }
+  .editor-wrap{ flex:1; position:relative; display:flex; overflow:hidden; }
 
   .line-numbers{
-    font-family: var(--mono);
-    font-size:13px;
-    line-height:1.6;
-    color:#3a3a4a;
-    text-align:right;
-    padding:16px 10px 16px 0;
-    user-select:none;
-    background: rgba(0,0,0,0.15);
-    overflow:hidden;
-    min-width:44px;
+    font-family: var(--mono); font-size:13px; line-height:1.6; color:#3a3a4a;
+    text-align:right; padding:16px 10px 16px 0; user-select:none;
+    background: rgba(0,0,0,0.15); overflow:hidden; min-width:44px;
   }
 
   #codeInput{
-    flex:1;
-    background:transparent;
-    color: var(--text);
-    font-family: var(--mono);
-    font-size:13px;
-    line-height:1.6;
-    border:none;
-    outline:none;
-    resize:none;
-    padding:16px 16px 16px 8px;
-    white-space:pre;
-    overflow:auto;
+    flex:1; background:transparent; color: var(--text); font-family: var(--mono);
+    font-size:13px; line-height:1.6; border:none; outline:none; resize:none;
+    padding:16px 16px 16px 8px; white-space:pre; overflow:auto;
   }
-
-  #codeInput::placeholder{
-    color:#3f3f52;
-  }
+  #codeInput::placeholder{ color:#3f3f52; }
 
   ::-webkit-scrollbar{ width:10px; height:10px; }
   ::-webkit-scrollbar-track{ background: transparent; }
   ::-webkit-scrollbar-thumb{ background: #2a2a38; border-radius:6px; }
   ::-webkit-scrollbar-thumb:hover{ background: var(--violet-dim); }
 
-  /* ---------- PREVIEW PANE ---------- */
   .browser-chrome{
-    padding: 10px 14px;
-    display:flex;
-    align-items:center;
-    gap:10px;
-    background: var(--panel-2);
-    border-bottom:1px solid var(--border);
+    padding: 10px 14px; display:flex; align-items:center; gap:10px;
+    background: var(--panel-2); border-bottom:1px solid var(--border);
   }
 
   .url-bar{
-    flex:1;
-    background: rgba(0,0,0,0.35);
-    border:1px solid var(--border);
-    border-radius:999px;
-    padding:7px 14px;
-    font-family: var(--mono);
-    font-size:12px;
-    color: var(--muted);
-    display:flex;
-    align-items:center;
-    gap:8px;
-    overflow:hidden;
-    white-space:nowrap;
+    flex:1; background: rgba(0,0,0,0.35); border:1px solid var(--border);
+    border-radius:999px; padding:8px 14px; font-family: var(--mono); font-size:12px;
+    color: var(--muted); display:flex; align-items:center; gap:8px;
+    overflow:hidden; white-space:nowrap;
   }
+  .url-bar .lock{ color: var(--ok); flex-shrink:0; }
+  .url-bar .slug{ color: var(--cyan); overflow:hidden; text-overflow:ellipsis; flex:1; }
+  .url-bar .slug a{ color: var(--cyan); text-decoration:none; }
+  .url-bar .slug a:hover{ text-decoration:underline; }
+  .url-bar .copy-btn{ background:none; border:none; color: var(--muted); font-size:13px; flex-shrink:0; }
+  .url-bar .copy-btn:hover{ color: var(--cyan); }
 
-  .url-bar .lock{
-    color: var(--ok);
-    flex-shrink:0;
-  }
-
-  .url-bar .slug{
-    color: var(--cyan);
-    overflow:hidden;
-    text-overflow:ellipsis;
-  }
-
-  .url-bar .slug .fixed{
-    color: var(--muted);
-  }
-
-  iframe{
-    flex:1;
-    border:none;
-    background:#fff;
-    width:100%;
-  }
+  iframe{ flex:1; border:none; background:#fff; width:100%; }
 
   .empty-state{
-    flex:1;
-    display:flex;
-    flex-direction:column;
-    align-items:center;
-    justify-content:center;
-    gap:14px;
-    color: var(--muted);
-    background:
-      linear-gradient(var(--bg), var(--bg)),
-      repeating-linear-gradient(45deg, rgba(139,92,246,0.03) 0 2px, transparent 2px 14px);
+    flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center;
+    gap:14px; color: var(--muted); padding:20px; text-align:center;
   }
+  .empty-state .glyph{ font-size:34px; filter: drop-shadow(0 0 14px rgba(139,92,246,0.4)); }
+  .empty-state p{ font-family: var(--mono); font-size:12.5px; max-width:280px; line-height:1.6; }
 
-  .empty-state .glyph{
-    font-size:38px;
-    filter: drop-shadow(0 0 14px rgba(139,92,246,0.4));
-  }
-
-  .empty-state p{
-    font-family: var(--mono);
-    font-size:12.5px;
-    max-width:280px;
-    text-align:center;
-    line-height:1.6;
-  }
-
-  /* ---------- FOOTER STATUS BAR ---------- */
   footer{
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-    padding:7px 18px;
-    border-top:1px solid var(--border);
-    background: var(--panel);
-    font-family: var(--mono);
-    font-size:11px;
-    color: var(--muted);
+    display:flex; align-items:center; justify-content:center; padding:8px 18px;
+    border-top:1px solid var(--border); background: var(--panel);
+    font-family: var(--mono); font-size:11px; color: var(--muted); text-align:center;
   }
 
-  footer .status-left{ display:flex; gap:16px; }
-  footer .status-item{ display:flex; align-items:center; gap:5px; }
-
-  /* ---------- TOAST ---------- */
   #toast{
-    position:fixed;
-    bottom:46px;
-    left:50%;
-    transform: translateX(-50%) translateY(20px);
-    background: var(--panel-2);
-    border:1px solid var(--violet-dim);
-    color: var(--text);
-    padding:11px 20px;
-    border-radius:9px;
-    font-size:13px;
-    font-family: var(--display);
-    font-weight:500;
+    position:fixed; bottom:20px; left:50%; transform: translateX(-50%) translateY(20px);
+    background: var(--panel-2); border:1px solid var(--violet-dim); color: var(--text);
+    padding:11px 20px; border-radius:9px; font-size:13px; font-weight:500;
     box-shadow: 0 8px 30px rgba(0,0,0,0.5), 0 0 20px rgba(139,92,246,0.25);
-    opacity:0;
-    pointer-events:none;
-    transition: all .3s cubic-bezier(.4,0,.2,1);
-    z-index:100;
-    display:flex;
-    align-items:center;
-    gap:8px;
+    opacity:0; pointer-events:none; transition: all .3s cubic-bezier(.4,0,.2,1);
+    z-index:100; max-width:90vw; text-align:center;
   }
-  #toast.show{
-    opacity:1;
-    transform: translateX(-50%) translateY(0);
-  }
+  #toast.show{ opacity:1; transform: translateX(-50%) translateY(0); }
 
-  /* ---------- RESPONSIVE ---------- */
   @media (max-width: 860px){
     main{ flex-direction:column; }
     .pane-editor{ border-right:none; border-bottom:1px solid var(--border); }
-    .pane{ min-height:0; }
-    header{ flex-wrap:wrap; gap:10px; }
+    header{ padding:12px 14px; }
+    .header-actions{ width:100%; display:flex; gap:8px; }
+    .header-actions .btn{ flex:1; }
+    #codeInput, .line-numbers{ font-size:12.5px; }
   }
 
-  /* focus visibility */
-  button:focus-visible, textarea:focus-visible{
-    outline: 2px solid var(--cyan);
-    outline-offset:2px;
+  button:focus-visible, textarea:focus-visible, input:focus-visible{
+    outline: 2px solid var(--cyan); outline-offset:2px;
   }
 
   @media (prefers-reduced-motion: reduce){
@@ -400,16 +217,16 @@
     <div class="brand-mark">SH</div>
     <div class="brand-text">
       <div class="name">SpyHub <span>Gen URL Web</span></div>
-      <div class="tagline">éditeur &amp; aperçu HTML en local</div>
+      <div class="tagline">colle ton code, obtiens un lien</div>
     </div>
   </div>
   <div class="header-actions">
-    <div class="pill"><span class="dot"></span> Aperçu local actif</div>
     <button class="btn btn-ghost" id="clearBtn">Effacer</button>
-    <button class="btn btn-ghost" id="downloadBtn">⬇ Télécharger</button>
-    <button class="btn btn-primary" id="genBtn">⚡ Générer l'aperçu</button>
+    <button class="btn btn-primary" id="genBtn">⚡ Générer le lien</button>
   </div>
 </header>
+
+<div class="banner">🌍 Ouvert à tous — colle ton HTML et génère ton lien, aucune clé requise</div>
 
 <main>
   <section class="pane pane-editor">
@@ -439,37 +256,38 @@
       <span class="traffic-lights"><span class="tl-r"></span><span class="tl-y"></span><span class="tl-g"></span></span>
       <div class="url-bar">
         <span class="lock">🔒</span>
-        <span class="slug" id="urlSlug"><span class="fixed">preview://local/</span>en-attente</span>
+        <span class="slug" id="urlSlug">en attente de génération</span>
+        <button class="copy-btn" id="copyBtn" title="Copier le lien" style="display:none;">📋</button>
       </div>
     </div>
     <div class="empty-state" id="emptyState">
       <div class="glyph">🡒 ⧉</div>
-      <p>Colle du code HTML à gauche puis clique sur "Générer l'aperçu" pour le voir rendu ici.</p>
+      <p>Colle ton code HTML à gauche, puis clique sur "Générer le lien". Aucune clé, aucun compte requis.</p>
     </div>
     <iframe id="previewFrame" style="display:none;"></iframe>
   </section>
 </main>
 
 <footer>
-  <div class="status-left">
-    <div class="status-item">🖥 Rendu 100% local — rien n'est envoyé sur internet</div>
-  </div>
-  <div class="status-item">SpyHub Gen URL Web · v1.0</div>
+  SpyHub Gen URL Web · propulsé par un backend privé
 </footer>
 
 <div id="toast"></div>
 
 <script>
+  // URL of your Cloudflare Worker backend
+  const BACKEND_URL = 'https://spyhub-gen-backend.spyuhq.workers.dev';
+
   const codeInput = document.getElementById('codeInput');
   const lineNumbers = document.getElementById('lineNumbers');
   const charCount = document.getElementById('charCount');
   const previewFrame = document.getElementById('previewFrame');
   const emptyState = document.getElementById('emptyState');
   const urlSlug = document.getElementById('urlSlug');
+  const copyBtn = document.getElementById('copyBtn');
   const toast = document.getElementById('toast');
   const genBtn = document.getElementById('genBtn');
   const clearBtn = document.getElementById('clearBtn');
-  const downloadBtn = document.getElementById('downloadBtn');
 
   function updateLineNumbers(){
     const lines = codeInput.value.split('\n').length;
@@ -478,48 +296,63 @@
     lineNumbers.textContent = out;
     charCount.textContent = codeInput.value.length + ' caractères';
   }
-
   codeInput.addEventListener('input', updateLineNumbers);
-  codeInput.addEventListener('scroll', () => {
-    lineNumbers.scrollTop = codeInput.scrollTop;
-  });
+  codeInput.addEventListener('scroll', () => { lineNumbers.scrollTop = codeInput.scrollTop; });
   updateLineNumbers();
-
-  function randomSlug(){
-    const chars = 'abcdefghijklmnopqrstuvwxyz0123456789';
-    let s = '';
-    for(let i=0;i<8;i++) s += chars[Math.floor(Math.random()*chars.length)];
-    return s;
-  }
 
   function showToast(msg){
     toast.textContent = msg;
     toast.classList.add('show');
-    setTimeout(() => toast.classList.remove('show'), 2200);
+    setTimeout(() => toast.classList.remove('show'), 2800);
   }
 
-  function generatePreview(){
+  async function generateLink(){
     const code = codeInput.value;
+
     if(!code.trim()){
       showToast('⚠ Colle du code avant de générer');
       return;
     }
 
-    urlSlug.innerHTML = '<span class="fixed">preview://local/</span>génération...';
+    genBtn.disabled = true;
+    genBtn.textContent = '⏳ Génération...';
 
-    setTimeout(() => {
-      const slug = randomSlug();
-      urlSlug.innerHTML = '<span class="fixed">preview://local/</span>' + slug;
+    try {
+      const res = await fetch(BACKEND_URL + '/create', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ html: code })
+      });
+
+      if(!res.ok){
+        const errBody = await res.json().catch(() => ({}));
+        throw new Error(errBody.error || ('Erreur HTTP ' + res.status));
+      }
+
+      const data = await res.json();
+      const renderLink = `${BACKEND_URL}/view?id=${data.id}`;
+
+      urlSlug.innerHTML = `<a href="${renderLink}" target="_blank" rel="noopener">${renderLink}</a>`;
+      copyBtn.style.display = 'inline-block';
+      copyBtn.onclick = () => {
+        navigator.clipboard.writeText(renderLink);
+        showToast('📋 Lien copié');
+      };
 
       emptyState.style.display = 'none';
       previewFrame.style.display = 'block';
       previewFrame.srcdoc = code;
 
-      showToast('✓ Aperçu généré (rendu local, sans lien partageable)');
-    }, 500);
+      showToast('✓ Lien public généré avec succès');
+    } catch(err){
+      showToast('✗ Erreur : ' + err.message);
+    } finally {
+      genBtn.disabled = false;
+      genBtn.textContent = '⚡ Générer le lien';
+    }
   }
 
-  genBtn.addEventListener('click', generatePreview);
+  genBtn.addEventListener('click', generateLink);
 
   clearBtn.addEventListener('click', () => {
     codeInput.value = '';
@@ -527,31 +360,15 @@
     previewFrame.style.display = 'none';
     previewFrame.srcdoc = '';
     emptyState.style.display = 'flex';
-    urlSlug.innerHTML = '<span class="fixed">preview://local/</span>en-attente';
+    urlSlug.textContent = 'en attente de génération';
+    copyBtn.style.display = 'none';
     showToast('🗑 Éditeur vidé');
   });
 
-  downloadBtn.addEventListener('click', () => {
-    const code = codeInput.value;
-    if(!code.trim()){
-      showToast('⚠ Rien à télécharger');
-      return;
-    }
-    const blob = new Blob([code], {type:'text/html'});
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'site.html';
-    a.click();
-    URL.revokeObjectURL(url);
-    showToast('⬇ Fichier téléchargé : site.html');
-  });
-
-  // Ctrl+Enter to generate
   codeInput.addEventListener('keydown', (e) => {
     if((e.ctrlKey || e.metaKey) && e.key === 'Enter'){
       e.preventDefault();
-      generatePreview();
+      generateLink();
     }
   });
 </script>
