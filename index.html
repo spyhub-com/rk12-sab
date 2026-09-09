@@ -262,6 +262,87 @@
   .dbg-line.dbg-body{ color:var(--text-faint); }
   .dbg-line.dbg-ok{ color:var(--green); }
   .dbg-line.dbg-err{ color:var(--red); font-weight:600; }
+
+  /* ---- Social login buttons ---- */
+  .social-row{ display:flex; flex-direction:column; gap:10px; margin-bottom:18px; }
+  .social-btn{
+    display:flex; align-items:center; justify-content:center; gap:10px;
+    width:100%; padding:11px 0; border-radius:11px;
+    background:rgba(255,255,255,0.05); border:1px solid var(--border-soft);
+    color:var(--text); font-size:14px; font-weight:500; cursor:pointer;
+    transition:background .15s;
+  }
+  .social-btn:hover{ background:rgba(255,255,255,0.09); }
+  .social-icon{ font-weight:700; font-size:15px; }
+  .divider{ display:flex; align-items:center; text-align:center; margin-bottom:18px; color:var(--text-faint); font-size:12px; }
+  .divider::before, .divider::after{ content:""; flex:1; height:1px; background:var(--border-soft); }
+  .divider span{ padding:0 10px; }
+
+  /* ---- CGU checkbox + modal ---- */
+  .tos-row{ display:flex; align-items:flex-start; gap:8px; margin-bottom:14px; font-size:12.5px; color:var(--text-dim); }
+  .tos-row input{ margin-top:2px; }
+  .tos-row span{ color:var(--text); text-decoration:underline; cursor:pointer; }
+  .tos-modal-overlay{
+    position:fixed; inset:0; background:rgba(0,0,0,0.6); z-index:400;
+    display:flex; align-items:center; justify-content:center; padding:20px;
+    opacity:0; pointer-events:none; transition:opacity .2s;
+  }
+  .tos-modal-overlay.show{ opacity:1; pointer-events:auto; }
+  .tos-modal{
+    max-width:440px; width:100%; background:rgba(18,18,20,0.98); border:1px solid var(--border);
+    border-radius:20px; padding:26px; backdrop-filter:blur(20px);
+  }
+  .tos-modal h3{ font-size:16px; font-weight:600; margin-bottom:14px; }
+  .tos-body{ font-size:13px; color:var(--text-dim); line-height:1.6; margin-bottom:20px; max-height:40vh; overflow-y:auto; }
+
+  /* ---- Loader global ---- */
+  .global-loader{
+    position:fixed; inset:0; background:var(--bg); z-index:500;
+    display:flex; align-items:center; justify-content:center;
+    opacity:0; pointer-events:none; transition:opacity .2s;
+  }
+  .global-loader.show{ opacity:1; pointer-events:auto; }
+  .loader-spin{
+    width:34px; height:34px; border-radius:50%;
+    border:3px solid rgba(255,255,255,0.12); border-top-color:var(--accent);
+    animation:spin .7s linear infinite;
+  }
+
+  /* ---- Langue select ---- */
+  .lang-select{
+    width:100%; background:rgba(255,255,255,0.04); border:1px solid var(--border-soft);
+    border-radius:11px; padding:12px 14px; color:var(--text); font-size:14.5px; outline:none;
+  }
+
+  /* ---- Écran de bienvenue animé ---- */
+  .welcome-wrap{
+    height:100%; width:100%; display:flex; flex-direction:column;
+    align-items:center; justify-content:center; text-align:center; padding:20px;
+    animation:fadeIn .4s ease;
+  }
+  @keyframes fadeIn{ from{ opacity:0; } to{ opacity:1; } }
+  .welcome-title{ font-size:20px; font-weight:600; letter-spacing:-0.01em; margin-top:10px; max-width:340px; }
+  .welcome-sub{ color:var(--text-dim); font-size:13.5px; margin-top:6px; }
+
+  .cloud-anim-container{
+    width:220px; height:220px; padding:15px;
+    display:flex; align-items:center; justify-content:center;
+    position:relative;
+  }
+  .cloud-anim-container .cloud{
+    width:220px; display:inline; position:absolute; z-index:11;
+    animation:clouds 8s infinite; animation-timing-function:ease-in-out;
+  }
+  .cloud-anim-container .front{ padding-top:40px; margin-left:20px; animation-duration:8s; }
+  .cloud-anim-container .back{ margin-top:-26px; margin-left:130px; z-index:12; animation-duration:12s; }
+  .right-front{ width:40px; height:40px; border-radius:50% 50% 50% 0%; background-color:var(--accent); display:inline-block; margin-left:-22px; z-index:5; }
+  .left-front{ width:58px; height:58px; border-radius:50% 50% 0% 50%; background-color:var(--accent); display:inline-block; z-index:5; }
+  .right-back{ width:44px; height:44px; border-radius:50% 50% 50% 0%; background-color:var(--accent-2); display:inline-block; margin-left:-18px; z-index:5; }
+  .left-back{ width:26px; height:26px; border-radius:50% 50% 0% 50%; background-color:var(--accent-2); display:inline-block; z-index:5; }
+  .sun{ width:100px; height:100px; background:linear-gradient(to right, var(--accent-2), var(--accent)); border-radius:50px; display:inline; position:absolute; }
+  .sunshine{ animation:sunshines 2s infinite; }
+  @keyframes sunshines{ 0%{ transform:scale(1); opacity:0.5; } 100%{ transform:scale(1.4); opacity:0; } }
+  @keyframes clouds{ 0%{ transform:translateX(12px); } 50%{ transform:translateX(0px); } 100%{ transform:translateX(12px); } }
 </style>
 </head>
 <body>
@@ -317,42 +398,13 @@ function toast(msg){
 }
 
 /* =========================================================
-   DEBUG CONSOLE (mini console visible dès le login)
+   LOGS SYSTÈME (gardés en mémoire pour la console Owner, plus affichés sur le login)
    ========================================================= */
 const debugLog = [];
 function dlog(kind, msg){
   const time = new Date().toLocaleTimeString('fr-FR', { hour12:false });
   debugLog.push({ kind, msg, time });
-  if(debugLog.length > 200) debugLog.shift();
-  renderDebugConsole();
-}
-function renderDebugConsole(){
-  const box = document.getElementById('debug-console-body');
-  if(!box) return;
-  box.innerHTML = debugLog.map(l => `<div class="dbg-line dbg-${l.kind}">[${l.time}] ${escapeHtml(l.msg)}</div>`).join('');
-  box.scrollTop = box.scrollHeight;
-}
-function debugConsoleHTML(){
-  return `
-    <div class="debug-console" id="debug-console">
-      <div class="debug-console-bar" id="debug-console-bar">
-        <span>Console de debug</span>
-        <span id="debug-toggle-arrow">▾</span>
-      </div>
-      <div class="debug-console-body" id="debug-console-body"></div>
-    </div>
-  `;
-}
-function bindDebugConsoleToggle(){
-  const bar = document.getElementById('debug-console-bar');
-  const body = document.getElementById('debug-console-body');
-  if(!bar) return;
-  bar.onclick = ()=>{
-    const collapsed = body.style.display === 'none';
-    body.style.display = collapsed ? 'block' : 'none';
-    document.getElementById('debug-toggle-arrow').textContent = collapsed ? '▾' : '▸';
-  };
-  renderDebugConsole();
+  if(debugLog.length > 300) debugLog.shift();
 }
 
 /* =========================================================
@@ -399,16 +451,28 @@ function escapeHtml(s){
 /* =========================================================
    LOGIN
    ========================================================= */
+const TOS_TEXT = `En créant un compte, vous acceptez que vos informations (pseudo, mot de passe sous forme chiffrée, préférences) soient stockées de façon sécurisée dans notre base de données. Nous ne partageons aucune donnée avec des tiers. Vous pouvez demander la suppression de votre compte et de vos données à tout moment depuis les Paramètres.`;
+
 function renderLogin(mode){
   mode = mode || 'login';
   const app = document.getElementById('app');
   app.innerHTML = `
-    ${debugConsoleHTML()}
     <div class="login-wrap">
       <div class="login-card">
         <div class="login-mark">${APP_INITIAL}</div>
         <h1>${mode==='login' ? 'Connexion' : 'Créer un compte'}</h1>
         <p class="sub">${mode==='login' ? `Accède à ${APP_NAME}.` : 'Choisis un pseudo et un mot de passe.'}</p>
+
+        <div class="social-row">
+          <button class="social-btn" id="google-btn">
+            <span class="social-icon">G</span> Continuer avec Google
+          </button>
+          <button class="social-btn" id="apple-btn">
+            <span class="social-icon"></span> Continuer avec Apple
+          </button>
+        </div>
+        <div class="divider"><span>ou</span></div>
+
         <div class="field">
           <label>Pseudo</label>
           <input id="in-user" type="text" placeholder="ex : spyuhq" autocomplete="username">
@@ -417,20 +481,40 @@ function renderLogin(mode){
           <label>Mot de passe</label>
           <input id="in-pass" type="password" placeholder="••••••••" autocomplete="current-password">
         </div>
+
+        ${mode === 'register' ? `
+        <div class="tos-row">
+          <input type="checkbox" id="tos-check">
+          <label for="tos-check">J'accepte les <span id="tos-link">conditions d'utilisation</span></label>
+        </div>` : ''}
+
         <button class="btn-primary" id="submit-btn">${mode==='login' ? 'Se connecter' : "S'inscrire"}</button>
         <div class="login-error" id="login-err"></div>
         <div class="login-toggle">
           ${mode==='login' ? `Pas de compte ? <span id="toggle-mode">Créer un compte</span>` : `Déjà un compte ? <span id="toggle-mode">Se connecter</span>`}
         </div>
-        <div class="login-note">${API_BASE}</div>
       </div>
     </div>
+
+    <div class="tos-modal-overlay" id="tos-modal-overlay">
+      <div class="tos-modal">
+        <h3>Conditions d'utilisation et confidentialité</h3>
+        <div class="tos-body">${TOS_TEXT}</div>
+        <button class="btn-primary" id="tos-close">J'ai compris</button>
+      </div>
+    </div>
+
     <div class="toast" id="toast"></div>
   `;
 
-  bindDebugConsoleToggle();
-
   document.getElementById('toggle-mode').onclick = ()=> renderLogin(mode==='login' ? 'register' : 'login');
+  document.getElementById('google-btn').onclick = ()=> toast('Connexion Google — bientôt disponible');
+  document.getElementById('apple-btn').onclick = ()=> toast('Connexion Apple — bientôt disponible');
+
+  if(mode === 'register'){
+    document.getElementById('tos-link').onclick = ()=> document.getElementById('tos-modal-overlay').classList.add('show');
+    document.getElementById('tos-close').onclick = ()=> document.getElementById('tos-modal-overlay').classList.remove('show');
+  }
 
   document.getElementById('submit-btn').onclick = async ()=>{
     const u = document.getElementById('in-user').value.trim();
@@ -439,24 +523,151 @@ function renderLogin(mode){
     const btn = document.getElementById('submit-btn');
     err.style.display = 'none';
     if(!u || !p){ err.textContent = 'Remplis le pseudo et le mot de passe.'; err.style.display='block'; return; }
+    if(mode === 'register' && !document.getElementById('tos-check').checked){
+      err.textContent = "Merci d'accepter les conditions d'utilisation."; err.style.display='block'; return;
+    }
 
     btn.disabled = true;
     btn.innerHTML = '<span class="spinner"></span>';
+    showLoader();
     try{
       const data = await api(mode === 'register' ? '/auth/register' : '/auth/login', {
         method:'POST', body:{ username:u, password:p }
       });
       state.user = { username:data.username, role:data.role, token:data.token };
-      renderMain();
+      saveSession();
+      if(mode === 'register'){
+        renderAccountSetup();
+      } else {
+        renderWelcomeScreen();
+      }
     } catch(e){
       err.textContent = e.message;
       err.style.display = 'block';
     } finally{
       btn.disabled = false;
       btn.textContent = mode==='login' ? 'Se connecter' : "S'inscrire";
+      hideLoader();
     }
   };
 }
+
+/* =========================================================
+   SESSION PERSISTANTE
+   ========================================================= */
+function saveSession(){
+  localStorage.setItem('shgt_session', JSON.stringify(state.user));
+}
+function clearSession(){
+  localStorage.removeItem('shgt_session');
+}
+function loadSession(){
+  try{ return JSON.parse(localStorage.getItem('shgt_session')); }
+  catch(e){ return null; }
+}
+
+/* =========================================================
+   LOADER (petit écran de chargement entre les pages)
+   ========================================================= */
+function showLoader(){
+  let l = document.getElementById('global-loader');
+  if(!l){
+    l = document.createElement('div');
+    l.id = 'global-loader';
+    l.className = 'global-loader';
+    l.innerHTML = `<div class="loader-spin"></div>`;
+    document.body.appendChild(l);
+  }
+  l.classList.add('show');
+}
+function hideLoader(){
+  const l = document.getElementById('global-loader');
+  if(l) l.classList.remove('show');
+}
+
+/* =========================================================
+   ÉCRAN DE CONFIGURATION DE COMPTE (après inscription)
+   ========================================================= */
+const LANGUAGES = [
+  { code:'fr', label:'Français' },
+  { code:'en', label:'English' },
+  { code:'es', label:'Español' },
+  { code:'ru', label:'Русский' },
+  { code:'zh', label:'中文' },
+  { code:'ar', label:'العربية' },
+  { code:'pt', label:'Português' },
+];
+
+function renderAccountSetup(){
+  const app = document.getElementById('app');
+  app.innerHTML = `
+    <div class="login-wrap">
+      <div class="login-card" style="max-width:420px;">
+        <div class="login-mark">${APP_INITIAL}</div>
+        <h1>Configure ton compte</h1>
+        <p class="sub">Personnalise ton profil avant de commencer.</p>
+
+        <div class="field">
+          <label>Surnom affiché</label>
+          <input id="setup-nick" type="text" placeholder="${escapeHtml(state.user.username)}">
+        </div>
+        <div class="field">
+          <label>Email (optionnel)</label>
+          <input id="setup-email" type="email" placeholder="ton@email.com">
+        </div>
+        <div class="field">
+          <label>Photo de profil (URL, optionnel)</label>
+          <input id="setup-avatar" type="text" placeholder="https://...">
+        </div>
+        <div class="field">
+          <label>Langue</label>
+          <select id="setup-lang" class="lang-select">
+            ${LANGUAGES.map(l => `<option value="${l.code}" ${l.code==='fr'?'selected':''}>${l.label}</option>`).join('')}
+          </select>
+        </div>
+        <button class="btn-primary" id="setup-save-btn">Continuer</button>
+      </div>
+    </div>
+    <div class="toast" id="toast"></div>
+  `;
+
+  document.getElementById('setup-save-btn').onclick = ()=>{
+    const nick = document.getElementById('setup-nick').value.trim() || state.user.username;
+    const email = document.getElementById('setup-email').value.trim();
+    const avatar = document.getElementById('setup-avatar').value.trim();
+    const lang = document.getElementById('setup-lang').value;
+
+    state.user.nickname = nick;
+    state.user.email = email;
+    state.user.avatar = avatar;
+    state.lang = lang;
+    localStorage.setItem('shgt_lang', lang);
+    saveSession();
+    renderWelcomeScreen();
+  };
+}
+
+/* =========================================================
+   ÉCRAN DE BIENVENUE ANIMÉ
+   ========================================================= */
+function renderWelcomeScreen(){
+  const app = document.getElementById('app');
+  const name = state.user.nickname || state.user.username;
+  app.innerHTML = `
+    <div class="welcome-wrap">
+      <div class="cloud-anim-container">
+        <div class="cloud front"><span class="left-front"></span><span class="right-front"></span></div>
+        <span class="sun sunshine"></span>
+        <span class="sun"></span>
+        <div class="cloud back"><span class="left-back"></span><span class="right-back"></span></div>
+      </div>
+      <h1 class="welcome-title">Bienvenue dans ton espace de travail, ${escapeHtml(name)}</h1>
+      <p class="welcome-sub">Tout est prêt.</p>
+    </div>
+  `;
+  setTimeout(()=> renderMain(), 1800);
+}
+
 
 /* =========================================================
    MAIN LAYOUT
@@ -465,8 +676,8 @@ function navItemsFor(role){
   const base = [
     { group:'Général', items:[ { id:'overview', label:'Accueil' } ] },
     { group:'Code', items:[ { id:'lua', label:'Lua' }, { id:'devtools', label:'Dev Tools' } ] },
-    { group:'Hébergement', items:[ { id:'hosting', label:'Sites hébergés' } ] },
-    { group:'Outils', items:[ { id:'discord', label:'Annonce Discord' } ] },
+    { group:'Hébergement', items:[ { id:'hosting', label:'Sites hébergés' }, { id:'botHosting', label:'Bot Discord hébergé' } ] },
+    { group:'Outils', items:[ { id:'discord', label:'Annonce Discord' }, { id:'notes', label:'Notes' } ] },
     { group:'Compte', items:[ { id:'settings', label:'Paramètres' } ] },
   ];
   if(role === 'owner'){
@@ -478,13 +689,14 @@ function navItemsFor(role){
 function renderMain(){
   const app = document.getElementById('app');
   const NAV = navItemsFor(state.user.role);
+  const displayName = state.user.nickname || state.user.username;
   app.innerHTML = `
     <div class="main-layout">
       <div class="topbar">
         <div class="hamburger" id="hamburger-btn"><span></span><span></span><span></span></div>
         <div class="mark">${APP_INITIAL}</div>
         <div class="topbar-title">${APP_NAME}</div>
-        <div class="avatar-sm">${state.user.username.slice(0,2).toUpperCase()}</div>
+        <div class="avatar-sm">${displayName.slice(0,2).toUpperCase()}</div>
       </div>
       <div class="body-row">
         <div class="sidebar-overlay" id="sidebar-overlay"></div>
@@ -492,9 +704,9 @@ function renderMain(){
           <div class="sidebar-close"><div class="hamburger" id="sidebar-close-btn"><span></span><span></span><span></span></div></div>
           <div id="nav-container"></div>
           <div class="sidebar-footer">
-            <div class="avatar">${state.user.username.slice(0,2).toUpperCase()}</div>
+            <div class="avatar">${displayName.slice(0,2).toUpperCase()}</div>
             <div class="user-meta">
-              <div class="uname">${escapeHtml(state.user.username)}</div>
+              <div class="uname">${escapeHtml(displayName)}</div>
               <div class="urole">${state.user.role === 'owner' ? 'Owner' : 'Membre'}</div>
             </div>
             <div class="logout-btn" id="logout-btn">Quitter</div>
@@ -510,6 +722,7 @@ function renderMain(){
 
   document.getElementById('logout-btn').onclick = ()=>{
     state.user = null;
+    clearSession();
     renderLogin('login');
   };
 
@@ -547,23 +760,123 @@ function renderNav(NAV){
 
 function renderSection(id){
   const c = document.getElementById('content');
-  if(id === 'overview') return renderOverview(c);
-  if(id === 'lua') return renderCodeEditor(c, 'lua');
-  if(id === 'devtools') return renderDevTools(c);
-  if(id === 'hosting') return renderHosting(c);
-  if(id === 'discord') return renderDiscord(c);
-  if(id === 'settings') return renderSettings(c);
-  if(id === 'admin') return renderAdmin(c);
+  showLoader();
+  setTimeout(()=>{
+    if(id === 'overview') renderOverview(c);
+    else if(id === 'lua') renderCodeEditor(c, 'lua');
+    else if(id === 'devtools') renderDevTools(c);
+    else if(id === 'hosting') renderHosting(c);
+    else if(id === 'botHosting') renderBotHosting(c);
+    else if(id === 'discord') renderDiscord(c);
+    else if(id === 'notes') renderNotes(c);
+    else if(id === 'settings') renderSettings(c);
+    else if(id === 'admin') renderAdmin(c);
+    hideLoader();
+  }, 280);
+}
+
+/* ---------- Bot Discord hébergé (bientôt disponible) ---------- */
+function renderBotHosting(c){
+  c.innerHTML = `
+    <div class="content-header">
+      <h2>Bot Discord hébergé</h2>
+      <p>Héberge ton propre bot Discord directement depuis la plateforme.</p>
+    </div>
+    <div class="panel" style="text-align:center; padding:50px 20px;">
+      <div style="font-size:15px; font-weight:600; margin-bottom:8px;">Bientôt disponible</div>
+      <div style="font-size:13.5px; color:var(--text-dim); max-width:420px; margin:0 auto 20px auto;">
+        Cette fonctionnalité est en cours de construction.
+      </div>
+      <div class="panel" style="max-width:380px; margin:0 auto; background:rgba(255,255,255,0.03);">
+        <div style="display:flex; justify-content:space-between; font-size:12.5px; color:var(--text-dim); margin-bottom:6px;">
+          <span>Progression</span><span>35%</span>
+        </div>
+        <div style="height:6px; background:rgba(255,255,255,0.08); border-radius:6px; overflow:hidden;">
+          <div style="height:100%; width:35%; background:linear-gradient(120deg, var(--accent), var(--accent-2));"></div>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+/* ---------- Notes ---------- */
+function loadNotes(){
+  try{ return JSON.parse(localStorage.getItem('shgt_notes')) || []; }
+  catch(e){ return []; }
+}
+function saveNotes(notes){
+  localStorage.setItem('shgt_notes', JSON.stringify(notes));
+}
+
+function renderNotes(c){
+  let notes = loadNotes();
+  c.innerHTML = `
+    <div class="content-header">
+      <h2>Notes</h2>
+      <p>Note rapidement une idée, un bout de code ou un rappel.</p>
+    </div>
+    <div class="panel" style="margin-bottom:16px;">
+      <div class="field" style="margin-bottom:10px;">
+        <input id="note-title" type="text" placeholder="Titre de la note">
+      </div>
+      <div class="field" style="margin-bottom:14px;">
+        <textarea id="note-content" placeholder="Contenu..." style="min-height:100px;"></textarea>
+      </div>
+      <button class="pill-btn run" id="add-note-btn">Ajouter la note</button>
+    </div>
+    <div id="notes-list"></div>
+  `;
+
+  function renderList(){
+    const list = document.getElementById('notes-list');
+    if(!notes.length){
+      list.innerHTML = `<div class="empty-state"><div class="big">Aucune note</div>Ajoute ta première idée ci-dessus.</div>`;
+      return;
+    }
+    list.innerHTML = notes.slice().reverse().map((n, revIdx) => {
+      const i = notes.length - 1 - revIdx;
+      return `
+        <div class="panel" style="margin-bottom:10px;">
+          <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:10px; margin-bottom:6px;">
+            <div style="font-weight:600; font-size:14px;">${escapeHtml(n.title || 'Sans titre')}</div>
+            <button class="pill-btn danger" data-del="${i}">Supprimer</button>
+          </div>
+          <div style="font-size:13px; color:var(--text-dim); white-space:pre-wrap;">${escapeHtml(n.content)}</div>
+        </div>
+      `;
+    }).join('');
+    list.querySelectorAll('[data-del]').forEach(btn=>{
+      btn.onclick = ()=>{
+        notes.splice(btn.dataset.del, 1);
+        saveNotes(notes);
+        renderList();
+      };
+    });
+  }
+  renderList();
+
+  document.getElementById('add-note-btn').onclick = ()=>{
+    const title = document.getElementById('note-title').value.trim();
+    const content = document.getElementById('note-content').value.trim();
+    if(!content){ toast('La note est vide'); return; }
+    notes.push({ title, content });
+    saveNotes(notes);
+    document.getElementById('note-title').value = '';
+    document.getElementById('note-content').value = '';
+    renderList();
+    toast('Note ajoutée');
+  };
 }
 
 /* ---------- Accueil enrichi ---------- */
 async function renderOverview(c){
   const hour = new Date().getHours();
   const greeting = hour < 5 ? 'Bonne nuit' : hour < 12 ? 'Bonjour' : hour < 18 ? 'Bon après-midi' : 'Bonsoir';
+  const displayName = state.user.nickname || state.user.username;
 
   c.innerHTML = `
     <div class="content-header">
-      <h2>${greeting}, ${escapeHtml(state.user.username)} 👋</h2>
+      <h2>${greeting}, ${escapeHtml(displayName)}</h2>
       <p>Voici un aperçu complet de ton espace ${APP_NAME}.</p>
     </div>
 
@@ -581,16 +894,16 @@ async function renderOverview(c){
       <h3>Accès rapide</h3>
       <div class="grid-cards" id="quick-links">
         <div class="stat-card qlink" data-go="lua" style="cursor:pointer;">
-          <div class="label">Éditeur</div><div class="value" style="font-size:16px;">Lua →</div>
+          <div class="label">Éditeur</div><div class="value" style="font-size:16px;">Lua</div>
         </div>
         <div class="stat-card qlink" data-go="devtools" style="cursor:pointer;">
-          <div class="label">Éditeur</div><div class="value" style="font-size:16px;">Dev Tools →</div>
+          <div class="label">Éditeur</div><div class="value" style="font-size:16px;">Dev Tools</div>
         </div>
         <div class="stat-card qlink" data-go="hosting" style="cursor:pointer;">
-          <div class="label">Publier</div><div class="value" style="font-size:16px;">Sites hébergés →</div>
+          <div class="label">Publier</div><div class="value" style="font-size:16px;">Sites hébergés</div>
         </div>
         <div class="stat-card qlink" data-go="discord" style="cursor:pointer;">
-          <div class="label">Envoyer</div><div class="value" style="font-size:16px;">Annonce Discord →</div>
+          <div class="label">Envoyer</div><div class="value" style="font-size:16px;">Annonce Discord</div>
         </div>
       </div>
     </div>
@@ -605,16 +918,20 @@ async function renderOverview(c){
       <div class="panel">
         <div style="display:flex; flex-direction:column; gap:10px;">
           <div style="display:flex; justify-content:space-between; align-items:center;">
-            <span style="font-size:13.5px; color:var(--text-dim);">Backend (Worker)</span>
+            <span style="font-size:13.5px; color:var(--text-dim);">Backend</span>
             <span id="status-worker" style="font-size:12px; color:var(--text-faint);">Vérification…</span>
           </div>
           <div style="display:flex; justify-content:space-between; align-items:center;">
-            <span style="font-size:13.5px; color:var(--text-dim);">Moteur d'exécution (Piston)</span>
-            <span style="font-size:12px; color:var(--green);">● Public</span>
+            <span style="font-size:13.5px; color:var(--text-dim);">Moteur d'exécution</span>
+            <span style="font-size:12px; color:var(--green);">En ligne — Public</span>
+          </div>
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <span style="font-size:13.5px; color:var(--text-dim);">Hosting</span>
+            <span style="font-size:12px; color:var(--green);">En ligne — Public</span>
           </div>
           <div style="display:flex; justify-content:space-between; align-items:center;">
             <span style="font-size:13.5px; color:var(--text-dim);">Compte connecté</span>
-            <span style="font-size:12px; color:var(--text-dim);">${escapeHtml(state.user.username)}</span>
+            <span style="font-size:12px; color:var(--text-dim);">${escapeHtml(displayName)}</span>
           </div>
         </div>
       </div>
@@ -624,10 +941,10 @@ async function renderOverview(c){
       <h3>Astuces</h3>
       <div class="panel">
         <div style="display:flex; flex-direction:column; gap:12px; font-size:13.5px; color:var(--text-dim); line-height:1.5;">
-          <div>💡 Dans l'éditeur Lua, tape 2 lettres d'un mot-clé pour voir des suggestions apparaître.</div>
-          <div>💡 Dans Dev Tools, l'onglet "Browser" affiche un aperçu en direct de ton HTML/CSS/JS.</div>
-          <div>💡 Personnalise la couleur d'accent du site dans Paramètres — elle s'applique partout.</div>
-          <div>💡 Ton webhook Discord reste enregistré même après avoir quitté le site.</div>
+          <div>Dans l'éditeur Lua, tape 2 lettres d'un mot-clé pour voir des suggestions apparaître.</div>
+          <div>Dans Dev Tools, l'onglet "Browser" affiche un aperçu en direct de ton HTML/CSS/JS.</div>
+          <div>Personnalise la couleur d'accent du site dans Paramètres — elle s'applique partout.</div>
+          <div>Ton webhook Discord reste enregistré même après avoir quitté le site.</div>
         </div>
       </div>
     </div>
@@ -641,7 +958,6 @@ async function renderOverview(c){
     };
   });
 
-  // Sites récents + compteur
   try{
     const data = await api('/sites/mine');
     const sites = data.sites || [];
@@ -659,11 +975,11 @@ async function renderOverview(c){
         </div>
       `).join('');
     }
-    document.getElementById('status-worker').innerHTML = `<span style="color:var(--green)">● En ligne</span>`;
+    document.getElementById('status-worker').innerHTML = `<span style="color:var(--green)">En ligne</span>`;
   } catch(e){
     document.getElementById('ov-sites').textContent = '—';
     document.getElementById('recent-sites').innerHTML = `<div class="empty-state">Impossible de charger.</div>`;
-    document.getElementById('status-worker').innerHTML = `<span style="color:var(--red)">● Injoignable</span>`;
+    document.getElementById('status-worker').innerHTML = `<span style="color:var(--red)">Injoignable</span>`;
   }
 }
 
@@ -1333,9 +1649,15 @@ async function renderAdmin(c){
 }
 
 /* =========================================================
-   BOOT
+   BOOT — restaure la session si elle existe déjà
    ========================================================= */
-renderLogin('login');
+const savedSession = loadSession();
+if(savedSession && savedSession.token){
+  state.user = savedSession;
+  renderMain();
+} else {
+  renderLogin('login');
+}
 </script>
 </body>
 </html>
