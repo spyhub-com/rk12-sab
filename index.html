@@ -424,8 +424,8 @@ async function api(path, opts){
       body: opts.body ? JSON.stringify(opts.body) : undefined
     });
   } catch(e){
-    dlog('err', `✗ Échec réseau : ${e.message} (vérifie CORS / URL du Worker / que le Worker est bien déployé)`);
-    throw new Error("Impossible de contacter le serveur. Vérifie que le Worker est déployé.");
+    dlog('err', `✗ Échec réseau : ${e.message}`);
+    throw new Error("Backend not available at the moment, please try again.");
   }
   dlog('status', `← statut HTTP ${res.status} ${res.statusText}`);
   let rawText = '';
@@ -433,12 +433,14 @@ async function api(path, opts){
   dlog('body', `← corps brut : ${rawText.slice(0,300) || '(vide)'}`);
   let data = null;
   try{ data = JSON.parse(rawText); } catch(e){
-    dlog('err', `✗ Réponse non-JSON — le Worker a probablement planté avant de répondre en JSON`);
+    dlog('err', `✗ Réponse non-JSON (statut ${res.status})`);
   }
   if(!res.ok){
-    const msg = (data && data.error) || ("Erreur serveur (" + res.status + ")");
-    dlog('err', `✗ ${msg}`);
-    throw new Error(msg);
+    // Message technique brut gardé dans les logs internes uniquement (console Owner) ;
+    // l'utilisateur voit toujours un message propre et générique.
+    const rawMsg = (data && data.error) || rawText || ("HTTP " + res.status);
+    dlog('err', `✗ ${rawMsg}`);
+    throw new Error("Backend not available at the moment, please try again.");
   }
   dlog('ok', `✓ Requête réussie`);
   return data;
@@ -678,6 +680,7 @@ function navItemsFor(role){
     { group:'Code', items:[ { id:'lua', label:'Lua' }, { id:'devtools', label:'Dev Tools' } ] },
     { group:'Hébergement', items:[ { id:'hosting', label:'Sites hébergés' }, { id:'botHosting', label:'Bot Discord hébergé' } ] },
     { group:'Outils', items:[ { id:'discord', label:'Annonce Discord' }, { id:'notes', label:'Notes' } ] },
+    { group:'Communauté', items:[ { id:'forum', label:'Scripts partagés' } ] },
     { group:'Compte', items:[ { id:'settings', label:'Paramètres' } ] },
   ];
   if(role === 'owner'){
@@ -769,6 +772,7 @@ function renderSection(id){
     else if(id === 'botHosting') renderBotHosting(c);
     else if(id === 'discord') renderDiscord(c);
     else if(id === 'notes') renderNotes(c);
+    else if(id === 'forum') renderForum(c);
     else if(id === 'settings') renderSettings(c);
     else if(id === 'admin') renderAdmin(c);
     hideLoader();
@@ -983,7 +987,163 @@ async function renderOverview(c){
   }
 }
 
-/* ---------- Lua : exécution réelle via Piston ---------- */
+/* ---------- Forum : partage de scripts entre membres ---------- */
+function renderForum(c){
+  c.innerHTML = `
+    <div class="content-header">
+      <h2>Scripts partagés</h2>
+      <p>Publie tes scripts et découvre ceux des autres membres.</p>
+    </div>
+
+    <div class="panel" style="margin-bottom:20px;">
+      <div class="field" style="margin-bottom:10px;">
+        <label>Titre du script</label>
+        <input id="forum-title" type="text" placeholder="ex : Menu ESP simple">
+      </div>
+      <div class="field" style="margin-bottom:10px;">
+        <label>Description</label>
+        <textarea id="forum-desc" placeholder="Explique ce que fait ton script..." style="min-height:80px;"></textarea>
+      </div>
+      <div class="field" style="margin-bottom:10px;">
+        <label>Ce script est-il en loadstring ?</label>
+        <select id="forum-loadstring" class="lang-select">
+          <option value="">— Choisis une option —</option>
+          <option value="yes">Oui, c'est un loadstring</option>
+          <option value="no">Non, c'est le code complet</option>
+        </select>
+      </div>
+      <div class="field" style="margin-bottom:6px;">
+        <label>Script</label>
+        <div class="lang-tabs" style="margin-bottom:10px;">
+          <div class="lang-tab active" data-input-mode="paste">Coller le code</div>
+          <div class="lang-tab" data-input-mode="file">Envoyer un fichier (.lua / .txt)</div>
+        </div>
+        <textarea id="forum-code" placeholder="Colle ton script ici..." style="min-height:120px; font-family:'SF Mono', Menlo, monospace; font-size:13px;"></textarea>
+        <input id="forum-file" type="file" accept=".lua,.txt" class="hidden">
+      </div>
+      <button class="pill-btn run" id="forum-publish-btn" style="margin-top:8px;">Publier</button>
+    </div>
+
+    <div id="forum-list"><div class="empty-state">Chargement…</div></div>
+  `;
+
+  let inputMode = 'paste';
+  c.querySelectorAll('[data-input-mode]').forEach(el=>{
+    el.onclick = ()=>{
+      inputMode = el.dataset.inputMode;
+      c.querySelectorAll('[data-input-mode]').forEach(x=>x.classList.remove('active'));
+      el.classList.add('active');
+      const codeArea = document.getElementById('forum-code');
+      const fileInput = document.getElementById('forum-file');
+      if(inputMode === 'file'){
+        codeArea.classList.add('hidden');
+        fileInput.classList.remove('hidden');
+      } else {
+        codeArea.classList.remove('hidden');
+        fileInput.classList.add('hidden');
+      }
+    };
+  });
+
+  async function loadForum(){
+    const list = document.getElementById('forum-list');
+    try{
+      const data = await api('/forum/posts');
+      const posts = data.posts || [];
+      if(!posts.length){
+        list.innerHTML = `<div class="empty-state"><div class="big">Aucun script partagé encore</div>Sois le premier à en publier un.</div>`;
+        return;
+      }
+      list.innerHTML = posts.map(p => `
+        <div class="panel" style="margin-bottom:12px;">
+          <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:10px; margin-bottom:8px;">
+            <div>
+              <div style="font-weight:600; font-size:15px;">${escapeHtml(p.title)}</div>
+              <div style="font-size:12px; color:var(--text-faint);">par ${escapeHtml(p.author)} · ${p.isLoadstring ? 'Loadstring' : 'Code complet'}</div>
+            </div>
+            ${(p.author === state.user.username || state.user.role === 'owner') ? `<button class="pill-btn danger" data-del-post="${p.id}">Supprimer</button>` : ''}
+          </div>
+          <div style="font-size:13.5px; color:var(--text-dim); margin-bottom:10px; white-space:pre-wrap;">${escapeHtml(p.description)}</div>
+          <div class="console-body" style="border:1px solid var(--border-soft); border-radius:10px; max-height:160px; margin-bottom:10px;">${escapeHtml(p.code)}</div>
+          <div style="display:flex; gap:8px;">
+            <button class="pill-btn ${p.liked ? 'run' : ''}" data-like="${p.id}">J'aime (${p.likeCount || 0})</button>
+            <button class="pill-btn" data-copy-code="${p.id}">Copier le script</button>
+          </div>
+        </div>
+      `).join('');
+
+      list.querySelectorAll('[data-like]').forEach(btn=>{
+        btn.onclick = async ()=>{
+          try{
+            await api('/forum/posts/' + btn.dataset.like + '/like', { method:'POST' });
+            loadForum();
+          } catch(e){ toast(e.message); }
+        };
+      });
+      list.querySelectorAll('[data-copy-code]').forEach(btn=>{
+        btn.onclick = ()=>{
+          const post = posts.find(p => p.id === btn.dataset.copyCode);
+          navigator.clipboard.writeText(post.code);
+          toast('Script copié');
+        };
+      });
+      list.querySelectorAll('[data-del-post]').forEach(btn=>{
+        btn.onclick = async ()=>{
+          if(!confirm('Supprimer ce script partagé ?')) return;
+          try{
+            await api('/forum/posts/' + btn.dataset.delPost, { method:'DELETE' });
+            toast('Script supprimé');
+            loadForum();
+          } catch(e){ toast(e.message); }
+        };
+      });
+    } catch(e){
+      list.innerHTML = `<div class="empty-state"><div class="big" style="color:var(--red)">Impossible de charger les scripts</div>${escapeHtml(e.message)}</div>`;
+    }
+  }
+  loadForum();
+
+  document.getElementById('forum-publish-btn').onclick = async ()=>{
+    const title = document.getElementById('forum-title').value.trim();
+    const description = document.getElementById('forum-desc').value.trim();
+    const loadstringVal = document.getElementById('forum-loadstring').value;
+    const btn = document.getElementById('forum-publish-btn');
+
+    if(!title){ toast('Le titre est obligatoire'); return; }
+    if(!description){ toast('La description est obligatoire'); return; }
+    if(loadstringVal !== 'yes' && loadstringVal !== 'no'){ toast('Précise si le script est en loadstring'); return; }
+
+    let code = '';
+    if(inputMode === 'file'){
+      const fileInput = document.getElementById('forum-file');
+      if(!fileInput.files.length){ toast('Choisis un fichier .lua ou .txt'); return; }
+      code = await fileInput.files[0].text();
+    } else {
+      code = document.getElementById('forum-code').value;
+    }
+    if(!code.trim()){ toast('Le script est vide'); return; }
+
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner"></span>';
+    try{
+      await api('/forum/posts', {
+        method:'POST',
+        body:{ title, description, code, isLoadstring: loadstringVal === 'yes' }
+      });
+      document.getElementById('forum-title').value = '';
+      document.getElementById('forum-desc').value = '';
+      document.getElementById('forum-code').value = '';
+      document.getElementById('forum-loadstring').value = '';
+      toast('Script publié');
+      loadForum();
+    } catch(e){
+      toast(e.message);
+    } finally{
+      btn.disabled = false;
+      btn.textContent = 'Publier';
+    }
+  };
+}
 function renderCodeEditor(c, kind){
   c.innerHTML = `
     <div class="content-header">
