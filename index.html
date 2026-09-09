@@ -33,7 +33,7 @@
   ::-webkit-scrollbar-track{ background:transparent; }
 
   /* ---- Login ---- */
-  .login-wrap{ height:100%; width:100%; display:flex; align-items:center; justify-content:center; padding:20px; }
+  .login-wrap{ height:100%; width:100%; display:flex; align-items:center; justify-content:center; padding:20px; padding-top:80px; }
   .login-card{ width:100%; max-width:380px; padding:36px 32px; background:var(--glass); border:1px solid var(--border);
     border-radius:24px; backdrop-filter:blur(30px) saturate(160%); -webkit-backdrop-filter:blur(30px) saturate(160%);
     box-shadow:0 30px 80px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.06);
@@ -239,6 +239,29 @@
   .spinner{ display:inline-block; width:13px; height:13px; border:2px solid rgba(0,0,0,0.3);
     border-top-color:currentColor; border-radius:50%; animation:spin .6s linear infinite; }
   @keyframes spin{ to{ transform:rotate(360deg); } }
+
+  /* ---- Debug console ---- */
+  .debug-console{
+    position:fixed; top:0; left:0; right:0; z-index:300;
+    background:rgba(8,8,9,0.97); border-bottom:1px solid var(--border);
+    backdrop-filter:blur(20px);
+    font-family:"SF Mono", Menlo, Consolas, monospace;
+  }
+  .debug-console-bar{
+    display:flex; align-items:center; justify-content:space-between;
+    padding:8px 14px; font-size:12px; color:var(--text-dim); cursor:pointer;
+    user-select:none;
+  }
+  .debug-console-body{
+    max-height:34vh; overflow-y:auto; padding:0 14px 10px 14px;
+    font-size:11.5px; line-height:1.6;
+  }
+  .dbg-line{ white-space:pre-wrap; word-break:break-all; color:var(--text-dim); }
+  .dbg-line.dbg-req{ color:#7fb8ff; }
+  .dbg-line.dbg-status{ color:var(--text-dim); }
+  .dbg-line.dbg-body{ color:var(--text-faint); }
+  .dbg-line.dbg-ok{ color:var(--green); }
+  .dbg-line.dbg-err{ color:var(--red); font-weight:600; }
 </style>
 </head>
 <body>
@@ -294,25 +317,78 @@ function toast(msg){
 }
 
 /* =========================================================
+   DEBUG CONSOLE (mini console visible dès le login)
+   ========================================================= */
+const debugLog = [];
+function dlog(kind, msg){
+  const time = new Date().toLocaleTimeString('fr-FR', { hour12:false });
+  debugLog.push({ kind, msg, time });
+  if(debugLog.length > 200) debugLog.shift();
+  renderDebugConsole();
+}
+function renderDebugConsole(){
+  const box = document.getElementById('debug-console-body');
+  if(!box) return;
+  box.innerHTML = debugLog.map(l => `<div class="dbg-line dbg-${l.kind}">[${l.time}] ${escapeHtml(l.msg)}</div>`).join('');
+  box.scrollTop = box.scrollHeight;
+}
+function debugConsoleHTML(){
+  return `
+    <div class="debug-console" id="debug-console">
+      <div class="debug-console-bar" id="debug-console-bar">
+        <span>Console de debug</span>
+        <span id="debug-toggle-arrow">▾</span>
+      </div>
+      <div class="debug-console-body" id="debug-console-body"></div>
+    </div>
+  `;
+}
+function bindDebugConsoleToggle(){
+  const bar = document.getElementById('debug-console-bar');
+  const body = document.getElementById('debug-console-body');
+  if(!bar) return;
+  bar.onclick = ()=>{
+    const collapsed = body.style.display === 'none';
+    body.style.display = collapsed ? 'block' : 'none';
+    document.getElementById('debug-toggle-arrow').textContent = collapsed ? '▾' : '▸';
+  };
+  renderDebugConsole();
+}
+
+/* =========================================================
    API
    ========================================================= */
 async function api(path, opts){
   opts = opts || {};
   const headers = Object.assign({ 'Content-Type': 'application/json' }, opts.headers || {});
   if(state.user && state.user.token) headers['Authorization'] = 'Bearer ' + state.user.token;
+  const fullUrl = API_BASE + path;
+  dlog('req', `→ ${opts.method || 'GET'} ${fullUrl}` + (opts.body ? ` body=${JSON.stringify(opts.body).slice(0,200)}` : ''));
   let res;
   try{
-    res = await fetch(API_BASE + path, {
+    res = await fetch(fullUrl, {
       method: opts.method || 'GET',
       headers,
       body: opts.body ? JSON.stringify(opts.body) : undefined
     });
   } catch(e){
+    dlog('err', `✗ Échec réseau : ${e.message} (vérifie CORS / URL du Worker / que le Worker est bien déployé)`);
     throw new Error("Impossible de contacter le serveur. Vérifie que le Worker est déployé.");
   }
+  dlog('status', `← statut HTTP ${res.status} ${res.statusText}`);
+  let rawText = '';
+  try{ rawText = await res.clone().text(); } catch(e){}
+  dlog('body', `← corps brut : ${rawText.slice(0,300) || '(vide)'}`);
   let data = null;
-  try{ data = await res.json(); } catch(e){}
-  if(!res.ok) throw new Error((data && data.error) || ("Erreur serveur (" + res.status + ")"));
+  try{ data = JSON.parse(rawText); } catch(e){
+    dlog('err', `✗ Réponse non-JSON — le Worker a probablement planté avant de répondre en JSON`);
+  }
+  if(!res.ok){
+    const msg = (data && data.error) || ("Erreur serveur (" + res.status + ")");
+    dlog('err', `✗ ${msg}`);
+    throw new Error(msg);
+  }
+  dlog('ok', `✓ Requête réussie`);
   return data;
 }
 
@@ -327,6 +403,7 @@ function renderLogin(mode){
   mode = mode || 'login';
   const app = document.getElementById('app');
   app.innerHTML = `
+    ${debugConsoleHTML()}
     <div class="login-wrap">
       <div class="login-card">
         <div class="login-mark">${APP_INITIAL}</div>
@@ -350,6 +427,8 @@ function renderLogin(mode){
     </div>
     <div class="toast" id="toast"></div>
   `;
+
+  bindDebugConsoleToggle();
 
   document.getElementById('toggle-mode').onclick = ()=> renderLogin(mode==='login' ? 'register' : 'login');
 
@@ -470,49 +549,131 @@ function renderSection(id){
   const c = document.getElementById('content');
   if(id === 'overview') return renderOverview(c);
   if(id === 'lua') return renderCodeEditor(c, 'lua');
-  if(id === 'devtools') return renderCodeEditor(c, 'devtools');
+  if(id === 'devtools') return renderDevTools(c);
   if(id === 'hosting') return renderHosting(c);
   if(id === 'discord') return renderDiscord(c);
   if(id === 'settings') return renderSettings(c);
   if(id === 'admin') return renderAdmin(c);
 }
 
-/* ---------- Accueil ---------- */
+/* ---------- Accueil enrichi ---------- */
 async function renderOverview(c){
+  const hour = new Date().getHours();
+  const greeting = hour < 5 ? 'Bonne nuit' : hour < 12 ? 'Bonjour' : hour < 18 ? 'Bon après-midi' : 'Bonsoir';
+
   c.innerHTML = `
     <div class="content-header">
-      <h2>Bonjour, ${escapeHtml(state.user.username)}</h2>
-      <p>Vue d'ensemble de ton espace.</p>
+      <h2>${greeting}, ${escapeHtml(state.user.username)} 👋</h2>
+      <p>Voici un aperçu complet de ton espace ${APP_NAME}.</p>
     </div>
-    <div class="grid-cards" id="ov-cards">
-      <div class="stat-card"><div class="label">Sites hébergés</div><div class="value accent">…</div></div>
+
+    <div class="grid-cards" id="ov-cards" style="margin-bottom:24px;">
+      <div class="stat-card"><div class="label">Sites hébergés</div><div class="value accent" id="ov-sites">…</div></div>
       <div class="stat-card"><div class="label">Rôle</div><div class="value">${state.user.role === 'owner' ? 'Owner' : 'Membre'}</div></div>
       <div class="stat-card"><div class="label">Webhook Discord</div><div class="value">${state.savedWebhook ? 'Enregistré' : 'Aucun'}</div></div>
+      <div class="stat-card"><div class="label">Thème actif</div><div class="value" style="display:flex; align-items:center; gap:8px;">
+        <span style="width:16px; height:16px; border-radius:5px; display:inline-block; background:linear-gradient(120deg, ${currentTheme.accent}, ${currentTheme.accent2});"></span>
+        Personnalisé
+      </div></div>
+    </div>
+
+    <div class="settings-section">
+      <h3>Accès rapide</h3>
+      <div class="grid-cards" id="quick-links">
+        <div class="stat-card qlink" data-go="lua" style="cursor:pointer;">
+          <div class="label">Éditeur</div><div class="value" style="font-size:16px;">Lua →</div>
+        </div>
+        <div class="stat-card qlink" data-go="devtools" style="cursor:pointer;">
+          <div class="label">Éditeur</div><div class="value" style="font-size:16px;">Dev Tools →</div>
+        </div>
+        <div class="stat-card qlink" data-go="hosting" style="cursor:pointer;">
+          <div class="label">Publier</div><div class="value" style="font-size:16px;">Sites hébergés →</div>
+        </div>
+        <div class="stat-card qlink" data-go="discord" style="cursor:pointer;">
+          <div class="label">Envoyer</div><div class="value" style="font-size:16px;">Annonce Discord →</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="settings-section">
+      <h3>Tes derniers sites</h3>
+      <div class="panel" id="recent-sites"><div class="empty-state">Chargement…</div></div>
+    </div>
+
+    <div class="settings-section">
+      <h3>Statut de la plateforme</h3>
+      <div class="panel">
+        <div style="display:flex; flex-direction:column; gap:10px;">
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <span style="font-size:13.5px; color:var(--text-dim);">Backend (Worker)</span>
+            <span id="status-worker" style="font-size:12px; color:var(--text-faint);">Vérification…</span>
+          </div>
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <span style="font-size:13.5px; color:var(--text-dim);">Moteur d'exécution (Piston)</span>
+            <span style="font-size:12px; color:var(--green);">● Public</span>
+          </div>
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <span style="font-size:13.5px; color:var(--text-dim);">Compte connecté</span>
+            <span style="font-size:12px; color:var(--text-dim);">${escapeHtml(state.user.username)}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="settings-section">
+      <h3>Astuces</h3>
+      <div class="panel">
+        <div style="display:flex; flex-direction:column; gap:12px; font-size:13.5px; color:var(--text-dim); line-height:1.5;">
+          <div>💡 Dans l'éditeur Lua, tape 2 lettres d'un mot-clé pour voir des suggestions apparaître.</div>
+          <div>💡 Dans Dev Tools, l'onglet "Browser" affiche un aperçu en direct de ton HTML/CSS/JS.</div>
+          <div>💡 Personnalise la couleur d'accent du site dans Paramètres — elle s'applique partout.</div>
+          <div>💡 Ton webhook Discord reste enregistré même après avoir quitté le site.</div>
+        </div>
+      </div>
     </div>
   `;
+
+  c.querySelectorAll('.qlink').forEach(el=>{
+    el.onclick = ()=>{
+      state.section = el.dataset.go;
+      renderNav(navItemsFor(state.user.role));
+      renderSection(state.section);
+    };
+  });
+
+  // Sites récents + compteur
   try{
     const data = await api('/sites/mine');
-    document.querySelector('#ov-cards .stat-card .value.accent').textContent = (data.sites || []).length;
+    const sites = data.sites || [];
+    document.getElementById('ov-sites').textContent = sites.length;
+    const recentBox = document.getElementById('recent-sites');
+    if(!sites.length){
+      recentBox.innerHTML = `<div class="empty-state"><div class="big">Aucun site publié encore</div>Va dans "Sites hébergés" pour créer le premier.</div>`;
+    } else {
+      recentBox.innerHTML = sites.slice(-3).reverse().map(s => `
+        <div class="site-row">
+          <div>
+            <div class="name">${escapeHtml(s.name)}</div>
+            <div class="link">${API_BASE}/site/${s.id}</div>
+          </div>
+        </div>
+      `).join('');
+    }
+    document.getElementById('status-worker').innerHTML = `<span style="color:var(--green)">● En ligne</span>`;
   } catch(e){
-    document.querySelector('#ov-cards .stat-card .value.accent').textContent = '—';
+    document.getElementById('ov-sites').textContent = '—';
+    document.getElementById('recent-sites').innerHTML = `<div class="empty-state">Impossible de charger.</div>`;
+    document.getElementById('status-worker').innerHTML = `<span style="color:var(--red)">● Injoignable</span>`;
   }
 }
 
-/* ---------- Lua / Dev Tools : exécution réelle via Piston ---------- */
+/* ---------- Lua : exécution réelle via Piston ---------- */
 function renderCodeEditor(c, kind){
-  const isLua = kind === 'lua';
-
   c.innerHTML = `
     <div class="content-header">
-      <h2>${isLua ? 'Lua' : 'Dev Tools'}</h2>
-      <p>${isLua ? "Écris ton script Lua et exécute-le pour de vrai." : "Exécute du Python ou du JavaScript pour de vrai."}</p>
+      <h2>Lua</h2>
+      <p>Écris ton script Lua et exécute-le pour de vrai.</p>
     </div>
-    ${!isLua ? `
-      <div class="lang-tabs" id="lang-tabs">
-        <div class="lang-tab active" data-lang="python">Python</div>
-        <div class="lang-tab" data-lang="javascript">JavaScript</div>
-      </div>
-    ` : ''}
     <div class="editor-wrap">
       <div class="editor-pane">
         <div class="pane-bar">
@@ -522,7 +683,7 @@ function renderCodeEditor(c, kind){
             <button class="pill-btn run" id="run-btn">Exécuter</button>
           </div>
         </div>
-        <textarea class="code-input" id="code-input" spellcheck="false" placeholder="${isLua ? '-- écris ton script Lua ici' : '# écris ton script ici'}"></textarea>
+        <textarea class="code-input" id="code-input" spellcheck="false" placeholder="-- écris ton script Lua ici"></textarea>
       </div>
       <div class="console-pane">
         <div class="pane-bar">
@@ -538,50 +699,36 @@ function renderCodeEditor(c, kind){
     <div class="autocomplete-box" id="autocomplete"></div>
   `;
 
-  let currentLang = isLua ? 'lua' : 'python';
-
-  if(!isLua){
-    c.querySelectorAll('#lang-tabs .lang-tab').forEach(el=>{
-      el.onclick = ()=>{
-        c.querySelectorAll('#lang-tabs .lang-tab').forEach(x=>x.classList.remove('active'));
-        el.classList.add('active');
-        currentLang = el.dataset.lang;
-      };
-    });
-  }
-
   const input = document.getElementById('code-input');
   const autoBox = document.getElementById('autocomplete');
 
-  if(isLua){
-    input.addEventListener('keyup', ()=>{
-      const val = input.value;
-      const pos = input.selectionStart;
-      const before = val.slice(0, pos);
-      const match = before.match(/[a-zA-Z_]+$/);
-      if(match && match[0].length >= 2){
-        const word = match[0];
-        const sugg = LUA_KEYWORDS.filter(k => k.startsWith(word) && k !== word);
-        if(sugg.length){
-          autoBox.style.display = 'block';
-          autoBox.style.left = '20px';
-          autoBox.style.top = '44px';
-          autoBox.innerHTML = sugg.slice(0,6).map(s => `<div class="autocomplete-item" data-word="${s}">${s}</div>`).join('');
-          autoBox.querySelectorAll('.autocomplete-item').forEach(item=>{
-            item.onclick = ()=>{
-              const w = item.dataset.word;
-              input.value = before.slice(0, before.length - word.length) + w + val.slice(pos);
-              autoBox.style.display = 'none';
-              input.focus();
-            };
-          });
-          return;
-        }
+  input.addEventListener('keyup', ()=>{
+    const val = input.value;
+    const pos = input.selectionStart;
+    const before = val.slice(0, pos);
+    const match = before.match(/[a-zA-Z_]+$/);
+    if(match && match[0].length >= 2){
+      const word = match[0];
+      const sugg = LUA_KEYWORDS.filter(k => k.startsWith(word) && k !== word);
+      if(sugg.length){
+        autoBox.style.display = 'block';
+        autoBox.style.left = '20px';
+        autoBox.style.top = '44px';
+        autoBox.innerHTML = sugg.slice(0,6).map(s => `<div class="autocomplete-item" data-word="${s}">${s}</div>`).join('');
+        autoBox.querySelectorAll('.autocomplete-item').forEach(item=>{
+          item.onclick = ()=>{
+            const w = item.dataset.word;
+            input.value = before.slice(0, before.length - word.length) + w + val.slice(pos);
+            autoBox.style.display = 'none';
+            input.focus();
+          };
+        });
+        return;
       }
-      autoBox.style.display = 'none';
-    });
-    input.addEventListener('blur', ()=> setTimeout(()=> autoBox.style.display='none', 150));
-  }
+    }
+    autoBox.style.display = 'none';
+  });
+  input.addEventListener('blur', ()=> setTimeout(()=> autoBox.style.display='none', 150));
 
   document.getElementById('run-btn').onclick = async ()=>{
     const body = document.getElementById('console-body');
@@ -596,12 +743,10 @@ function renderCodeEditor(c, kind){
     body.innerHTML = `<div class="sys">// Exécution en cours…</div>`;
 
     try{
-      const langMap = { lua:'lua', python:'python', javascript:'javascript' };
-      const piston_lang = langMap[currentLang];
       const res = await fetch('https://emkc.org/api/v2/piston/execute', {
         method:'POST',
         headers:{'Content-Type':'application/json'},
-        body: JSON.stringify({ language: piston_lang, version: '*', files: [{ content: code }] })
+        body: JSON.stringify({ language: 'lua', version: '*', files: [{ content: code }] })
       });
       const data = await res.json();
       const out = (data.run && data.run.stdout) || '';
@@ -622,14 +767,239 @@ function renderCodeEditor(c, kind){
   };
 
   document.getElementById('dl-btn').onclick = ()=>{
-    const ext = isLua ? 'lua' : (currentLang === 'python' ? 'py' : 'js');
+    const blob = new Blob([input.value], {type:'text/plain'});
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = `script.lua`;
+    a.click();
+  };
+
+  document.getElementById('copy-console').onclick = ()=>{
+    navigator.clipboard.writeText(document.getElementById('console-body').innerText);
+    toast('Console copiée');
+  };
+  document.getElementById('clear-console').onclick = ()=>{
+    document.getElementById('console-body').innerHTML = `<div class="sys">// Console vidée.</div>`;
+  };
+}
+
+/* ---------- Dev Tools : éditeur multi-fichiers (HTML/CSS/JS + preview) + exécution Python/JS ---------- */
+const JS_KEYWORDS = ["const","let","var","function","return","if","else","for","while","class","import","export","async","await","true","false","null","undefined","console.log","document","window"];
+const CSS_KEYWORDS = ["display","flex","grid","color","background","margin","padding","border","width","height","position","absolute","relative","font-size","font-weight","border-radius","transition","transform"];
+const HTML_KEYWORDS = ["div","span","button","input","textarea","section","header","footer","nav","h1","h2","h3","p","a","img","ul","li","form","class","id"];
+
+const devFiles = {
+  html: { name:'index.html', content: `<h1>Hello world</h1>\n<p>Modifie ce fichier pour commencer.</p>\n<button onclick="sayHi()">Clique-moi</button>` },
+  css:  { name:'style.css', content: `body {\n  font-family: sans-serif;\n  background: #111;\n  color: #eee;\n  padding: 40px;\n}` },
+  js:   { name:'script.js', content: `function sayHi(){\n  console.log("Bonjour !");\n  alert("Bonjour !");\n}` }
+};
+let devActiveTab = 'html';
+let devMode = 'web'; // 'web' = éditeur multi-fichiers, 'run' = exécution Python/JS
+
+function devKeywordsFor(tab){
+  if(tab === 'html') return HTML_KEYWORDS;
+  if(tab === 'css') return CSS_KEYWORDS;
+  return JS_KEYWORDS;
+}
+
+function buildPreviewDoc(){
+  return `<!DOCTYPE html><html><head><style>${devFiles.css.content}</style></head><body>${devFiles.html.content}<script>${devFiles.js.content}<\/script></body></html>`;
+}
+
+function renderDevTools(c){
+  c.innerHTML = `
+    <div class="content-header">
+      <h2>Dev Tools</h2>
+      <p>Construis un mini-site multi-fichiers avec preview live, ou exécute du Python/JavaScript directement.</p>
+    </div>
+    <div class="lang-tabs" id="mode-tabs">
+      <div class="lang-tab ${devMode==='web'?'active':''}" data-mode="web">Éditeur web</div>
+      <div class="lang-tab ${devMode==='run'?'active':''}" data-mode="run">Exécuter Python / JS</div>
+    </div>
+    <div id="dev-body"></div>
+  `;
+
+  c.querySelectorAll('#mode-tabs .lang-tab').forEach(el=>{
+    el.onclick = ()=>{ devMode = el.dataset.mode; renderDevTools(c); };
+  });
+
+  if(devMode === 'web') renderDevWebEditor(document.getElementById('dev-body'));
+  else renderDevRunEditor(document.getElementById('dev-body'));
+}
+
+function renderDevWebEditor(host){
+  host.innerHTML = `
+    <div class="pane-bar" style="border:1px solid var(--border); border-radius:var(--radius) var(--radius) 0 0; background:var(--glass);">
+      <div class="tools" style="gap:4px;">
+        <div class="pill-btn ${devActiveTab==='html'?'run':''}" data-tab="html" style="cursor:pointer;">index.html</div>
+        <div class="pill-btn ${devActiveTab==='css'?'run':''}" data-tab="css" style="cursor:pointer;">style.css</div>
+        <div class="pill-btn ${devActiveTab==='js'?'run':''}" data-tab="js" style="cursor:pointer;">script.js</div>
+        <div class="pill-btn ${devActiveTab==='preview'?'run':''}" data-tab="preview" style="cursor:pointer;">Browser</div>
+      </div>
+      <button class="pill-btn" id="dev-dl-btn">Télécharger tout</button>
+    </div>
+    <div class="editor-wrap" style="margin-top:0;">
+      <div class="editor-pane" style="border-radius:0 0 var(--radius) var(--radius); ${devActiveTab==='preview' ? 'display:none;' : ''}">
+        <textarea class="code-input" id="dev-code-input" spellcheck="false"></textarea>
+        <div class="autocomplete-box" id="dev-autocomplete"></div>
+      </div>
+      <iframe id="dev-preview" style="${devActiveTab==='preview' ? 'display:flex; flex:1;' : 'display:none;'} border:1px solid var(--border); border-radius:var(--radius); background:#fff;"></iframe>
+    </div>
+  `;
+
+  host.querySelectorAll('[data-tab]').forEach(el=>{
+    el.onclick = ()=>{
+      // sauvegarde le fichier courant avant de changer d'onglet
+      if(devActiveTab !== 'preview'){
+        devFiles[devActiveTab].content = document.getElementById('dev-code-input').value;
+      }
+      devActiveTab = el.dataset.tab;
+      renderDevWebEditor(host);
+    };
+  });
+
+  if(devActiveTab === 'preview'){
+    document.getElementById('dev-preview').srcdoc = buildPreviewDoc();
+  } else {
+    const input = document.getElementById('dev-code-input');
+    input.value = devFiles[devActiveTab].content;
+    input.focus();
+
+    const autoBox = document.getElementById('dev-autocomplete');
+    input.addEventListener('keyup', ()=>{
+      devFiles[devActiveTab].content = input.value;
+      const val = input.value;
+      const pos = input.selectionStart;
+      const before = val.slice(0, pos);
+      const match = before.match(/[a-zA-Z.-]+$/);
+      if(match && match[0].length >= 2){
+        const word = match[0];
+        const keywords = devKeywordsFor(devActiveTab);
+        const sugg = keywords.filter(k => k.startsWith(word) && k !== word);
+        if(sugg.length){
+          autoBox.style.display = 'block';
+          autoBox.style.left = '20px';
+          autoBox.style.top = '44px';
+          autoBox.innerHTML = sugg.slice(0,6).map(s => `<div class="autocomplete-item" data-word="${s}">${s}</div>`).join('');
+          autoBox.querySelectorAll('.autocomplete-item').forEach(item=>{
+            item.onclick = ()=>{
+              const w = item.dataset.word;
+              input.value = before.slice(0, before.length - word.length) + w + val.slice(pos);
+              devFiles[devActiveTab].content = input.value;
+              autoBox.style.display = 'none';
+              input.focus();
+            };
+          });
+          return;
+        }
+      }
+      autoBox.style.display = 'none';
+    });
+    input.addEventListener('blur', ()=>{
+      devFiles[devActiveTab].content = input.value;
+      setTimeout(()=> autoBox.style.display='none', 150);
+    });
+  }
+
+  document.getElementById('dev-dl-btn').onclick = ()=>{
+    if(devActiveTab !== 'preview'){
+      devFiles[devActiveTab].content = document.getElementById('dev-code-input').value;
+    }
+    Object.values(devFiles).forEach(f=>{
+      const blob = new Blob([f.content], {type:'text/plain'});
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = f.name;
+      a.click();
+    });
+    toast('Fichiers téléchargés');
+  };
+}
+
+function renderDevRunEditor(host){
+  host.innerHTML = `
+    <div class="lang-tabs" id="lang-tabs">
+      <div class="lang-tab active" data-lang="python">Python</div>
+      <div class="lang-tab" data-lang="javascript">JavaScript</div>
+    </div>
+    <div class="editor-wrap">
+      <div class="editor-pane">
+        <div class="pane-bar">
+          <span>Script</span>
+          <div class="tools">
+            <button class="pill-btn" id="dl-btn">Télécharger</button>
+            <button class="pill-btn run" id="run-btn">Exécuter</button>
+          </div>
+        </div>
+        <textarea class="code-input" id="code-input" spellcheck="false" placeholder="# écris ton script ici"></textarea>
+      </div>
+      <div class="console-pane">
+        <div class="pane-bar">
+          <span>Console</span>
+          <div class="tools">
+            <button class="pill-btn" id="copy-console">Copier</button>
+            <button class="pill-btn" id="clear-console">Vider</button>
+          </div>
+        </div>
+        <div class="console-body" id="console-body"><div class="sys">// La console s'affichera ici après exécution.</div></div>
+      </div>
+    </div>
+  `;
+
+  let currentLang = 'python';
+  host.querySelectorAll('#lang-tabs .lang-tab').forEach(el=>{
+    el.onclick = ()=>{
+      host.querySelectorAll('#lang-tabs .lang-tab').forEach(x=>x.classList.remove('active'));
+      el.classList.add('active');
+      currentLang = el.dataset.lang;
+    };
+  });
+
+  const input = document.getElementById('code-input');
+
+  document.getElementById('run-btn').onclick = async ()=>{
+    const body = document.getElementById('console-body');
+    const code = input.value;
+    const runBtn = document.getElementById('run-btn');
+    if(!code.trim()){
+      body.innerHTML = `<div class="err">Erreur : aucun code à exécuter.</div>`;
+      return;
+    }
+    runBtn.disabled = true;
+    runBtn.innerHTML = '<span class="spinner"></span>';
+    body.innerHTML = `<div class="sys">// Exécution en cours…</div>`;
+    try{
+      const res = await fetch('https://emkc.org/api/v2/piston/execute', {
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({ language: currentLang, version: '*', files: [{ content: code }] })
+      });
+      const data = await res.json();
+      const out = (data.run && data.run.stdout) || '';
+      const errOut = (data.run && data.run.stderr) || '';
+      const compileErr = (data.compile && data.compile.stderr) || '';
+      let html = '';
+      if(out) html += `<div class="ok">${escapeHtml(out)}</div>`;
+      if(compileErr) html += `<div class="err">${escapeHtml(compileErr)}</div>`;
+      if(errOut) html += `<div class="err">${escapeHtml(errOut)}</div>`;
+      if(!out && !errOut && !compileErr) html = `<div class="sys">// Aucune sortie.</div>`;
+      body.innerHTML = html;
+    } catch(e){
+      body.innerHTML = `<div class="err">Erreur d'exécution : ${escapeHtml(e.message)}</div>`;
+    } finally{
+      runBtn.disabled = false;
+      runBtn.textContent = 'Exécuter';
+    }
+  };
+
+  document.getElementById('dl-btn').onclick = ()=>{
+    const ext = currentLang === 'python' ? 'py' : 'js';
     const blob = new Blob([input.value], {type:'text/plain'});
     const a = document.createElement('a');
     a.href = URL.createObjectURL(blob);
     a.download = `script.${ext}`;
     a.click();
   };
-
   document.getElementById('copy-console').onclick = ()=>{
     navigator.clipboard.writeText(document.getElementById('console-body').innerText);
     toast('Console copiée');
