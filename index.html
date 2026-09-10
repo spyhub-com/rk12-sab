@@ -23,11 +23,11 @@
     font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Segoe UI", Roboto, sans-serif;
   }
   *{box-sizing:border-box; margin:0; padding:0;}
-  html,body{ background:var(--bg); color:var(--text); height:100%; -webkit-font-smoothing:antialiased; overflow:hidden; }
+  html,body{ background:var(--bg); color:var(--text); min-height:100%; -webkit-font-smoothing:antialiased; overflow-y:auto; overflow-x:hidden; }
   body{ background-image:
       radial-gradient(circle at 12% 15%, color-mix(in srgb, var(--accent) 10%, transparent), transparent 45%),
       radial-gradient(circle at 88% 82%, color-mix(in srgb, var(--accent-2) 8%, transparent), transparent 50%); }
-  #app{ height:100vh; width:100vw; }
+  #app{ min-height:100vh; width:100vw; }
   ::-webkit-scrollbar{ width:8px; height:8px; }
   ::-webkit-scrollbar-thumb{ background:rgba(255,255,255,0.12); border-radius:8px; }
   ::-webkit-scrollbar-track{ background:transparent; }
@@ -83,7 +83,7 @@
     display:flex; align-items:center; justify-content:center; font-size:11.5px; font-weight:600; color:var(--text-dim); flex-shrink:0; }
 
   /* ---- Layout ---- */
-  .main-layout{ display:flex; flex-direction:column; height:100%; width:100%; }
+  .main-layout{ display:flex; flex-direction:column; min-height:100vh; width:100%; }
   .body-row{ display:flex; flex:1; overflow:hidden; position:relative; }
 
   .sidebar-overlay{
@@ -240,6 +240,11 @@
   .spinner{ display:inline-block; width:13px; height:13px; border:2px solid rgba(0,0,0,0.3);
     border-top-color:currentColor; border-radius:50%; animation:spin .6s linear infinite; }
   @keyframes spin{ to{ transform:rotate(360deg); } }
+  .thinking-dots{ display:inline-flex; gap:4px; align-items:center; height:14px; }
+  .thinking-dots span{ width:6px; height:6px; border-radius:50%; background:var(--text-dim); animation:thinkPulse 1.2s infinite ease-in-out; }
+  .thinking-dots span:nth-child(2){ animation-delay:0.2s; }
+  .thinking-dots span:nth-child(3){ animation-delay:0.4s; }
+  @keyframes thinkPulse{ 0%,60%,100%{ opacity:0.3; transform:scale(0.8); } 30%{ opacity:1; transform:scale(1); } }
 
   /* ---- Debug console ---- */
   .debug-console{
@@ -823,7 +828,8 @@ function navItemsFor(role){
     { group:'Code', items:[ { id:'lua', label:'Lua' }, { id:'devtools', label:'Dev Tools' } ] },
     { group:'Hébergement', items:[ { id:'hosting', label:'Sites hébergés' }, { id:'botHosting', label:'Bot Discord hébergé' } ] },
     { group:'Outils', items:[ { id:'discord', label:'Annonce Discord' }, { id:'notes', label:'Notes' } ] },
-    { group:'Communauté', items:[ { id:'forum', label:'Scripts partagés' } ] },
+    { group:'Communauté', items:[ { id:'chat', label:'Discussion' } ] },
+    { group:'Boutique', items:[ { id:'shop', label:'Ma boutique' }, { id:'shopBrowse', label:'Boutiques' } ] },
     { group:'IA', items:[ { id:'chatgpt', label:'Chat GPT' } ] },
     { group:'Sécurité', items:[ { id:'toolsv1', label:'Tools V1' } ] },
     { group:'Compte', items:[ { id:'settings', label:'Paramètres' } ] },
@@ -908,6 +914,7 @@ function renderNav(NAV){
 
 function renderSection(id){
   const c = document.getElementById('content');
+  if(id !== 'chat' && chatPollTimer){ clearInterval(chatPollTimer); chatPollTimer = null; }
   showLoader();
   setTimeout(()=>{
     if(id === 'overview') renderOverview(c);
@@ -917,7 +924,9 @@ function renderSection(id){
     else if(id === 'botHosting') renderBotHosting(c);
     else if(id === 'discord') renderDiscord(c);
     else if(id === 'notes') renderNotes(c);
-    else if(id === 'forum') renderForum(c);
+    else if(id === 'chat') renderChat(c);
+    else if(id === 'shop') renderShop(c);
+    else if(id === 'shopBrowse') renderShopBrowse(c);
     else if(id === 'news') renderNews(c);
     else if(id === 'chatgpt') renderChatGPT(c);
     else if(id === 'toolsv1') renderToolsV1(c);
@@ -1215,6 +1224,15 @@ async function renderNews(c){
 let chatHistory = [];
 let chatAttachments = [];
 
+function renderMarkdownLite(text){
+  let html = escapeHtml(text);
+  html = html.replace(/```([\s\S]*?)```/g, (m, code) => `<pre style="background:rgba(0,0,0,0.35); border:1px solid var(--border-soft); border-radius:8px; padding:10px 12px; overflow-x:auto; margin:8px 0; font-family:'SF Mono',Menlo,monospace; font-size:12.5px;">${code.trim()}</pre>`);
+  html = html.replace(/`([^`]+)`/g, '<code style="background:rgba(255,255,255,0.08); padding:1px 6px; border-radius:5px; font-family:\'SF Mono\',Menlo,monospace; font-size:0.9em;">$1</code>');
+  html = html.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+  html = html.replace(/\n/g, '<br>');
+  return html;
+}
+
 function renderChatGPT(c){
   c.innerHTML = `
     <div class="content-header">
@@ -1254,9 +1272,11 @@ function renderChatGPT(c){
       return;
     }
     messagesBox.innerHTML = chatHistory.map(m => `
-      <div style="align-self:${m.role === 'user' ? 'flex-end' : 'flex-start'}; max-width:80%;">
+      <div style="align-self:${m.role === 'user' ? 'flex-end' : 'flex-start'}; max-width:85%;">
         <div style="font-size:11px; color:var(--text-faint); margin-bottom:3px;">${m.role === 'user' ? 'Toi' : 'Assistant'}</div>
-        <div style="background:${m.role === 'user' ? 'rgba(255,255,255,0.08)' : 'rgba(255,255,255,0.03)'}; border:1px solid var(--border-soft); border-radius:12px; padding:10px 14px; font-size:13.5px; color:var(--text); white-space:pre-wrap;">${escapeHtml(m.displayContent || m.content)}</div>
+        <div style="background:${m.role === 'user' ? 'rgba(255,255,255,0.08)' : 'rgba(255,255,255,0.03)'}; border:1px solid var(--border-soft); border-radius:12px; padding:10px 14px; font-size:13.5px; color:var(--text); line-height:1.55;">
+          ${m.thinking ? `<span class="thinking-dots"><span></span><span></span><span></span></span>` : renderMarkdownLite(m.displayContent || m.content)}
+        </div>
       </div>
     `).join('');
     messagesBox.scrollTop = messagesBox.scrollHeight;
@@ -1276,7 +1296,7 @@ function renderChatGPT(c){
   fileInput.onchange = async ()=>{
     for(const file of fileInput.files){
       if(file.type.startsWith('image/')){
-        toast(`"${file.name}" est une image — le modèle actuel ne peut pas encore l'analyser, seul son nom sera mentionné.`);
+        toast(`"${file.name}" est une image — ce modèle ne peut pas encore l'analyser, seul son nom sera mentionné.`);
         chatAttachments.push({ name: file.name, content: `[Image jointe : ${file.name} — non analysable par ce modèle]`, isImage: true });
       } else {
         const text = await file.text();
@@ -1316,12 +1336,12 @@ function renderChatGPT(c){
     sendBtn.disabled = true;
     sendBtn.innerHTML = '<span class="spinner"></span>';
 
-    chatHistory.push({ role:'assistant', content:'…', displayContent:'…' });
+    chatHistory.push({ role:'assistant', content:'', displayContent:'', thinking:true });
     renderMessages();
 
     try{
       const apiMessages = chatHistory
-        .filter((m, i) => !(i === chatHistory.length - 1)) // exclut le "…" placeholder
+        .slice(0, -1)
         .map(m => ({ role: m.role, content: m.content }));
 
       const data = await api('/ai/chat', { method:'POST', body:{ messages: apiMessages } });
@@ -1395,162 +1415,207 @@ function renderToolsV1(c){
   };
 }
 
-/* ---------- Forum : partage de scripts entre membres ---------- */
-function renderForum(c){
+/* ---------- Discussion : chat live entre tous les membres ---------- */
+let chatPollTimer = null;
+
+function renderChat(c){
   c.innerHTML = `
     <div class="content-header">
-      <h2>Scripts partagés</h2>
-      <p>Publie tes scripts et découvre ceux des autres membres.</p>
+      <h2>Discussion</h2>
+      <p>Discute en direct avec tous les membres de la plateforme.</p>
     </div>
-
-    <div class="panel" style="margin-bottom:20px;">
-      <div class="field" style="margin-bottom:10px;">
-        <label>Titre du script</label>
-        <input id="forum-title" type="text" placeholder="ex : Menu ESP simple">
-      </div>
-      <div class="field" style="margin-bottom:10px;">
-        <label>Description</label>
-        <textarea id="forum-desc" placeholder="Explique ce que fait ton script..." style="min-height:80px;"></textarea>
-      </div>
-      <div class="field" style="margin-bottom:10px;">
-        <label>Ce script est-il en loadstring ?</label>
-        <select id="forum-loadstring" class="lang-select">
-          <option value="">— Choisis une option —</option>
-          <option value="yes">Oui, c'est un loadstring</option>
-          <option value="no">Non, c'est le code complet</option>
-        </select>
-      </div>
-      <div class="field" style="margin-bottom:6px;">
-        <label>Script</label>
-        <div class="lang-tabs" style="margin-bottom:10px;">
-          <div class="lang-tab active" data-input-mode="paste">Coller le code</div>
-          <div class="lang-tab" data-input-mode="file">Envoyer un fichier (.lua / .txt)</div>
+    <div class="editor-wrap" style="height:calc(100vh - 210px);">
+      <div class="console-pane" style="flex:1;">
+        <div class="pane-bar">
+          <span>Discussion générale</span>
         </div>
-        <textarea id="forum-code" placeholder="Colle ton script ici..." style="min-height:120px; font-family:'SF Mono', Menlo, monospace; font-size:13px;"></textarea>
-        <input id="forum-file" type="file" accept=".lua,.txt" class="hidden">
+        <div class="console-body" id="live-chat-messages" style="display:flex; flex-direction:column; gap:10px;">
+          <div class="sys">// Chargement des messages…</div>
+        </div>
+        <div style="border-top:1px solid var(--border-soft); padding:12px; display:flex; gap:8px; align-items:flex-end;">
+          <textarea id="live-chat-input" placeholder="Écris un message..." maxlength="500" style="flex:1; min-height:44px; max-height:100px; background:rgba(255,255,255,0.04); border:1px solid var(--border-soft); border-radius:11px; padding:10px 14px; color:var(--text); font-size:14px; outline:none; resize:none; font-family:inherit;"></textarea>
+          <button class="pill-btn run" id="live-chat-send-btn">Envoyer</button>
+        </div>
       </div>
-      <button class="pill-btn run" id="forum-publish-btn" style="margin-top:8px;">Publier</button>
     </div>
-
-    <div id="forum-list"><div class="empty-state">Chargement…</div></div>
   `;
 
-  let inputMode = 'paste';
-  c.querySelectorAll('[data-input-mode]').forEach(el=>{
-    el.onclick = ()=>{
-      inputMode = el.dataset.inputMode;
-      c.querySelectorAll('[data-input-mode]').forEach(x=>x.classList.remove('active'));
-      el.classList.add('active');
-      const codeArea = document.getElementById('forum-code');
-      const fileInput = document.getElementById('forum-file');
-      if(inputMode === 'file'){
-        codeArea.classList.add('hidden');
-        fileInput.classList.remove('hidden');
-      } else {
-        codeArea.classList.remove('hidden');
-        fileInput.classList.add('hidden');
-      }
-    };
-  });
+  const box = document.getElementById('live-chat-messages');
+  const input = document.getElementById('live-chat-input');
 
-  async function loadForum(){
-    const list = document.getElementById('forum-list');
-    try{
-      const data = await api('/forum/posts');
-      const posts = data.posts || [];
-      if(!posts.length){
-        list.innerHTML = `<div class="empty-state"><div class="big">Aucun script partagé encore</div>Sois le premier à en publier un.</div>`;
-        return;
-      }
-      list.innerHTML = posts.map(p => `
-        <div class="panel" style="margin-bottom:12px;">
-          <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:10px; margin-bottom:8px;">
-            <div>
-              <div style="font-weight:600; font-size:15px;">${escapeHtml(p.title)}</div>
-              <div style="font-size:12px; color:var(--text-faint);">par ${escapeHtml(p.author)} · ${p.isLoadstring ? 'Loadstring' : 'Code complet'}</div>
-            </div>
-            ${(p.author === state.user.username || state.user.role === 'owner') ? `<button class="pill-btn danger" data-del-post="${p.id}">Supprimer</button>` : ''}
-          </div>
-          <div style="font-size:13.5px; color:var(--text-dim); margin-bottom:10px; white-space:pre-wrap;">${escapeHtml(p.description)}</div>
-          <div class="console-body" style="border:1px solid var(--border-soft); border-radius:10px; max-height:160px; margin-bottom:10px;">${escapeHtml(p.code)}</div>
-          <div style="display:flex; gap:8px;">
-            <button class="pill-btn ${p.liked ? 'run' : ''}" data-like="${p.id}">J'aime (${p.likeCount || 0})</button>
-            <button class="pill-btn" data-copy-code="${p.id}">Copier le script</button>
-          </div>
+  function renderList(messages){
+    if(!messages.length){
+      box.innerHTML = `<div class="sys">// Aucun message. Sois le premier à écrire.</div>`;
+      return;
+    }
+    const wasNearBottom = (box.scrollHeight - box.scrollTop - box.clientHeight) < 80;
+    box.innerHTML = messages.map(m => `
+      <div style="align-self:${m.author === state.user.username ? 'flex-end' : 'flex-start'}; max-width:80%;">
+        <div style="font-size:11px; color:var(--text-faint); margin-bottom:3px;">${escapeHtml(m.author)} · ${new Date(m.createdAt).toLocaleTimeString('fr-FR', {hour:'2-digit', minute:'2-digit'})}</div>
+        <div style="background:${m.author === state.user.username ? 'rgba(255,255,255,0.08)' : 'rgba(255,255,255,0.03)'}; border:1px solid var(--border-soft); border-radius:12px; padding:9px 13px; font-size:13.5px; color:var(--text); white-space:pre-wrap; position:relative;">
+          ${escapeHtml(m.content)}
+          ${(m.author === state.user.username || state.user.role === 'owner') ? `<span data-del-msg="${m.id}" style="cursor:pointer; color:var(--red); font-size:11px; margin-left:8px;">supprimer</span>` : ''}
         </div>
-      `).join('');
+      </div>
+    `).join('');
+    if(wasNearBottom) box.scrollTop = box.scrollHeight;
+    box.querySelectorAll('[data-del-msg]').forEach(el=>{
+      el.onclick = async ()=>{
+        try{ await api('/chat/messages/' + el.dataset.delMsg, { method:'DELETE' }); loadMessages(); }
+        catch(e){ toast(e.message); }
+      };
+    });
+  }
 
-      list.querySelectorAll('[data-like]').forEach(btn=>{
-        btn.onclick = async ()=>{
-          try{
-            await api('/forum/posts/' + btn.dataset.like + '/like', { method:'POST' });
-            loadForum();
-          } catch(e){ toast(e.message); }
-        };
-      });
-      list.querySelectorAll('[data-copy-code]').forEach(btn=>{
-        btn.onclick = ()=>{
-          const post = posts.find(p => p.id === btn.dataset.copyCode);
-          navigator.clipboard.writeText(post.code);
-          toast('Script copié');
-        };
-      });
-      list.querySelectorAll('[data-del-post]').forEach(btn=>{
-        btn.onclick = async ()=>{
-          if(!confirm('Supprimer ce script partagé ?')) return;
-          try{
-            await api('/forum/posts/' + btn.dataset.delPost, { method:'DELETE' });
-            toast('Script supprimé');
-            loadForum();
-          } catch(e){ toast(e.message); }
-        };
-      });
+  async function loadMessages(){
+    try{
+      const data = await api('/chat/messages');
+      renderList(data.messages || []);
     } catch(e){
-      list.innerHTML = `<div class="empty-state"><div class="big" style="color:var(--red)">Impossible de charger les scripts</div>${escapeHtml(e.message)}</div>`;
+      box.innerHTML = `<div class="err">${escapeHtml(e.message)}</div>`;
     }
   }
-  loadForum();
+  loadMessages();
 
-  document.getElementById('forum-publish-btn').onclick = async ()=>{
-    const title = document.getElementById('forum-title').value.trim();
-    const description = document.getElementById('forum-desc').value.trim();
-    const loadstringVal = document.getElementById('forum-loadstring').value;
-    const btn = document.getElementById('forum-publish-btn');
+  if(chatPollTimer) clearInterval(chatPollTimer);
+  chatPollTimer = setInterval(loadMessages, 5000);
 
-    if(!title){ toast('Le titre est obligatoire'); return; }
-    if(!description){ toast('La description est obligatoire'); return; }
-    if(loadstringVal !== 'yes' && loadstringVal !== 'no'){ toast('Précise si le script est en loadstring'); return; }
+  async function send(){
+    const text = input.value.trim();
+    if(!text) return;
+    const btn = document.getElementById('live-chat-send-btn');
+    btn.disabled = true;
+    try{
+      await api('/chat/messages', { method:'POST', body:{ content: text } });
+      input.value = '';
+      loadMessages();
+    } catch(e){ toast(e.message); }
+    finally{ btn.disabled = false; }
+  }
+  document.getElementById('live-chat-send-btn').onclick = send;
+  input.addEventListener('keydown', (e)=>{
+    if(e.key === 'Enter' && !e.shiftKey){ e.preventDefault(); send(); }
+  });
+}
 
-    let code = '';
-    if(inputMode === 'file'){
-      const fileInput = document.getElementById('forum-file');
-      if(!fileInput.files.length){ toast('Choisis un fichier .lua ou .txt'); return; }
-      code = await fileInput.files[0].text();
-    } else {
-      code = document.getElementById('forum-code').value;
-    }
-    if(!code.trim()){ toast('Le script est vide'); return; }
+/* ---------- Shop : créer sa boutique ---------- */
+const PAYMENT_METHODS = ['PayPal', 'CashApp', 'Venmo', 'Zelle', 'LTC (Litecoin)', 'BTC (Bitcoin)', 'ETH (Ethereum)', 'Virement bancaire', 'Carte cadeau', 'Autre'];
+
+async function renderShop(c){
+  c.innerHTML = `
+    <div class="content-header">
+      <h2>Ma boutique</h2>
+      <p>Crée ta boutique pour vendre tes objets ou services.</p>
+    </div>
+    <div id="shop-form-area"><div class="empty-state">Chargement…</div></div>
+  `;
+
+  let existingShop = null;
+  try{
+    const data = await api('/shop/mine');
+    existingShop = data.shop;
+  } catch(e){ /* pas grave, on affiche le formulaire vide */ }
+
+  const area = document.getElementById('shop-form-area');
+  area.innerHTML = `
+    <div class="panel" style="max-width:520px;">
+      <div class="field" style="margin-bottom:12px;">
+        <label>Nom de la boutique</label>
+        <input id="shop-name" type="text" value="${existingShop ? escapeHtml(existingShop.shopName) : ''}" placeholder="Ma boutique">
+      </div>
+      <div class="field" style="margin-bottom:12px;">
+        <label>Moyen de paiement</label>
+        <select id="shop-payment" class="lang-select">
+          <option value="">— Choisis —</option>
+          ${PAYMENT_METHODS.map(m => `<option value="${m}" ${existingShop && existingShop.paymentMethod === m ? 'selected' : ''}>${m}</option>`).join('')}
+        </select>
+      </div>
+      <div class="field" style="margin-bottom:12px;">
+        <label>Lien de paiement</label>
+        <input id="shop-link" type="text" value="${existingShop ? escapeHtml(existingShop.paymentLink) : ''}" placeholder="ex : paypal.me/tonpseudo">
+      </div>
+      <div class="field" style="margin-bottom:12px;">
+        <label>Comment te contacter ?</label>
+        <input id="shop-contact" type="text" value="${existingShop ? escapeHtml(existingShop.contact) : ''}" placeholder="ex : Discord: pseudo#0000">
+      </div>
+      <div class="field" style="margin-bottom:14px;">
+        <label>Objets en vente (un par ligne : nom - prix)</label>
+        <textarea id="shop-items" placeholder="Script Lua premium - 5$&#10;Configuration custom - 10$" style="min-height:100px;">${existingShop && existingShop.items ? existingShop.items.map(i => i.name + ' - ' + i.price).join('\n') : ''}</textarea>
+      </div>
+      <div style="display:flex; gap:8px;">
+        <button class="pill-btn run" id="shop-save-btn">${existingShop ? 'Mettre à jour' : 'Créer ma boutique'}</button>
+        ${existingShop ? `<button class="pill-btn danger" id="shop-delete-btn">Supprimer ma boutique</button>` : ''}
+      </div>
+    </div>
+  `;
+
+  document.getElementById('shop-save-btn').onclick = async ()=>{
+    const shopName = document.getElementById('shop-name').value.trim();
+    const paymentMethod = document.getElementById('shop-payment').value;
+    const paymentLink = document.getElementById('shop-link').value.trim();
+    const contact = document.getElementById('shop-contact').value.trim();
+    const itemsRaw = document.getElementById('shop-items').value.trim();
+    const btn = document.getElementById('shop-save-btn');
+
+    if(!shopName || !paymentMethod || !paymentLink || !contact){ toast('Tous les champs sont requis'); return; }
+
+    const items = itemsRaw.split('\n').filter(l => l.trim()).map(line => {
+      const parts = line.split(' - ');
+      return { name: parts[0] ? parts[0].trim() : line.trim(), price: parts[1] ? parts[1].trim() : '' };
+    });
 
     btn.disabled = true;
     btn.innerHTML = '<span class="spinner"></span>';
     try{
-      await api('/forum/posts', {
-        method:'POST',
-        body:{ title, description, code, isLoadstring: loadstringVal === 'yes' }
-      });
-      document.getElementById('forum-title').value = '';
-      document.getElementById('forum-desc').value = '';
-      document.getElementById('forum-code').value = '';
-      document.getElementById('forum-loadstring').value = '';
-      toast('Script publié');
-      loadForum();
-    } catch(e){
-      toast(e.message);
-    } finally{
-      btn.disabled = false;
-      btn.textContent = 'Publier';
-    }
+      await api('/shop', { method:'POST', body:{ shopName, paymentMethod, paymentLink, contact, items } });
+      toast('Boutique enregistrée');
+      renderShop(c);
+    } catch(e){ toast(e.message); }
+    finally{ btn.disabled = false; }
   };
+
+  if(existingShop){
+    document.getElementById('shop-delete-btn').onclick = async ()=>{
+      if(!confirm('Supprimer ta boutique ?')) return;
+      try{ await api('/shop', { method:'DELETE' }); toast('Boutique supprimée'); renderShop(c); }
+      catch(e){ toast(e.message); }
+    };
+  }
+}
+
+/* ---------- Boutiques : parcourir celles des autres membres ---------- */
+async function renderShopBrowse(c){
+  c.innerHTML = `
+    <div class="content-header">
+      <h2>Boutiques</h2>
+      <p>Découvre les boutiques créées par les membres.</p>
+    </div>
+    <div id="shops-list"><div class="empty-state">Chargement…</div></div>
+  `;
+
+  try{
+    const data = await api('/shop/all');
+    const shops = data.shops || [];
+    const list = document.getElementById('shops-list');
+    if(!shops.length){
+      list.innerHTML = `<div class="empty-state"><div class="big">Aucune boutique pour le moment</div></div>`;
+      return;
+    }
+    list.innerHTML = shops.map(s => `
+      <div class="panel" style="margin-bottom:12px;">
+        <div style="font-weight:600; font-size:15px; margin-bottom:4px;">${escapeHtml(s.shopName)}</div>
+        <div style="font-size:12px; color:var(--text-faint); margin-bottom:10px;">par ${escapeHtml(s.owner)} · Paiement : ${escapeHtml(s.paymentMethod)}</div>
+        ${(s.items || []).length ? `
+          <div style="margin-bottom:10px;">
+            ${s.items.map(i => `<div style="font-size:13.5px; color:var(--text-dim); padding:4px 0; border-bottom:1px solid var(--border-soft);">${escapeHtml(i.name)} ${i.price ? '— ' + escapeHtml(i.price) : ''}</div>`).join('')}
+          </div>
+        ` : ''}
+        <div style="font-size:13px; color:var(--text-dim);">Contact : ${escapeHtml(s.contact)}</div>
+      </div>
+    `).join('');
+  } catch(e){
+    document.getElementById('shops-list').innerHTML = `<div class="empty-state" style="color:var(--red)">${escapeHtml(e.message)}</div>`;
+  }
 }
 function renderCodeEditor(c, kind){
   c.innerHTML = `
@@ -2110,255 +2175,4 @@ function renderSettings(c){
   swatchRow.querySelectorAll('.swatch').forEach(el=>{
     el.onclick = ()=>{
       const t = PRESET_THEMES[el.dataset.i];
-      setTheme(t.accent, t.accent2);
-      swatchRow.querySelectorAll('.swatch').forEach(x=>x.classList.remove('sel'));
-      el.classList.add('sel');
-    };
-  });
-
-  // Picker strip (glisser pour choisir une teinte, façon sidenard iOS)
-  const strip = document.getElementById('picker-strip');
-  const handle = document.getElementById('picker-handle');
-
-  function setHandleFromEvent(clientY){
-    const rect = strip.getBoundingClientRect();
-    let pct = (clientY - rect.top) / rect.height;
-    pct = Math.max(0, Math.min(1, pct));
-    handle.style.top = (pct * 100) + '%';
-    const hue = pct * 360;
-    const accent = hslToHex(hue, 70, 65);
-    const accent2 = hslToHex(hue, 65, 40);
-    setTheme(accent, accent2, false);
-  }
-
-  let dragging = false;
-  strip.addEventListener('pointerdown', (e)=>{ dragging = true; setHandleFromEvent(e.clientY); strip.setPointerCapture(e.pointerId); });
-  strip.addEventListener('pointermove', (e)=>{ if(dragging) setHandleFromEvent(e.clientY); });
-  strip.addEventListener('pointerup', ()=>{ dragging = false; });
-  strip.addEventListener('pointercancel', ()=>{ dragging = false; });
-
-  function setTheme(accent, accent2, clearSwatchSel){
-    currentTheme = { accent, accent2 };
-    applyTheme(currentTheme);
-    localStorage.setItem('shgt_theme', JSON.stringify(currentTheme));
-    document.getElementById('gradient-preview').style.background = `linear-gradient(120deg, ${accent}, ${accent2})`;
-    if(clearSwatchSel !== false){
-      // rien de plus, presets gérés séparément
-    }
-  }
-
-  document.getElementById('change-pass-btn').onclick = async ()=>{
-    const cur = document.getElementById('cur-pass').value;
-    const neu = document.getElementById('new-pass').value;
-    if(!cur || !neu){ toast('Remplis les deux champs'); return; }
-    try{
-      await api('/auth/change-password', { method:'POST', body:{ current:cur, next:neu } });
-      toast('Mot de passe mis à jour');
-      document.getElementById('cur-pass').value = '';
-      document.getElementById('new-pass').value = '';
-    } catch(e){ toast(e.message); }
-  };
-
-  document.getElementById('clear-wh-btn').onclick = ()=>{
-    localStorage.removeItem('shgt_webhook');
-    state.savedWebhook = '';
-    document.getElementById('wh-set').value = '';
-    toast('Webhook oublié');
-  };
-}
-
-/* ---------- Dashboard Owner ---------- */
-async function renderAdmin(c){
-  c.innerHTML = `
-    <div class="content-header">
-      <h2>Dashboard Owner</h2>
-      <p>Vue globale sur les comptes, les sites hébergés et la modération de la plateforme.</p>
-    </div>
-    <div class="grid-cards" id="admin-cards" style="margin-bottom:20px;">
-      <div class="stat-card"><div class="label">Comptes</div><div class="value accent">…</div></div>
-      <div class="stat-card"><div class="label">Sites publiés</div><div class="value">…</div></div>
-    </div>
-
-    <div class="settings-section">
-      <h3>Mode maintenance</h3>
-      <div class="panel" style="max-width:480px;">
-        <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:14px;">
-          <span style="font-size:13.5px; color:var(--text-dim);">Statut</span>
-          <span id="maintenance-status" style="font-size:12px;">Chargement…</span>
-        </div>
-        <div class="field" style="margin-bottom:12px;">
-          <label>Message affiché aux utilisateurs</label>
-          <input id="maintenance-msg" type="text" placeholder="Le site est en maintenance, reviens plus tard.">
-        </div>
-        <div style="display:flex; gap:8px;">
-          <button class="pill-btn run" id="maintenance-on-btn">Activer</button>
-          <button class="pill-btn danger" id="maintenance-off-btn">Désactiver</button>
-        </div>
-      </div>
-    </div>
-
-    <div class="settings-section">
-      <h3>Bannir une IP</h3>
-      <div class="panel" style="max-width:480px;">
-        <div class="field" style="margin-bottom:10px;">
-          <label>Adresse IP</label>
-          <input id="ban-ip-input" type="text" placeholder="ex : 203.0.113.42">
-        </div>
-        <div class="field" style="margin-bottom:12px;">
-          <label>Durée</label>
-          <select id="ban-ip-duration" class="lang-select">
-            <option value="3">Temporaire — 3 heures</option>
-            <option value="24">Temporaire — 24 heures</option>
-            <option value="permanent">Permanent</option>
-          </select>
-        </div>
-        <button class="pill-btn danger" id="ban-ip-btn">Bannir cette IP</button>
-      </div>
-    </div>
-
-    <div class="settings-section">
-      <h3>IPs actuellement bannies</h3>
-      <div class="panel" id="banned-ips-list"><div class="empty-state">Chargement…</div></div>
-    </div>
-
-    <div class="settings-section">
-      <h3>Comptes</h3>
-      <div class="panel">
-        <div style="overflow-x:auto;">
-          <table class="table" id="accounts-table">
-            <thead><tr><th>Pseudo</th><th>Rôle</th><th>Sites</th><th></th></tr></thead>
-            <tbody><tr><td colspan="4">Chargement…</td></tr></tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-  `;
-
-  // ---- Vue d'ensemble + comptes ----
-  try{
-    const data = await api('/admin/overview');
-    document.querySelector('#admin-cards .stat-card .value.accent').textContent = data.accounts.length;
-    document.querySelectorAll('#admin-cards .stat-card .value')[1].textContent = data.totalSites;
-
-    const tbody = document.querySelector('#accounts-table tbody');
-    tbody.innerHTML = data.accounts.map(a => `
-      <tr>
-        <td>${escapeHtml(a.username)}</td>
-        <td><span class="badge ${a.role}">${a.role === 'owner' ? 'Owner' : 'Membre'}</span></td>
-        <td>${a.siteCount}</td>
-        <td>${a.role !== 'owner' ? `
-          <button class="pill-btn danger" data-ban-user="${a.username}">Bannir</button>
-          <button class="pill-btn danger" data-del="${a.username}">Supprimer</button>
-        ` : ''}</td>
-      </tr>
-    `).join('');
-
-    tbody.querySelectorAll('[data-del]').forEach(btn=>{
-      btn.onclick = async ()=>{
-        if(!confirm(`Supprimer le compte ${btn.dataset.del} ?`)) return;
-        try{ await api('/admin/accounts/' + btn.dataset.del, { method:'DELETE' }); toast('Compte supprimé'); renderAdmin(c); }
-        catch(e){ toast(e.message); }
-      };
-    });
-    tbody.querySelectorAll('[data-ban-user]').forEach(btn=>{
-      btn.onclick = async ()=>{
-        if(!confirm(`Bannir le compte ${btn.dataset.banUser} ?`)) return;
-        try{ await api('/admin/ban-user', { method:'POST', body:{ username: btn.dataset.banUser } }); toast('Compte banni'); renderAdmin(c); }
-        catch(e){ toast(e.message); }
-      };
-    });
-  } catch(e){
-    document.querySelector('#accounts-table tbody').innerHTML = `<tr><td colspan="4" style="color:var(--red)">${escapeHtml(e.message)}</td></tr>`;
-  }
-
-  // ---- Mode maintenance ----
-  try{
-    const m = await api('/settings/maintenance');
-    document.getElementById('maintenance-status').innerHTML = m.maintenance
-      ? `<span style="color:var(--red)">Activé</span>`
-      : `<span style="color:var(--green)">Désactivé</span>`;
-    document.getElementById('maintenance-msg').value = m.message || '';
-  } catch(e){
-    document.getElementById('maintenance-status').textContent = '—';
-  }
-
-  document.getElementById('maintenance-on-btn').onclick = async ()=>{
-    const message = document.getElementById('maintenance-msg').value.trim();
-    try{
-      await api('/settings/maintenance', { method:'POST', body:{ enabled:true, message } });
-      toast('Maintenance activée');
-      renderAdmin(c);
-    } catch(e){ toast(e.message); }
-  };
-  document.getElementById('maintenance-off-btn').onclick = async ()=>{
-    try{
-      await api('/settings/maintenance', { method:'POST', body:{ enabled:false, message:'' } });
-      toast('Maintenance désactivée');
-      renderAdmin(c);
-    } catch(e){ toast(e.message); }
-  };
-
-  // ---- Ban IP ----
-  document.getElementById('ban-ip-btn').onclick = async ()=>{
-    const ip = document.getElementById('ban-ip-input').value.trim();
-    const duration = document.getElementById('ban-ip-duration').value;
-    if(!ip){ toast("Renseigne une adresse IP"); return; }
-    try{
-      await api('/admin/ban-ip', {
-        method:'POST',
-        body: duration === 'permanent' ? { ip, permanent:true } : { ip, permanent:false, hours: Number(duration) }
-      });
-      toast('IP bannie');
-      document.getElementById('ban-ip-input').value = '';
-      loadBannedIps();
-    } catch(e){ toast(e.message); }
-  };
-
-  async function loadBannedIps(){
-    const box = document.getElementById('banned-ips-list');
-    try{
-      const data = await api('/admin/bans');
-      const ips = data.bannedIps || [];
-      if(!ips.length){
-        box.innerHTML = `<div class="empty-state">Aucune IP bannie actuellement.</div>`;
-        return;
-      }
-      box.innerHTML = ips.map(b => `
-        <div class="site-row">
-          <div>
-            <div class="name">${escapeHtml(b.ip)}</div>
-            <div class="link">${b.permanent ? 'Bannissement permanent' : ("Jusqu'au " + new Date(b.expires).toLocaleString('fr-FR'))}</div>
-          </div>
-          <button class="pill-btn" data-unban-ip="${b.ip}">Débannir</button>
-        </div>
-      `).join('');
-      box.querySelectorAll('[data-unban-ip]').forEach(btn=>{
-        btn.onclick = async ()=>{
-          try{ await api('/admin/unban-ip', { method:'POST', body:{ ip: btn.dataset.unbanIp } }); toast('IP débannie'); loadBannedIps(); }
-          catch(e){ toast(e.message); }
-        };
-      });
-    } catch(e){
-      box.innerHTML = `<div class="empty-state" style="color:var(--red)">Impossible de charger.</div>`;
-    }
-  }
-  loadBannedIps();
-}
-
-/* =========================================================
-   BOOT — restaure la session si elle existe déjà
-   ========================================================= */
-try{
-  const savedSession = loadSession();
-  if(savedSession && savedSession.token && savedSession.username && savedSession.role){
-    state.user = savedSession;
-    renderMain();
-  } else {
-    renderLogin('login');
-  }
-} catch(bootErr){
-  document.getElementById('app').innerHTML = '<div style="color:#FF6B6B; background:#000; padding:40px; font-family:monospace; font-size:14px; white-space:pre-wrap;">ERREUR AU DÉMARRAGE :\n\n' + bootErr.message + '\n\n' + (bootErr.stack || '') + '</div>';
-}
-</script>
-</body>
-</html>
+      setTheme(t.accent, t.accen
