@@ -348,6 +348,17 @@
 </head>
 <body>
 <div id="app"></div>
+<div id="crash-reporter" style="display:none; position:fixed; inset:0; background:#0A0A0B; color:#FF6B6B; font-family:monospace; font-size:13px; padding:20px; z-index:9999; overflow:auto; white-space:pre-wrap; line-height:1.6;"></div>
+
+<script>
+window.addEventListener('error', function(e){
+  var box = document.getElementById('crash-reporter');
+  if(box){
+    box.style.display = 'block';
+    box.textContent = "ERREUR DÉTECTÉE :\n\n" + e.message + "\n\nFichier : " + e.filename + "\nLigne : " + e.lineno + ", colonne : " + e.colno + (e.error && e.error.stack ? "\n\nDétail :\n" + e.error.stack : "");
+  }
+});
+</script>
 
 <script>
 /* =========================================================
@@ -2189,23 +2200,4 @@ async function renderAdmin(c){
 
     <div class="settings-section">
       <h3>IPs actuellement bannies</h3>
-      <div class="panel" id="banned-ips-list"><div class="empty-state">Chargement…</div></div>
-    </div>
-
-    <div class="settings-section">
-      <h3>Comptes</h3>
-      <div class="panel">
-        <div style="overflow-x:auto;">
-          <table class="table" id="accounts-table">
-            <thead><tr><th>Pseudo</th><th>Rôle</th><th>Sites</th><th></th></tr></thead>
-            <tbody><tr><td colspan="4">Chargement…</td></tr></tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-  `;
-
-  // ---- Vue d'ensemble + comptes ----
-  try{
-    const data = await api('/admin/overview');
-    document.querySelector('#admin-cards .stat-card .value.accent').textContent = data.accounts.lengt
+      <div class="panel" id="banned-ips-list"><div class="empty-state">Charge
