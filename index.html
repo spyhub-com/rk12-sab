@@ -358,7 +358,25 @@ window.addEventListener('error', function(e){
     box.textContent = "ERREUR DÉTECTÉE :\n\n" + e.message + "\n\nFichier : " + e.filename + "\nLigne : " + e.lineno + ", colonne : " + e.colno + (e.error && e.error.stack ? "\n\nDétail :\n" + e.error.stack : "");
   }
 });
+
+if('serviceWorker' in navigator){
+  navigator.serviceWorker.getRegistrations().then(function(regs){
+    regs.forEach(function(reg){ reg.unregister(); });
+  }).catch(function(){});
+}
+if('caches' in window){
+  caches.keys().then(function(names){
+    names.forEach(function(name){ caches.delete(name); });
+  }).catch(function(){});
+}
 </script>
+
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+
+<script src="https://cdn.jsdelivr.net/npm/eruda"></script>
+<script>eruda.init();</script>
 
 <script>
 /* =========================================================
@@ -2200,4 +2218,147 @@ async function renderAdmin(c){
 
     <div class="settings-section">
       <h3>IPs actuellement bannies</h3>
-      <div class="panel" id="banned-ips-list"><div class="empty-state">Charge
+      <div class="panel" id="banned-ips-list"><div class="empty-state">Chargement…</div></div>
+    </div>
+
+    <div class="settings-section">
+      <h3>Comptes</h3>
+      <div class="panel">
+        <div style="overflow-x:auto;">
+          <table class="table" id="accounts-table">
+            <thead><tr><th>Pseudo</th><th>Rôle</th><th>Sites</th><th></th></tr></thead>
+            <tbody><tr><td colspan="4">Chargement…</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  `;
+
+  // ---- Vue d'ensemble + comptes ----
+  try{
+    const data = await api('/admin/overview');
+    document.querySelector('#admin-cards .stat-card .value.accent').textContent = data.accounts.length;
+    document.querySelectorAll('#admin-cards .stat-card .value')[1].textContent = data.totalSites;
+
+    const tbody = document.querySelector('#accounts-table tbody');
+    tbody.innerHTML = data.accounts.map(a => `
+      <tr>
+        <td>${escapeHtml(a.username)}</td>
+        <td><span class="badge ${a.role}">${a.role === 'owner' ? 'Owner' : 'Membre'}</span></td>
+        <td>${a.siteCount}</td>
+        <td>${a.role !== 'owner' ? `
+          <button class="pill-btn danger" data-ban-user="${a.username}">Bannir</button>
+          <button class="pill-btn danger" data-del="${a.username}">Supprimer</button>
+        ` : ''}</td>
+      </tr>
+    `).join('');
+
+    tbody.querySelectorAll('[data-del]').forEach(btn=>{
+      btn.onclick = async ()=>{
+        if(!confirm(`Supprimer le compte ${btn.dataset.del} ?`)) return;
+        try{ await api('/admin/accounts/' + btn.dataset.del, { method:'DELETE' }); toast('Compte supprimé'); renderAdmin(c); }
+        catch(e){ toast(e.message); }
+      };
+    });
+    tbody.querySelectorAll('[data-ban-user]').forEach(btn=>{
+      btn.onclick = async ()=>{
+        if(!confirm(`Bannir le compte ${btn.dataset.banUser} ?`)) return;
+        try{ await api('/admin/ban-user', { method:'POST', body:{ username: btn.dataset.banUser } }); toast('Compte banni'); renderAdmin(c); }
+        catch(e){ toast(e.message); }
+      };
+    });
+  } catch(e){
+    document.querySelector('#accounts-table tbody').innerHTML = `<tr><td colspan="4" style="color:var(--red)">${escapeHtml(e.message)}</td></tr>`;
+  }
+
+  // ---- Mode maintenance ----
+  try{
+    const m = await api('/settings/maintenance');
+    document.getElementById('maintenance-status').innerHTML = m.maintenance
+      ? `<span style="color:var(--red)">Activé</span>`
+      : `<span style="color:var(--green)">Désactivé</span>`;
+    document.getElementById('maintenance-msg').value = m.message || '';
+  } catch(e){
+    document.getElementById('maintenance-status').textContent = '—';
+  }
+
+  document.getElementById('maintenance-on-btn').onclick = async ()=>{
+    const message = document.getElementById('maintenance-msg').value.trim();
+    try{
+      await api('/settings/maintenance', { method:'POST', body:{ enabled:true, message } });
+      toast('Maintenance activée');
+      renderAdmin(c);
+    } catch(e){ toast(e.message); }
+  };
+  document.getElementById('maintenance-off-btn').onclick = async ()=>{
+    try{
+      await api('/settings/maintenance', { method:'POST', body:{ enabled:false, message:'' } });
+      toast('Maintenance désactivée');
+      renderAdmin(c);
+    } catch(e){ toast(e.message); }
+  };
+
+  // ---- Ban IP ----
+  document.getElementById('ban-ip-btn').onclick = async ()=>{
+    const ip = document.getElementById('ban-ip-input').value.trim();
+    const duration = document.getElementById('ban-ip-duration').value;
+    if(!ip){ toast("Renseigne une adresse IP"); return; }
+    try{
+      await api('/admin/ban-ip', {
+        method:'POST',
+        body: duration === 'permanent' ? { ip, permanent:true } : { ip, permanent:false, hours: Number(duration) }
+      });
+      toast('IP bannie');
+      document.getElementById('ban-ip-input').value = '';
+      loadBannedIps();
+    } catch(e){ toast(e.message); }
+  };
+
+  async function loadBannedIps(){
+    const box = document.getElementById('banned-ips-list');
+    try{
+      const data = await api('/admin/bans');
+      const ips = data.bannedIps || [];
+      if(!ips.length){
+        box.innerHTML = `<div class="empty-state">Aucune IP bannie actuellement.</div>`;
+        return;
+      }
+      box.innerHTML = ips.map(b => `
+        <div class="site-row">
+          <div>
+            <div class="name">${escapeHtml(b.ip)}</div>
+            <div class="link">${b.permanent ? 'Bannissement permanent' : ("Jusqu'au " + new Date(b.expires).toLocaleString('fr-FR'))}</div>
+          </div>
+          <button class="pill-btn" data-unban-ip="${b.ip}">Débannir</button>
+        </div>
+      `).join('');
+      box.querySelectorAll('[data-unban-ip]').forEach(btn=>{
+        btn.onclick = async ()=>{
+          try{ await api('/admin/unban-ip', { method:'POST', body:{ ip: btn.dataset.unbanIp } }); toast('IP débannie'); loadBannedIps(); }
+          catch(e){ toast(e.message); }
+        };
+      });
+    } catch(e){
+      box.innerHTML = `<div class="empty-state" style="color:var(--red)">Impossible de charger.</div>`;
+    }
+  }
+  loadBannedIps();
+}
+
+/* =========================================================
+   BOOT — restaure la session si elle existe déjà
+   ========================================================= */
+try{
+  const savedSession = loadSession();
+  if(savedSession && savedSession.token && savedSession.username && savedSession.role){
+    state.user = savedSession;
+    renderMain();
+  } else {
+    renderLogin('login');
+  }
+} catch(bootErr){
+  document.getElementById('app').innerHTML = '<div style="color:#FF6B6B; background:#000; padding:40px; font-family:monospace; font-size:14px; white-space:pre-wrap;">ERREUR AU DÉMARRAGE :\n\n' + bootErr.message + '\n\n' + (bootErr.stack || '') + '</div>';
+}
+</script>
+</body>
+</html>
