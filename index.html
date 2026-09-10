@@ -365,6 +365,10 @@ window.addEventListener('error', function(e){
 </script>
 
 <script>
+document.getElementById('app').innerHTML = '<div style="color:#0f0; background:#000; padding:40px; font-family:sans-serif; font-size:18px;">TEST 2 : le second script JS s\'exécute correctement jusqu\'ici.</div>';
+</script>
+
+<script>
 /* =========================================================
    CONFIG
    ========================================================= */
@@ -2193,9 +2197,4 @@ async function renderAdmin(c){
         <div class="field" style="margin-bottom:12px;">
           <label>Durée</label>
           <select id="ban-ip-duration" class="lang-select">
-            <option value="3">Temporaire — 3 heures</option>
-            <option value="24">Temporaire — 24 heures</option>
-            <option value="permanent">Permanent</option>
-          </select>
-        </div>
-        <button class="pill-btn danger" id="
+            <option value="
