@@ -2175,4 +2175,255 @@ function renderSettings(c){
   swatchRow.querySelectorAll('.swatch').forEach(el=>{
     el.onclick = ()=>{
       const t = PRESET_THEMES[el.dataset.i];
-      setTheme(t.accent, t.accen
+      setTheme(t.accent, t.accent2);
+      swatchRow.querySelectorAll('.swatch').forEach(x=>x.classList.remove('sel'));
+      el.classList.add('sel');
+    };
+  });
+
+  // Picker strip (glisser pour choisir une teinte, façon sidenard iOS)
+  const strip = document.getElementById('picker-strip');
+  const handle = document.getElementById('picker-handle');
+
+  function setHandleFromEvent(clientY){
+    const rect = strip.getBoundingClientRect();
+    let pct = (clientY - rect.top) / rect.height;
+    pct = Math.max(0, Math.min(1, pct));
+    handle.style.top = (pct * 100) + '%';
+    const hue = pct * 360;
+    const accent = hslToHex(hue, 70, 65);
+    const accent2 = hslToHex(hue, 65, 40);
+    setTheme(accent, accent2, false);
+  }
+
+  let dragging = false;
+  strip.addEventListener('pointerdown', (e)=>{ dragging = true; setHandleFromEvent(e.clientY); strip.setPointerCapture(e.pointerId); });
+  strip.addEventListener('pointermove', (e)=>{ if(dragging) setHandleFromEvent(e.clientY); });
+  strip.addEventListener('pointerup', ()=>{ dragging = false; });
+  strip.addEventListener('pointercancel', ()=>{ dragging = false; });
+
+  function setTheme(accent, accent2, clearSwatchSel){
+    currentTheme = { accent, accent2 };
+    applyTheme(currentTheme);
+    localStorage.setItem('shgt_theme', JSON.stringify(currentTheme));
+    document.getElementById('gradient-preview').style.background = `linear-gradient(120deg, ${accent}, ${accent2})`;
+    if(clearSwatchSel !== false){
+      // rien de plus, presets gérés séparément
+    }
+  }
+
+  document.getElementById('change-pass-btn').onclick = async ()=>{
+    const cur = document.getElementById('cur-pass').value;
+    const neu = document.getElementById('new-pass').value;
+    if(!cur || !neu){ toast('Remplis les deux champs'); return; }
+    try{
+      await api('/auth/change-password', { method:'POST', body:{ current:cur, next:neu } });
+      toast('Mot de passe mis à jour');
+      document.getElementById('cur-pass').value = '';
+      document.getElementById('new-pass').value = '';
+    } catch(e){ toast(e.message); }
+  };
+
+  document.getElementById('clear-wh-btn').onclick = ()=>{
+    localStorage.removeItem('shgt_webhook');
+    state.savedWebhook = '';
+    document.getElementById('wh-set').value = '';
+    toast('Webhook oublié');
+  };
+}
+
+/* ---------- Dashboard Owner ---------- */
+async function renderAdmin(c){
+  c.innerHTML = `
+    <div class="content-header">
+      <h2>Dashboard Owner</h2>
+      <p>Vue globale sur les comptes, les sites hébergés et la modération de la plateforme.</p>
+    </div>
+    <div class="grid-cards" id="admin-cards" style="margin-bottom:20px;">
+      <div class="stat-card"><div class="label">Comptes</div><div class="value accent">…</div></div>
+      <div class="stat-card"><div class="label">Sites publiés</div><div class="value">…</div></div>
+    </div>
+
+    <div class="settings-section">
+      <h3>Mode maintenance</h3>
+      <div class="panel" style="max-width:480px;">
+        <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:14px;">
+          <span style="font-size:13.5px; color:var(--text-dim);">Statut</span>
+          <span id="maintenance-status" style="font-size:12px;">Chargement…</span>
+        </div>
+        <div class="field" style="margin-bottom:12px;">
+          <label>Message affiché aux utilisateurs</label>
+          <input id="maintenance-msg" type="text" placeholder="Le site est en maintenance, reviens plus tard.">
+        </div>
+        <div style="display:flex; gap:8px;">
+          <button class="pill-btn run" id="maintenance-on-btn">Activer</button>
+          <button class="pill-btn danger" id="maintenance-off-btn">Désactiver</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="settings-section">
+      <h3>Bannir une IP</h3>
+      <div class="panel" style="max-width:480px;">
+        <div class="field" style="margin-bottom:10px;">
+          <label>Adresse IP</label>
+          <input id="ban-ip-input" type="text" placeholder="ex : 203.0.113.42">
+        </div>
+        <div class="field" style="margin-bottom:12px;">
+          <label>Durée</label>
+          <select id="ban-ip-duration" class="lang-select">
+            <option value="3">Temporaire — 3 heures</option>
+            <option value="24">Temporaire — 24 heures</option>
+            <option value="permanent">Permanent</option>
+          </select>
+        </div>
+        <button class="pill-btn danger" id="ban-ip-btn">Bannir cette IP</button>
+      </div>
+    </div>
+
+    <div class="settings-section">
+      <h3>IPs actuellement bannies</h3>
+      <div class="panel" id="banned-ips-list"><div class="empty-state">Chargement…</div></div>
+    </div>
+
+    <div class="settings-section">
+      <h3>Comptes</h3>
+      <div class="panel">
+        <div style="overflow-x:auto;">
+          <table class="table" id="accounts-table">
+            <thead><tr><th>Pseudo</th><th>Rôle</th><th>Sites</th><th></th></tr></thead>
+            <tbody><tr><td colspan="4">Chargement…</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  `;
+
+  // ---- Vue d'ensemble + comptes ----
+  try{
+    const data = await api('/admin/overview');
+    document.querySelector('#admin-cards .stat-card .value.accent').textContent = data.accounts.length;
+    document.querySelectorAll('#admin-cards .stat-card .value')[1].textContent = data.totalSites;
+
+    const tbody = document.querySelector('#accounts-table tbody');
+    tbody.innerHTML = data.accounts.map(a => `
+      <tr>
+        <td>${escapeHtml(a.username)}</td>
+        <td><span class="badge ${a.role}">${a.role === 'owner' ? 'Owner' : 'Membre'}</span></td>
+        <td>${a.siteCount}</td>
+        <td>${a.role !== 'owner' ? `
+          <button class="pill-btn danger" data-ban-user="${a.username}">Bannir</button>
+          <button class="pill-btn danger" data-del="${a.username}">Supprimer</button>
+        ` : ''}</td>
+      </tr>
+    `).join('');
+
+    tbody.querySelectorAll('[data-del]').forEach(btn=>{
+      btn.onclick = async ()=>{
+        if(!confirm(`Supprimer le compte ${btn.dataset.del} ?`)) return;
+        try{ await api('/admin/accounts/' + btn.dataset.del, { method:'DELETE' }); toast('Compte supprimé'); renderAdmin(c); }
+        catch(e){ toast(e.message); }
+      };
+    });
+    tbody.querySelectorAll('[data-ban-user]').forEach(btn=>{
+      btn.onclick = async ()=>{
+        if(!confirm(`Bannir le compte ${btn.dataset.banUser} ?`)) return;
+        try{ await api('/admin/ban-user', { method:'POST', body:{ username: btn.dataset.banUser } }); toast('Compte banni'); renderAdmin(c); }
+        catch(e){ toast(e.message); }
+      };
+    });
+  } catch(e){
+    document.querySelector('#accounts-table tbody').innerHTML = `<tr><td colspan="4" style="color:var(--red)">${escapeHtml(e.message)}</td></tr>`;
+  }
+
+  // ---- Mode maintenance ----
+  try{
+    const m = await api('/settings/maintenance');
+    document.getElementById('maintenance-status').innerHTML = m.maintenance
+      ? `<span style="color:var(--red)">Activé</span>`
+      : `<span style="color:var(--green)">Désactivé</span>`;
+    document.getElementById('maintenance-msg').value = m.message || '';
+  } catch(e){
+    document.getElementById('maintenance-status').textContent = '—';
+  }
+
+  document.getElementById('maintenance-on-btn').onclick = async ()=>{
+    const message = document.getElementById('maintenance-msg').value.trim();
+    try{
+      await api('/settings/maintenance', { method:'POST', body:{ enabled:true, message } });
+      toast('Maintenance activée');
+      renderAdmin(c);
+    } catch(e){ toast(e.message); }
+  };
+  document.getElementById('maintenance-off-btn').onclick = async ()=>{
+    try{
+      await api('/settings/maintenance', { method:'POST', body:{ enabled:false, message:'' } });
+      toast('Maintenance désactivée');
+      renderAdmin(c);
+    } catch(e){ toast(e.message); }
+  };
+
+  // ---- Ban IP ----
+  document.getElementById('ban-ip-btn').onclick = async ()=>{
+    const ip = document.getElementById('ban-ip-input').value.trim();
+    const duration = document.getElementById('ban-ip-duration').value;
+    if(!ip){ toast("Renseigne une adresse IP"); return; }
+    try{
+      await api('/admin/ban-ip', {
+        method:'POST',
+        body: duration === 'permanent' ? { ip, permanent:true } : { ip, permanent:false, hours: Number(duration) }
+      });
+      toast('IP bannie');
+      document.getElementById('ban-ip-input').value = '';
+      loadBannedIps();
+    } catch(e){ toast(e.message); }
+  };
+
+  async function loadBannedIps(){
+    const box = document.getElementById('banned-ips-list');
+    try{
+      const data = await api('/admin/bans');
+      const ips = data.bannedIps || [];
+      if(!ips.length){
+        box.innerHTML = `<div class="empty-state">Aucune IP bannie actuellement.</div>`;
+        return;
+      }
+      box.innerHTML = ips.map(b => `
+        <div class="site-row">
+          <div>
+            <div class="name">${escapeHtml(b.ip)}</div>
+            <div class="link">${b.permanent ? 'Bannissement permanent' : ("Jusqu'au " + new Date(b.expires).toLocaleString('fr-FR'))}</div>
+          </div>
+          <button class="pill-btn" data-unban-ip="${b.ip}">Débannir</button>
+        </div>
+      `).join('');
+      box.querySelectorAll('[data-unban-ip]').forEach(btn=>{
+        btn.onclick = async ()=>{
+          try{ await api('/admin/unban-ip', { method:'POST', body:{ ip: btn.dataset.unbanIp } }); toast('IP débannie'); loadBannedIps(); }
+          catch(e){ toast(e.message); }
+        };
+      });
+    } catch(e){
+      box.innerHTML = `<div class="empty-state" style="color:var(--red)">Impossible de charger.</div>`;
+    }
+  }
+  loadBannedIps();
+}
+
+/* =========================================================
+   BOOT — restaure la session si elle existe déjà
+   ========================================================= */
+try{
+  const savedSession = loadSession();
+  if(savedSession && savedSession.token && savedSession.username && savedSession.role){
+    state.user = savedSession;
+    renderMain();
+  } else {
+    renderLogin('login');
+  }
+} catch(bootErr){
+  document.getElementById('app').innerHTML = '<div style="color:#FF6B6B; background:#000; padding:40px; font-family:monospace; font-size:14px; white-space:pre-wrap;">ERREUR AU DÉMARRAGE :\n\n' + bootErr.message + '\n\n' + (bootErr.stack || '') + '</div>';
+}
+</script>
+</body>
+</html>
