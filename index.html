@@ -347,11 +347,7 @@
 </style>
 </head>
 <body>
-<div id="app">
-  <div style="color:#fff; background:#000; padding:40px; font-family:sans-serif; font-size:18px;">
-    Si tu vois ce texte, le fichier HTML se charge bien. Le JavaScript va maintenant tenter de démarrer.
-  </div>
-</div>
+<div id="app"></div>
 <div id="crash-reporter" style="display:none; position:fixed; inset:0; background:#0A0A0B; color:#FF6B6B; font-family:monospace; font-size:13px; padding:20px; z-index:9999; overflow:auto; white-space:pre-wrap; line-height:1.6;"></div>
 
 <script>
@@ -362,10 +358,6 @@ window.addEventListener('error', function(e){
     box.textContent = "ERREUR DÉTECTÉE :\n\n" + e.message + "\n\nFichier : " + e.filename + "\nLigne : " + e.lineno + ", colonne : " + e.colno + (e.error && e.error.stack ? "\n\nDétail :\n" + e.error.stack : "");
   }
 });
-</script>
-
-<script>
-document.getElementById('app').innerHTML = '<div style="color:#0f0; background:#000; padding:40px; font-family:sans-serif; font-size:18px;">TEST 2 : le second script JS s\'exécute correctement jusqu\'ici.</div>';
 </script>
 
 <script>
@@ -2197,4 +2189,15 @@ async function renderAdmin(c){
         <div class="field" style="margin-bottom:12px;">
           <label>Durée</label>
           <select id="ban-ip-duration" class="lang-select">
-            <option value="
+            <option value="3">Temporaire — 3 heures</option>
+            <option value="24">Temporaire — 24 heures</option>
+            <option value="permanent">Permanent</option>
+          </select>
+        </div>
+        <button class="pill-btn danger" id="ban-ip-btn">Bannir cette IP</button>
+      </div>
+    </div>
+
+    <div class="settings-section">
+      <h3>IPs actuellement bannies</h3>
+      <div class="panel" id="banned-ips-list"><div class="empty-state">Charge
