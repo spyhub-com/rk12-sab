@@ -13,8 +13,8 @@
     --text:#F2F2F3;
     --text-dim:#9A9AA0;
     --text-faint:#5C5C62;
-    --accent:#B8B8BE;       /* gris clair neutre par défaut */
-    --accent-2:#7A7A80;     /* dégradé secondaire par défaut */
+    --accent:#C9A8FF;       /* violet clair par défaut */
+    --accent-2:#8B6FCE;     /* dégradé secondaire violet */
     --accent-text:#0A0A0B;
     --red:#FF6B6B;
     --green:#5FD98A;
@@ -84,7 +84,7 @@
 
   /* ---- Layout ---- */
   .main-layout{ display:flex; flex-direction:column; min-height:100vh; width:100%; }
-  .body-row{ display:flex; flex:1; overflow:hidden; position:relative; }
+  .body-row{ display:flex; flex:1; min-height:0; position:relative; }
 
   .sidebar-overlay{
     position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:90;
@@ -147,6 +147,7 @@
 
   .editor-wrap{ display:flex; flex-direction:column; gap:12px; }
   @media (min-width:860px){ .editor-wrap{ flex-direction:row; height:calc(100vh - 210px); } }
+  .editor-wrap.chat-height{ display:flex; flex-direction:column; }
   .editor-pane, .console-pane{ flex:1; background:var(--glass); border:1px solid var(--border); border-radius:var(--radius);
     display:flex; flex-direction:column; overflow:hidden; min-height:220px; }
   .pane-bar{ display:flex; align-items:center; justify-content:space-between; padding:10px 14px;
@@ -159,6 +160,16 @@
   .pill-btn.run:hover{ filter:brightness(1.08); }
   .pill-btn.run:disabled{ opacity:0.5; cursor:not-allowed; }
   .pill-btn.danger:hover{ color:var(--red); }
+
+  /* Boutons d'outils bien dimensionnés (ni trop grands, ni trop petits) */
+  .tool-btn{ background:rgba(255,255,255,0.06); border:1px solid var(--border-soft); color:var(--text-dim);
+    font-size:12.5px; font-weight:500; padding:7px 13px; border-radius:9px; cursor:pointer;
+    transition:background .12s, color .12s, transform .1s; white-space:nowrap; }
+  .tool-btn:hover{ background:rgba(255,255,255,0.11); color:var(--text); }
+  .tool-btn:active{ transform:scale(0.96); }
+  .tool-btn.primary{ background:linear-gradient(120deg, var(--accent), var(--accent-2)); color:var(--accent-text); border:none; font-weight:600; }
+  .tool-btn.primary:hover{ filter:brightness(1.08); }
+  .tool-btn:disabled{ opacity:0.5; cursor:not-allowed; }
 
   textarea.code-input{ flex:1; background:transparent; border:none; outline:none; resize:none; color:var(--text);
     font-family:"SF Mono", Menlo, Consolas, monospace; font-size:13px; line-height:1.6; padding:14px; min-height:160px; }
@@ -179,6 +190,29 @@
     font-size:13px; color:var(--text-dim); cursor:pointer; }
   .lang-tab.active{ background:rgba(184,184,190,0.18); background:color-mix(in srgb, var(--accent) 18%, transparent); color:var(--text); border-color:rgba(184,184,190,0.35); border-color:color-mix(in srgb, var(--accent) 35%, transparent); }
 
+  /* Sélecteur de mode (remplace/complète lang-tabs pour Dev Tools) */
+  .mode-switch{ display:flex; gap:6px; margin-bottom:16px; flex-wrap:wrap; background:rgba(255,255,255,0.03);
+    border:1px solid var(--border-soft); border-radius:12px; padding:5px; }
+  .mode-btn{ padding:8px 16px; border-radius:9px; font-size:13px; font-weight:500; color:var(--text-dim);
+    cursor:pointer; text-align:center; flex:1; min-width:90px; transition:background .15s, color .15s; }
+  .mode-btn.active{ background:linear-gradient(120deg, var(--accent), var(--accent-2)); color:var(--accent-text); font-weight:600; }
+
+  /* Onglets de fichiers (Dev Tools éditeur web) */
+  .file-tabs-bar{ display:flex; align-items:center; justify-content:space-between; gap:8px; flex-wrap:wrap;
+    background:var(--glass); border:1px solid var(--border); border-radius:var(--radius) var(--radius) 0 0; padding:8px 10px; }
+  .file-tabs{ display:flex; gap:4px; flex-wrap:wrap; }
+  .file-tab{ padding:6px 12px; border-radius:8px; font-size:12.5px; color:var(--text-dim); cursor:pointer; white-space:nowrap; }
+  .file-tab.active{ background:rgba(255,255,255,0.1); color:var(--text); font-weight:600; }
+  .dev-editor-area{ display:flex; flex-direction:column; }
+  .dev-editor-area .editor-pane{ min-height:280px; }
+  .preview-frame-wrap{ display:flex; flex-direction:column; min-height:400px; border:1px solid var(--border);
+    border-radius:0 0 var(--radius) var(--radius); overflow:hidden; background:#fff; }
+  .preview-frame-wrap iframe{ flex:1; width:100%; height:100%; min-height:400px; border:none; }
+  @media (min-width:860px){
+    .preview-frame-wrap{ min-height:520px; }
+    .preview-frame-wrap iframe{ min-height:520px; }
+  }
+
   .site-row{ display:flex; align-items:center; justify-content:space-between; padding:14px; border-radius:12px;
     background:rgba(255,255,255,0.03); border:1px solid var(--border-soft); margin-bottom:10px; gap:12px; flex-wrap:wrap; }
   .site-row .link{ color:var(--text); opacity:0.8; font-size:13px; font-family:"SF Mono", Menlo, monospace; word-break:break-all; }
@@ -188,10 +222,13 @@
   .empty-state{ text-align:center; padding:50px 20px; color:var(--text-faint); }
   .empty-state .big{ font-size:15px; color:var(--text-dim); margin-bottom:4px; }
 
-  .embed-preview{ border-left:3px solid var(--accent); background:rgba(255,255,255,0.03); border-radius:8px;
+  .discord-preview{ border-left:4px solid var(--accent); background:#2b2d31; border-radius:8px;
     padding:14px 16px; margin-top:16px; }
-  .embed-preview .etitle{ font-weight:600; font-size:14.5px; margin-bottom:6px; color:#fff; }
-  .embed-preview .edesc{ font-size:13.5px; color:#dcdde0; line-height:1.5; }
+  .dp-author{ font-weight:600; font-size:13px; color:#fff; margin-bottom:6px; }
+  .dp-title{ font-weight:700; font-size:15px; margin-bottom:6px; color:#fff; }
+  .dp-desc{ font-size:13.5px; color:#dbdee1; line-height:1.5; white-space:pre-wrap; }
+  .dp-image{ width:100%; max-height:220px; object-fit:cover; border-radius:6px; margin-top:10px; }
+  .dp-footer{ font-size:11.5px; color:#949ba4; margin-top:10px; }
 
   .toast{ position:fixed; bottom:20px; left:50%; transform:translateX(-50%) translateY(20px);
     background:rgba(20,20,22,0.95); border:1px solid var(--border); padding:12px 20px; border-radius:12px;
@@ -245,6 +282,105 @@
   .thinking-dots span:nth-child(2){ animation-delay:0.2s; }
   .thinking-dots span:nth-child(3){ animation-delay:0.4s; }
   @keyframes thinkPulse{ 0%,60%,100%{ opacity:0.3; transform:scale(0.8); } 30%{ opacity:1; transform:scale(1); } }
+
+  /* ---- Landing page Accueil ---- */
+  .landing-topbar{
+    display:flex; align-items:center; gap:12px; flex-wrap:wrap;
+    background:rgba(255,255,255,0.045); border:1px solid var(--border);
+    border-radius:20px; padding:14px 20px; margin-bottom:26px;
+    backdrop-filter:blur(24px) saturate(160%);
+    box-shadow:0 20px 50px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.06);
+  }
+  .landing-logo{ display:flex; align-items:center; gap:10px; font-weight:700; font-size:15px; }
+  .landing-logo .mark{ width:32px; height:32px; border-radius:10px; background:linear-gradient(155deg, var(--accent), var(--accent-2));
+    display:flex; align-items:center; justify-content:center; font-weight:700; color:var(--accent-text); }
+  .landing-status-pill{ display:flex; align-items:center; gap:7px; font-size:12.5px; color:var(--text-dim);
+    background:rgba(255,255,255,0.05); border:1px solid var(--border-soft); border-radius:20px; padding:6px 14px; }
+  .dot-live{ width:7px; height:7px; border-radius:50%; background:var(--green); box-shadow:0 0 8px var(--green); }
+  .landing-discord-btn{ margin-left:auto; background:linear-gradient(120deg, var(--accent), var(--accent-2)); color:var(--accent-text);
+    font-size:13px; font-weight:600; padding:9px 18px; border-radius:12px; text-decoration:none; transition:filter .15s; }
+  .landing-discord-btn:hover{ filter:brightness(1.1); }
+
+  .landing-hero{
+    position:relative; text-align:center; padding:60px 24px; border-radius:28px; overflow:hidden;
+    background:linear-gradient(160deg, rgba(201,168,255,0.14), rgba(139,111,206,0.05));
+    border:1px solid var(--border); margin-bottom:26px;
+  }
+  .landing-hero-glow{
+    position:absolute; top:-40%; left:50%; width:500px; height:500px; transform:translateX(-50%);
+    background:radial-gradient(circle, color-mix(in srgb, var(--accent) 35%, transparent), transparent 70%);
+    filter:blur(10px); pointer-events:none;
+  }
+  .landing-hero h1{ position:relative; font-size:28px; font-weight:700; letter-spacing:-0.02em; margin-bottom:10px; }
+  .landing-hero p{ position:relative; color:var(--text-dim); font-size:15px; }
+  @media (min-width:860px){ .landing-hero h1{ font-size:36px; } .landing-hero{ padding:80px 40px; } }
+
+  .landing-info-grid{ display:grid; grid-template-columns:repeat(2,1fr); gap:12px; margin-bottom:26px; }
+  @media (min-width:640px){ .landing-info-grid{ grid-template-columns:repeat(4,1fr); } }
+  .landing-info-card{
+    background:var(--glass); border:1px solid var(--border); border-radius:18px; padding:20px;
+    text-align:center; transition:transform .2s; backdrop-filter:blur(16px);
+  }
+  .landing-info-card:hover{ transform:translateY(-3px); }
+  .li-label{ font-size:12px; color:var(--text-dim); margin-bottom:8px; }
+  .li-value{ font-size:24px; font-weight:700; background:linear-gradient(120deg, var(--accent), var(--accent-2));
+    -webkit-background-clip:text; background-clip:text; color:transparent; }
+
+  .landing-quicklinks{ display:grid; grid-template-columns:repeat(2,1fr); gap:12px; }
+  @media (min-width:640px){ .landing-quicklinks{ grid-template-columns:repeat(4,1fr); } }
+  .landing-qlink{
+    background:var(--glass); border:1px solid var(--border); border-radius:16px; padding:22px 16px;
+    text-align:center; font-size:13.5px; font-weight:600; cursor:pointer; transition:transform .15s, border-color .15s;
+  }
+  .landing-qlink:hover{ transform:translateY(-3px); border-color:color-mix(in srgb, var(--accent) 45%, transparent); border-color:rgba(201,168,255,0.45); }
+
+  /* ---- News enrichi ---- */
+  .news-card{ background:var(--glass); border:1px solid var(--border); border-left:3px solid var(--accent);
+    border-radius:16px; padding:16px 18px; margin-bottom:12px; backdrop-filter:blur(16px); }
+  .news-card-top{ display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin-bottom:8px; }
+  .news-badge{ font-size:11px; font-weight:700; padding:3px 10px; border-radius:20px; }
+  .news-time{ font-size:11.5px; color:var(--text-faint); }
+  .news-card-title{ font-size:16px; font-weight:700; margin-bottom:6px; }
+  .news-card-body{ font-size:13.5px; color:var(--text-dim); line-height:1.55; white-space:pre-wrap; margin-bottom:10px; }
+  .news-card-author{ font-size:11.5px; color:var(--text-faint); }
+
+  .site-card{ background:var(--glass); border:1px solid var(--border); border-radius:16px; padding:16px 18px;
+    margin-bottom:12px; display:flex; flex-direction:column; gap:12px; }
+  @media (min-width:640px){ .site-card{ flex-direction:row; align-items:center; justify-content:space-between; } }
+  .site-card-info .name{ font-size:15px; font-weight:700; margin-bottom:3px; }
+  .site-card-desc{ font-size:13px; color:var(--text-dim); margin-bottom:5px; }
+  .site-card-date{ font-size:11px; color:var(--text-faint); margin-top:4px; }
+  .site-card .actions{ display:flex; gap:8px; flex-wrap:wrap; }
+
+  .shop-item-row{ display:grid; grid-template-columns:1fr; gap:8px; background:rgba(255,255,255,0.03);
+    border:1px solid var(--border-soft); border-radius:12px; padding:12px; margin-bottom:10px; }
+  @media (min-width:640px){ .shop-item-row{ grid-template-columns:1fr 1fr; } }
+  .shop-item-row input{ background:rgba(255,255,255,0.04); border:1px solid var(--border-soft); border-radius:9px;
+    padding:9px 11px; color:var(--text); font-size:13px; outline:none; }
+
+  /* ---- Chat GPT (nouveau style) ---- */
+  .chat-panel{ display:flex; flex-direction:column; height:calc(100vh - 210px); min-height:460px;
+    background:var(--glass); border:1px solid var(--border); border-radius:var(--radius); overflow:hidden; }
+  .chat-panel-bar{ display:flex; align-items:center; justify-content:space-between; padding:12px 16px;
+    border-bottom:1px solid var(--border-soft); font-size:13px; color:var(--text-dim); flex-shrink:0; }
+  .chat-messages-area{ flex:1; overflow-y:auto; padding:18px; display:flex; flex-direction:column; gap:16px; min-height:0; }
+  .chat-empty-hint{ color:var(--text-faint); font-size:13.5px; text-align:center; margin-top:40px; }
+  .chat-bubble-row{ display:flex; flex-direction:column; max-width:82%; }
+  .chat-bubble-row.user{ align-self:flex-end; align-items:flex-end; }
+  .chat-bubble-row.assistant{ align-self:flex-start; align-items:flex-start; }
+  .chat-bubble-label{ font-size:11px; color:var(--text-faint); margin-bottom:4px; padding:0 4px; }
+  .chat-bubble{ border-radius:16px; padding:11px 15px; font-size:13.5px; line-height:1.6; color:var(--text); }
+  .chat-bubble.user{ background:linear-gradient(120deg, var(--accent), var(--accent-2)); color:var(--accent-text); border-bottom-right-radius:4px; }
+  .chat-bubble.assistant{ background:rgba(255,255,255,0.05); border:1px solid var(--border-soft); border-bottom-left-radius:4px; }
+  .chat-input-bar{ border-top:1px solid var(--border-soft); padding:12px; flex-shrink:0; }
+  .chat-attach-row{ display:flex; gap:6px; flex-wrap:wrap; margin-bottom:8px; }
+  .chat-attach-chip{ background:rgba(255,255,255,0.06); border:1px solid var(--border-soft); border-radius:8px;
+    padding:5px 10px; font-size:11.5px; color:var(--text-dim); display:flex; align-items:center; gap:6px; }
+  .chat-attach-chip span{ cursor:pointer; color:var(--red); font-weight:700; }
+  .chat-input-row{ display:flex; gap:8px; align-items:flex-end; }
+  .chat-textarea{ flex:1; min-height:42px; max-height:110px; background:rgba(255,255,255,0.04);
+    border:1px solid var(--border-soft); border-radius:12px; padding:10px 14px; color:var(--text);
+    font-size:14px; outline:none; resize:none; font-family:inherit; }
 
   /* ---- Debug console ---- */
   .debug-console{
@@ -394,7 +530,7 @@ const APP_INITIAL = "S";
 /* =========================================================
    THEME (couleurs custom, sauvegardées en localStorage)
    ========================================================= */
-const DEFAULT_THEME = { accent: "#B8B8BE", accent2: "#7A7A80" };
+const DEFAULT_THEME = { accent: "#C9A8FF", accent2: "#8B6FCE" };
 function loadTheme(){
   try{ return JSON.parse(localStorage.getItem('shgt_theme')) || DEFAULT_THEME; }
   catch(e){ return DEFAULT_THEME; }
@@ -483,13 +619,9 @@ async function api(path, opts){
       try{
         const { res, data, rawText } = await apiRaw(path, opts);
 
-        if(res.status === 429 && data && data.captcha){
-          dlog('err', `✗ CAPTCHA requis (trop de requêtes)`);
-          const solved = await showCaptchaModal();
-          if(!solved){
-            throw new Error("Backend not available at the moment, please try again.");
-          }
-          continue; // on retente la requête après résolution du captcha
+        if(res.status === 429 && data && data.error === "cooldown"){
+          renderCooldownScreen(data.cooldownUntil);
+          throw new Error("COOLDOWN_MODE");
         }
 
         if(res.status === 429){
@@ -517,7 +649,7 @@ async function api(path, opts){
 
       } catch(e){
         lastErr = e;
-        if(e.message === "MAINTENANCE_MODE") throw e;
+        if(e.message === "MAINTENANCE_MODE" || e.message === "COOLDOWN_MODE") throw e;
         if(e.message && e.message.includes("Backend not available")) throw e;
         // Erreur réseau (fetch a échoué) : on retente aussi, sauf à la dernière tentative
         dlog('err', `✗ Échec réseau : ${e.message}`);
@@ -539,48 +671,22 @@ function escapeHtml(s){
 }
 
 /* =========================================================
-   CAPTCHA (anti-spam) — petit calcul simple affiché en modal
+   COOLDOWN (remplace l'ancien système anti-spam/captcha)
    ========================================================= */
-function showCaptchaModal(){
-  return new Promise((resolve)=>{
-    const a = Math.floor(Math.random() * 8) + 1;
-    const b = Math.floor(Math.random() * 8) + 1;
-    const expected = a + b;
-
-    const overlay = document.createElement('div');
-    overlay.className = 'tos-modal-overlay show';
-    overlay.innerHTML = `
-      <div class="tos-modal" style="text-align:center;">
-        <h3>Vérification anti-spam</h3>
-        <div class="tos-body" style="font-size:15px;">Trop de requêtes détectées. Résous ce calcul pour continuer :</div>
-        <div style="font-size:22px; font-weight:600; margin-bottom:16px;">${a} + ${b} = ?</div>
-        <input id="captcha-input" type="number" class="field" style="width:100%; text-align:center; margin-bottom:14px; background:rgba(255,255,255,0.05); border:1px solid var(--border-soft); border-radius:11px; padding:12px; color:var(--text); font-size:16px;">
-        <button class="btn-primary" id="captcha-submit">Valider</button>
+function renderCooldownScreen(untilTimestamp){
+  const app = document.getElementById('app');
+  const minutes = Math.max(1, Math.ceil((untilTimestamp - Date.now()) / 60000));
+  app.innerHTML = `
+    <div class="login-wrap">
+      <div class="login-card" style="text-align:center;">
+        <div class="login-mark" style="margin-left:auto; margin-right:auto;">${APP_INITIAL}</div>
+        <h1>Trop de requêtes</h1>
+        <p class="sub">Vous pourrez réutiliser le site dans environ ${minutes} minute${minutes > 1 ? 's' : ''}.</p>
+        <button class="btn-primary" id="cooldown-retry">Réessayer</button>
       </div>
-    `;
-    document.body.appendChild(overlay);
-
-    const submit = async ()=>{
-      const val = document.getElementById('captcha-input').value;
-      try{
-        const { res } = await apiRaw('/anti-spam/captcha-check', {
-          method:'POST', body:{ answer: val, expected }
-        });
-        if(res.ok){
-          overlay.remove();
-          resolve(true);
-        } else {
-          toast('Réponse incorrecte, réessaie.');
-        }
-      } catch(e){
-        toast('Erreur de vérification.');
-      }
-    };
-    document.getElementById('captcha-submit').onclick = submit;
-    document.getElementById('captcha-input').addEventListener('keydown', (e)=>{
-      if(e.key === 'Enter') submit();
-    });
-  });
+    </div>
+  `;
+  document.getElementById('cooldown-retry').onclick = ()=> location.reload();
 }
 
 /* =========================================================
@@ -615,9 +721,6 @@ function renderLogin(mode){
         <div class="social-row">
           <button class="social-btn" id="google-btn">
             <span class="social-icon">G</span> Continuer avec Google
-          </button>
-          <button class="social-btn" id="apple-btn">
-            <span class="social-icon"></span> Continuer avec Apple
           </button>
         </div>
         <div class="divider"><span>ou</span></div>
@@ -658,7 +761,6 @@ function renderLogin(mode){
 
   document.getElementById('toggle-mode').onclick = ()=> renderLogin(mode==='login' ? 'register' : 'login');
   document.getElementById('google-btn').onclick = ()=> toast('Connexion Google — bientôt disponible');
-  document.getElementById('apple-btn').onclick = ()=> toast('Connexion Apple — bientôt disponible');
 
   if(mode === 'register'){
     document.getElementById('tos-link').onclick = ()=> document.getElementById('tos-modal-overlay').classList.add('show');
@@ -825,10 +927,9 @@ function navItemsFor(role){
   const base = [
     { group:'News', items:[ { id:'news', label:'Actualités' } ] },
     { group:'Général', items:[ { id:'overview', label:'Accueil' } ] },
-    { group:'Code', items:[ { id:'lua', label:'Lua' }, { id:'devtools', label:'Dev Tools' } ] },
+    { group:'Code', items:[ { id:'devtools', label:'Dev Tools' } ] },
     { group:'Hébergement', items:[ { id:'hosting', label:'Sites hébergés' }, { id:'botHosting', label:'Bot Discord hébergé' } ] },
-    { group:'Outils', items:[ { id:'discord', label:'Annonce Discord' }, { id:'notes', label:'Notes' } ] },
-    { group:'Communauté', items:[ { id:'chat', label:'Discussion' } ] },
+    { group:'Outils', items:[ { id:'discord', label:'Annonce Discord' } ] },
     { group:'Boutique', items:[ { id:'shop', label:'Ma boutique' }, { id:'shopBrowse', label:'Boutiques' } ] },
     { group:'IA', items:[ { id:'chatgpt', label:'Chat GPT' } ] },
     { group:'Sécurité', items:[ { id:'toolsv1', label:'Tools V1' } ] },
@@ -918,13 +1019,10 @@ function renderSection(id){
   showLoader();
   setTimeout(()=>{
     if(id === 'overview') renderOverview(c);
-    else if(id === 'lua') renderCodeEditor(c, 'lua');
     else if(id === 'devtools') renderDevTools(c);
     else if(id === 'hosting') renderHosting(c);
     else if(id === 'botHosting') renderBotHosting(c);
     else if(id === 'discord') renderDiscord(c);
-    else if(id === 'notes') renderNotes(c);
-    else if(id === 'chat') renderChat(c);
     else if(id === 'shop') renderShop(c);
     else if(id === 'shopBrowse') renderShopBrowse(c);
     else if(id === 'news') renderNews(c);
@@ -1031,87 +1129,54 @@ function renderNotes(c){
 
 /* ---------- Accueil enrichi ---------- */
 async function renderOverview(c){
-  const hour = new Date().getHours();
-  const greeting = hour < 5 ? 'Bonne nuit' : hour < 12 ? 'Bonjour' : hour < 18 ? 'Bon après-midi' : 'Bonsoir';
   const displayName = state.user.nickname || state.user.username;
 
   c.innerHTML = `
-    <div class="content-header">
-      <h2>${greeting}, ${escapeHtml(displayName)}</h2>
-      <p>Voici un aperçu complet de ton espace ${APP_NAME}.</p>
+    <div class="landing-topbar">
+      <div class="landing-logo">
+        <div class="mark">${APP_INITIAL}</div>
+        <span>${APP_NAME}</span>
+      </div>
+      <div class="landing-status-pill">
+        <span class="dot-live"></span> Hosting — En ligne
+      </div>
+      <a href="https://discord.gg/eaRmCczJmE" target="_blank" class="landing-discord-btn">Rejoindre le Discord</a>
     </div>
 
-    <div class="grid-cards" id="ov-cards" style="margin-bottom:24px;">
-      <div class="stat-card"><div class="label">Sites hébergés</div><div class="value accent" id="ov-sites">…</div></div>
-      <div class="stat-card"><div class="label">Rôle</div><div class="value">${state.user.role === 'owner' ? 'Owner' : 'Membre'}</div></div>
-      <div class="stat-card"><div class="label">Webhook Discord</div><div class="value">${state.savedWebhook ? 'Enregistré' : 'Aucun'}</div></div>
-      <div class="stat-card"><div class="label">Thème actif</div><div class="value" style="display:flex; align-items:center; gap:8px;">
-        <span style="width:16px; height:16px; border-radius:5px; display:inline-block; background:linear-gradient(120deg, ${currentTheme.accent}, ${currentTheme.accent2});"></span>
-        Personnalisé
-      </div></div>
+    <div class="landing-hero">
+      <div class="landing-hero-glow"></div>
+      <h1>Bienvenue, ${escapeHtml(displayName)}</h1>
+      <p>Ta plateforme tout-en-un pour coder, héberger et créer.</p>
     </div>
 
-    <div class="settings-section">
-      <h3>Accès rapide</h3>
-      <div class="grid-cards" id="quick-links">
-        <div class="stat-card qlink" data-go="lua" style="cursor:pointer;">
-          <div class="label">Éditeur</div><div class="value" style="font-size:16px;">Lua</div>
-        </div>
-        <div class="stat-card qlink" data-go="devtools" style="cursor:pointer;">
-          <div class="label">Éditeur</div><div class="value" style="font-size:16px;">Dev Tools</div>
-        </div>
-        <div class="stat-card qlink" data-go="hosting" style="cursor:pointer;">
-          <div class="label">Publier</div><div class="value" style="font-size:16px;">Sites hébergés</div>
-        </div>
-        <div class="stat-card qlink" data-go="discord" style="cursor:pointer;">
-          <div class="label">Envoyer</div><div class="value" style="font-size:16px;">Annonce Discord</div>
-        </div>
+    <div class="landing-info-grid" id="landing-info">
+      <div class="landing-info-card">
+        <div class="li-label">Sites hébergés</div>
+        <div class="li-value" id="li-sites">…</div>
+      </div>
+      <div class="landing-info-card">
+        <div class="li-label">Membres</div>
+        <div class="li-value" id="li-members">…</div>
+      </div>
+      <div class="landing-info-card">
+        <div class="li-label">Messages échangés</div>
+        <div class="li-value" id="li-messages">…</div>
+      </div>
+      <div class="landing-info-card">
+        <div class="li-label">Boutiques créées</div>
+        <div class="li-value" id="li-shops">…</div>
       </div>
     </div>
 
-    <div class="settings-section">
-      <h3>Tes derniers sites</h3>
-      <div class="panel" id="recent-sites"><div class="empty-state">Chargement…</div></div>
-    </div>
-
-    <div class="settings-section">
-      <h3>Statut de la plateforme</h3>
-      <div class="panel">
-        <div style="display:flex; flex-direction:column; gap:10px;">
-          <div style="display:flex; justify-content:space-between; align-items:center;">
-            <span style="font-size:13.5px; color:var(--text-dim);">Backend</span>
-            <span id="status-worker" style="font-size:12px; color:var(--text-faint);">Vérification…</span>
-          </div>
-          <div style="display:flex; justify-content:space-between; align-items:center;">
-            <span style="font-size:13.5px; color:var(--text-dim);">Moteur d'exécution</span>
-            <span style="font-size:12px; color:var(--green);">En ligne — Public</span>
-          </div>
-          <div style="display:flex; justify-content:space-between; align-items:center;">
-            <span style="font-size:13.5px; color:var(--text-dim);">Hosting</span>
-            <span style="font-size:12px; color:var(--green);">En ligne — Public</span>
-          </div>
-          <div style="display:flex; justify-content:space-between; align-items:center;">
-            <span style="font-size:13.5px; color:var(--text-dim);">Compte connecté</span>
-            <span style="font-size:12px; color:var(--text-dim);">${escapeHtml(displayName)}</span>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="settings-section">
-      <h3>Astuces</h3>
-      <div class="panel">
-        <div style="display:flex; flex-direction:column; gap:12px; font-size:13.5px; color:var(--text-dim); line-height:1.5;">
-          <div>Dans l'éditeur Lua, tape 2 lettres d'un mot-clé pour voir des suggestions apparaître.</div>
-          <div>Dans Dev Tools, l'onglet "Browser" affiche un aperçu en direct de ton HTML/CSS/JS.</div>
-          <div>Personnalise la couleur d'accent du site dans Paramètres — elle s'applique partout.</div>
-          <div>Ton webhook Discord reste enregistré même après avoir quitté le site.</div>
-        </div>
-      </div>
+    <div class="landing-quicklinks">
+      <div class="landing-qlink" data-go="devtools"><span>Dev Tools</span></div>
+      <div class="landing-qlink" data-go="hosting"><span>Sites hébergés</span></div>
+      <div class="landing-qlink" data-go="discord"><span>Annonce Discord</span></div>
+      <div class="landing-qlink" data-go="chatgpt"><span>Chat GPT</span></div>
     </div>
   `;
 
-  c.querySelectorAll('.qlink').forEach(el=>{
+  c.querySelectorAll('.landing-qlink').forEach(el=>{
     el.onclick = ()=>{
       state.section = el.dataset.go;
       renderNav(navItemsFor(state.user.role));
@@ -1121,30 +1186,30 @@ async function renderOverview(c){
 
   try{
     const data = await api('/sites/mine');
-    const sites = data.sites || [];
-    document.getElementById('ov-sites').textContent = sites.length;
-    const recentBox = document.getElementById('recent-sites');
-    if(!sites.length){
-      recentBox.innerHTML = `<div class="empty-state"><div class="big">Aucun site publié encore</div>Va dans "Sites hébergés" pour créer le premier.</div>`;
-    } else {
-      recentBox.innerHTML = sites.slice(-3).reverse().map(s => `
-        <div class="site-row">
-          <div>
-            <div class="name">${escapeHtml(s.name)}</div>
-            <div class="link">${API_BASE}/site/${s.id}</div>
-          </div>
-        </div>
-      `).join('');
+    document.getElementById('li-sites').textContent = (data.sites || []).length;
+  } catch(e){ document.getElementById('li-sites').textContent = '—'; }
+
+  if(state.user.role === 'owner'){
+    try{
+      const data = await api('/admin/overview');
+      document.getElementById('li-members').textContent = data.accounts.length;
+      document.getElementById('li-messages').textContent = data.totalMessages;
+      document.getElementById('li-shops').textContent = data.totalShops;
+    } catch(e){
+      document.getElementById('li-members').textContent = '—';
+      document.getElementById('li-messages').textContent = '—';
+      document.getElementById('li-shops').textContent = '—';
     }
-    document.getElementById('status-worker').innerHTML = `<span style="color:var(--green)">En ligne</span>`;
-  } catch(e){
-    document.getElementById('ov-sites').textContent = '—';
-    document.getElementById('recent-sites').innerHTML = `<div class="empty-state">Impossible de charger.</div>`;
-    document.getElementById('status-worker').innerHTML = `<span style="color:var(--red)">Injoignable</span>`;
+  } else {
+    document.getElementById('li-members').textContent = '—';
+    document.getElementById('li-messages').textContent = '—';
+    document.getElementById('li-shops').textContent = '—';
   }
 }
 
 /* ---------- News : actualités publiées par l'Owner ---------- */
+const NEWS_CATEGORIES = { info:{label:'Info', color:'#5E9EFF'}, update:{label:'Mise à jour', color:'#5FD98A'}, alert:{label:'Alerte', color:'#FF6B6B'}, event:{label:'Événement', color:'#C9A8FF'} };
+
 async function renderNews(c){
   const isOwner = state.user.role === 'owner';
   c.innerHTML = `
@@ -1158,11 +1223,17 @@ async function renderNews(c){
         <label>Titre</label>
         <input id="news-title" type="text" placeholder="Titre de l'actualité">
       </div>
+      <div class="field" style="margin-bottom:10px;">
+        <label>Catégorie</label>
+        <select id="news-category" class="lang-select">
+          ${Object.entries(NEWS_CATEGORIES).map(([k,v]) => `<option value="${k}">${v.label}</option>`).join('')}
+        </select>
+      </div>
       <div class="field" style="margin-bottom:14px;">
         <label>Contenu</label>
         <textarea id="news-content" placeholder="Contenu de l'annonce..." style="min-height:100px;"></textarea>
       </div>
-      <button class="pill-btn run" id="news-publish-btn">Publier</button>
+      <button class="tool-btn primary" id="news-publish-btn">Publier</button>
     </div>
     ` : ''}
     <div id="news-list"><div class="empty-state">Chargement…</div></div>
@@ -1177,16 +1248,21 @@ async function renderNews(c){
         list.innerHTML = `<div class="empty-state"><div class="big">Aucune actualité pour le moment</div></div>`;
         return;
       }
-      list.innerHTML = items.map(n => `
-        <div class="panel" style="margin-bottom:12px;">
-          <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:10px; margin-bottom:6px;">
-            <div style="font-weight:600; font-size:15px;">${escapeHtml(n.title)}</div>
-            ${isOwner ? `<button class="pill-btn danger" data-del-news="${n.id}">Supprimer</button>` : ''}
+      list.innerHTML = items.map(n => {
+        const cat = NEWS_CATEGORIES[n.category] || NEWS_CATEGORIES.info;
+        const d = new Date(n.createdAt);
+        return `
+        <div class="news-card" style="border-left-color:${cat.color};">
+          <div class="news-card-top">
+            <span class="news-badge" style="background:${cat.color}22; color:${cat.color};">${cat.label}</span>
+            <span class="news-time">${d.toLocaleDateString('fr-FR', {day:'2-digit', month:'short'})} à ${d.toLocaleTimeString('fr-FR', {hour:'2-digit', minute:'2-digit'})}</span>
+            ${isOwner ? `<button class="tool-btn" data-del-news="${n.id}" style="margin-left:auto; color:var(--red);">Supprimer</button>` : ''}
           </div>
-          <div style="font-size:12px; color:var(--text-faint); margin-bottom:8px;">${new Date(n.createdAt).toLocaleDateString('fr-FR')}</div>
-          <div style="font-size:13.5px; color:var(--text-dim); white-space:pre-wrap;">${escapeHtml(n.content)}</div>
+          <div class="news-card-title">${escapeHtml(n.title)}</div>
+          <div class="news-card-body">${escapeHtml(n.content)}</div>
+          <div class="news-card-author">Publié par ${escapeHtml(n.author)}</div>
         </div>
-      `).join('');
+      `}).join('');
       list.querySelectorAll('[data-del-news]').forEach(btn=>{
         btn.onclick = async ()=>{
           if(!confirm('Supprimer cette actualité ?')) return;
@@ -1204,12 +1280,13 @@ async function renderNews(c){
     document.getElementById('news-publish-btn').onclick = async ()=>{
       const title = document.getElementById('news-title').value.trim();
       const content = document.getElementById('news-content').value.trim();
+      const category = document.getElementById('news-category').value;
       const btn = document.getElementById('news-publish-btn');
       if(!title || !content){ toast('Titre et contenu requis'); return; }
       btn.disabled = true;
       btn.innerHTML = '<span class="spinner"></span>';
       try{
-        await api('/news', { method:'POST', body:{ title, content } });
+        await api('/news', { method:'POST', body:{ title, content, category } });
         document.getElementById('news-title').value = '';
         document.getElementById('news-content').value = '';
         toast('Actualité publiée');
@@ -1239,23 +1316,21 @@ function renderChatGPT(c){
       <h2>Chat GPT</h2>
       <p>Discute avec l'assistant IA. Tu peux joindre des fichiers texte (le contenu sera lu par l'IA).</p>
     </div>
-    <div class="editor-wrap" style="height:calc(100vh - 210px);">
-      <div class="console-pane" style="flex:1;">
-        <div class="pane-bar">
-          <span>Conversation</span>
-          <button class="pill-btn" id="chat-clear-btn">Effacer</button>
-        </div>
-        <div class="console-body" id="chat-messages" style="display:flex; flex-direction:column; gap:14px;">
-          <div class="sys">// Écris un message pour commencer la conversation.</div>
-        </div>
-        <div style="border-top:1px solid var(--border-soft); padding:12px; display:flex; flex-direction:column; gap:8px;">
-          <div id="chat-attachments-preview" style="display:flex; gap:6px; flex-wrap:wrap;"></div>
-          <div style="display:flex; gap:8px; align-items:flex-end;">
-            <input id="chat-file-input" type="file" accept=".txt,.js,.py,.lua,.json,.md,.html,.css,image/*" multiple class="hidden">
-            <button class="pill-btn" id="chat-attach-btn" title="Joindre un fichier">Joindre</button>
-            <textarea id="chat-input" placeholder="Écris ton message..." style="flex:1; min-height:44px; max-height:120px; background:rgba(255,255,255,0.04); border:1px solid var(--border-soft); border-radius:11px; padding:10px 14px; color:var(--text); font-size:14px; outline:none; resize:none; font-family:inherit;"></textarea>
-            <button class="pill-btn run" id="chat-send-btn">Envoyer</button>
-          </div>
+    <div class="chat-panel">
+      <div class="chat-panel-bar">
+        <span>Conversation</span>
+        <button class="tool-btn" id="chat-clear-btn">Effacer</button>
+      </div>
+      <div class="chat-messages-area" id="chat-messages">
+        <div class="chat-empty-hint">Écris un message pour commencer la conversation.</div>
+      </div>
+      <div class="chat-input-bar">
+        <div id="chat-attachments-preview" class="chat-attach-row"></div>
+        <div class="chat-input-row">
+          <input id="chat-file-input" type="file" accept=".txt,.js,.py,.lua,.json,.md,.html,.css,image/*" multiple class="hidden">
+          <button class="tool-btn" id="chat-attach-btn" title="Joindre un fichier">Joindre</button>
+          <textarea id="chat-input" placeholder="Écris ton message..." class="chat-textarea"></textarea>
+          <button class="tool-btn primary" id="chat-send-btn">Envoyer</button>
         </div>
       </div>
     </div>
@@ -1268,13 +1343,13 @@ function renderChatGPT(c){
 
   function renderMessages(){
     if(!chatHistory.length){
-      messagesBox.innerHTML = `<div class="sys">// Écris un message pour commencer la conversation.</div>`;
+      messagesBox.innerHTML = `<div class="chat-empty-hint">Écris un message pour commencer la conversation.</div>`;
       return;
     }
     messagesBox.innerHTML = chatHistory.map(m => `
-      <div style="align-self:${m.role === 'user' ? 'flex-end' : 'flex-start'}; max-width:85%;">
-        <div style="font-size:11px; color:var(--text-faint); margin-bottom:3px;">${m.role === 'user' ? 'Toi' : 'Assistant'}</div>
-        <div style="background:${m.role === 'user' ? 'rgba(255,255,255,0.08)' : 'rgba(255,255,255,0.03)'}; border:1px solid var(--border-soft); border-radius:12px; padding:10px 14px; font-size:13.5px; color:var(--text); line-height:1.55;">
+      <div class="chat-bubble-row ${m.role === 'user' ? 'user' : 'assistant'}">
+        <div class="chat-bubble-label">${m.role === 'user' ? 'Toi' : 'Assistant'}</div>
+        <div class="chat-bubble ${m.role === 'user' ? 'user' : 'assistant'}">
           ${m.thinking ? `<span class="thinking-dots"><span></span><span></span><span></span></span>` : renderMarkdownLite(m.displayContent || m.content)}
         </div>
       </div>
@@ -1285,7 +1360,7 @@ function renderChatGPT(c){
 
   function renderAttachPreview(){
     attachPreview.innerHTML = chatAttachments.map((a, i) => `
-      <div class="pill-btn" style="cursor:default;">${escapeHtml(a.name)} <span data-remove-att="${i}" style="cursor:pointer; margin-left:6px; color:var(--red);">×</span></div>
+      <div class="chat-attach-chip">${escapeHtml(a.name)} <span data-remove-att="${i}">×</span></div>
     `).join('');
     attachPreview.querySelectorAll('[data-remove-att]').forEach(el=>{
       el.onclick = ()=>{ chatAttachments.splice(el.dataset.removeAtt, 1); renderAttachPreview(); };
@@ -1368,51 +1443,13 @@ function renderToolsV1(c){
       <h2>Tools V1</h2>
       <p>Outils de cybersécurité légaux et informatifs.</p>
     </div>
-    <div class="panel" style="max-width:520px;">
-      <div class="field" style="margin-bottom:12px;">
-        <label>Adresse IP</label>
-        <input id="ip-lookup-input" type="text" placeholder="ex : 8.8.8.8">
+    <div class="panel" style="text-align:center; padding:50px 20px;">
+      <div style="font-size:15px; font-weight:600; margin-bottom:8px;">En développement</div>
+      <div style="font-size:13.5px; color:var(--text-dim); max-width:420px; margin:0 auto;">
+        Cette catégorie est en cours de construction. Reviens bientôt.
       </div>
-      <button class="pill-btn run" id="ip-lookup-btn">Rechercher</button>
     </div>
-    <div id="ip-lookup-result" style="margin-top:16px;"></div>
   `;
-
-  document.getElementById('ip-lookup-btn').onclick = async ()=>{
-    const ip = document.getElementById('ip-lookup-input').value.trim();
-    const box = document.getElementById('ip-lookup-result');
-    const btn = document.getElementById('ip-lookup-btn');
-    if(!ip){ toast('Renseigne une adresse IP'); return; }
-
-    btn.disabled = true;
-    btn.innerHTML = '<span class="spinner"></span>';
-    box.innerHTML = `<div class="empty-state">Recherche en cours…</div>`;
-    try{
-      const res = await fetch(`https://ip-api.com/json/${encodeURIComponent(ip)}`);
-      const data = await res.json();
-      if(data.status === 'fail'){
-        box.innerHTML = `<div class="panel" style="color:var(--red);">Impossible de trouver des informations pour cette IP (${escapeHtml(data.message || 'erreur inconnue')}).</div>`;
-        return;
-      }
-      box.innerHTML = `
-        <div class="panel">
-          <div class="grid-cards">
-            <div class="stat-card"><div class="label">Pays</div><div class="value" style="font-size:15px;">${escapeHtml(data.country || '—')}</div></div>
-            <div class="stat-card"><div class="label">Région</div><div class="value" style="font-size:15px;">${escapeHtml(data.regionName || '—')}</div></div>
-            <div class="stat-card"><div class="label">Ville</div><div class="value" style="font-size:15px;">${escapeHtml(data.city || '—')}</div></div>
-            <div class="stat-card"><div class="label">Fournisseur (ISP)</div><div class="value" style="font-size:14px;">${escapeHtml(data.isp || '—')}</div></div>
-            <div class="stat-card"><div class="label">Organisation</div><div class="value" style="font-size:14px;">${escapeHtml(data.org || '—')}</div></div>
-            <div class="stat-card"><div class="label">Fuseau horaire</div><div class="value" style="font-size:14px;">${escapeHtml(data.timezone || '—')}</div></div>
-          </div>
-        </div>
-      `;
-    } catch(e){
-      box.innerHTML = `<div class="panel" style="color:var(--red);">Erreur lors de la recherche.</div>`;
-    } finally{
-      btn.disabled = false;
-      btn.textContent = 'Rechercher';
-    }
-  };
 }
 
 /* ---------- Discussion : chat live entre tous les membres ---------- */
@@ -1424,7 +1461,7 @@ function renderChat(c){
       <h2>Discussion</h2>
       <p>Discute en direct avec tous les membres de la plateforme.</p>
     </div>
-    <div class="editor-wrap" style="height:calc(100vh - 210px);">
+    <div class="editor-wrap chat-height" style="height:calc(100vh - 210px); min-height:420px;">
       <div class="console-pane" style="flex:1;">
         <div class="pane-bar">
           <span>Discussion générale</span>
@@ -1501,86 +1538,169 @@ function renderChat(c){
 /* ---------- Shop : créer sa boutique ---------- */
 const PAYMENT_METHODS = ['PayPal', 'CashApp', 'Venmo', 'Zelle', 'LTC (Litecoin)', 'BTC (Bitcoin)', 'ETH (Ethereum)', 'Virement bancaire', 'Carte cadeau', 'Autre'];
 
+const SHOP_STEPS = ['Informations', 'Paiement', 'Objets', 'Style'];
+
 async function renderShop(c){
   c.innerHTML = `
     <div class="content-header">
       <h2>Ma boutique</h2>
-      <p>Crée ta boutique pour vendre tes objets ou services.</p>
+      <p>Configure ta boutique et génère un site dédié avec son propre lien.</p>
     </div>
-    <div id="shop-form-area"><div class="empty-state">Chargement…</div></div>
-  `;
-
-  let existingShop = null;
-  try{
-    const data = await api('/shop/mine');
-    existingShop = data.shop;
-  } catch(e){ /* pas grave, on affiche le formulaire vide */ }
-
-  const area = document.getElementById('shop-form-area');
-  area.innerHTML = `
-    <div class="panel" style="max-width:520px;">
-      <div class="field" style="margin-bottom:12px;">
-        <label>Nom de la boutique</label>
-        <input id="shop-name" type="text" value="${existingShop ? escapeHtml(existingShop.shopName) : ''}" placeholder="Ma boutique">
-      </div>
-      <div class="field" style="margin-bottom:12px;">
-        <label>Moyen de paiement</label>
-        <select id="shop-payment" class="lang-select">
-          <option value="">— Choisis —</option>
-          ${PAYMENT_METHODS.map(m => `<option value="${m}" ${existingShop && existingShop.paymentMethod === m ? 'selected' : ''}>${m}</option>`).join('')}
-        </select>
-      </div>
-      <div class="field" style="margin-bottom:12px;">
-        <label>Lien de paiement</label>
-        <input id="shop-link" type="text" value="${existingShop ? escapeHtml(existingShop.paymentLink) : ''}" placeholder="ex : paypal.me/tonpseudo">
-      </div>
-      <div class="field" style="margin-bottom:12px;">
-        <label>Comment te contacter ?</label>
-        <input id="shop-contact" type="text" value="${existingShop ? escapeHtml(existingShop.contact) : ''}" placeholder="ex : Discord: pseudo#0000">
-      </div>
-      <div class="field" style="margin-bottom:14px;">
-        <label>Objets en vente (un par ligne : nom - prix)</label>
-        <textarea id="shop-items" placeholder="Script Lua premium - 5$&#10;Configuration custom - 10$" style="min-height:100px;">${existingShop && existingShop.items ? existingShop.items.map(i => i.name + ' - ' + i.price).join('\n') : ''}</textarea>
-      </div>
-      <div style="display:flex; gap:8px;">
-        <button class="pill-btn run" id="shop-save-btn">${existingShop ? 'Mettre à jour' : 'Créer ma boutique'}</button>
-        ${existingShop ? `<button class="pill-btn danger" id="shop-delete-btn">Supprimer ma boutique</button>` : ''}
-      </div>
+    <div id="shop-wizard"></div>
+    <div class="settings-section">
+      <h3>Mes boutiques publiées</h3>
+      <div id="my-shops-list"><div class="empty-state">Chargement…</div></div>
     </div>
   `;
 
-  document.getElementById('shop-save-btn').onclick = async ()=>{
-    const shopName = document.getElementById('shop-name').value.trim();
-    const paymentMethod = document.getElementById('shop-payment').value;
-    const paymentLink = document.getElementById('shop-link').value.trim();
-    const contact = document.getElementById('shop-contact').value.trim();
-    const itemsRaw = document.getElementById('shop-items').value.trim();
-    const btn = document.getElementById('shop-save-btn');
+  let step = 0;
+  const shopData = { shopName:'', description:'', paymentMethod:'', paymentLink:'', contact:'', items:[], bannerImage:'', accentColor:'#c9a8ff' };
 
-    if(!shopName || !paymentMethod || !paymentLink || !contact){ toast('Tous les champs sont requis'); return; }
+  function renderWizard(){
+    const wizard = document.getElementById('shop-wizard');
+    wizard.innerHTML = `
+      <div class="panel" style="max-width:600px;">
+        <div class="mode-switch" style="margin-bottom:20px;">
+          ${SHOP_STEPS.map((s,i) => `<div class="mode-btn ${i===step?'active':''}">${s}</div>`).join('')}
+        </div>
+        <div id="shop-step-body"></div>
+        <div style="display:flex; gap:8px; margin-top:18px;">
+          ${step > 0 ? `<button class="tool-btn" id="shop-prev-btn">Précédent</button>` : ''}
+          ${step < SHOP_STEPS.length - 1 ? `<button class="tool-btn primary" id="shop-next-btn">Suivant</button>` : `<button class="tool-btn primary" id="shop-publish-btn">Générer ma boutique</button>`}
+        </div>
+      </div>
+    `;
 
-    const items = itemsRaw.split('\n').filter(l => l.trim()).map(line => {
-      const parts = line.split(' - ');
-      return { name: parts[0] ? parts[0].trim() : line.trim(), price: parts[1] ? parts[1].trim() : '' };
-    });
+    const body = document.getElementById('shop-step-body');
+    if(step === 0){
+      body.innerHTML = `
+        <div class="field" style="margin-bottom:12px;"><label>Nom de la boutique</label>
+          <input id="s-name" type="text" value="${escapeHtml(shopData.shopName)}" placeholder="Ma boutique"></div>
+        <div class="field"><label>Description</label>
+          <textarea id="s-desc" placeholder="Présente ta boutique en quelques mots" style="min-height:80px;">${escapeHtml(shopData.description)}</textarea></div>
+      `;
+    } else if(step === 1){
+      body.innerHTML = `
+        <div class="field" style="margin-bottom:12px;"><label>Moyen de paiement</label>
+          <select id="s-payment" class="lang-select">
+            <option value="">— Choisis —</option>
+            ${PAYMENT_METHODS.map(m => `<option value="${m}" ${shopData.paymentMethod===m?'selected':''}>${m}</option>`).join('')}
+          </select></div>
+        <div class="field" style="margin-bottom:12px;"><label>Lien de paiement</label>
+          <input id="s-link" type="text" value="${escapeHtml(shopData.paymentLink)}" placeholder="ex : paypal.me/tonpseudo"></div>
+        <div class="field"><label>Comment te contacter ?</label>
+          <input id="s-contact" type="text" value="${escapeHtml(shopData.contact)}" placeholder="ex : Discord pseudo#0000"></div>
+      `;
+    } else if(step === 2){
+      body.innerHTML = `
+        <div id="shop-items-editor"></div>
+        <button class="tool-btn" id="add-item-btn" style="margin-top:10px;">+ Ajouter un objet</button>
+      `;
+      renderItemsEditor();
+    } else if(step === 3){
+      body.innerHTML = `
+        <div class="field" style="margin-bottom:12px;"><label>Image de bannière (URL, optionnelle)</label>
+          <input id="s-banner" type="text" value="${escapeHtml(shopData.bannerImage)}" placeholder="https://..."></div>
+        <div class="field"><label>Couleur d'accent de la boutique</label>
+          <input id="s-color" type="color" value="${shopData.accentColor}" style="height:42px; padding:4px; cursor:pointer;"></div>
+      `;
+    }
 
+    if(step === 0){
+      document.getElementById('s-name').oninput = e => shopData.shopName = e.target.value;
+      document.getElementById('s-desc').oninput = e => shopData.description = e.target.value;
+    } else if(step === 1){
+      document.getElementById('s-payment').onchange = e => shopData.paymentMethod = e.target.value;
+      document.getElementById('s-link').oninput = e => shopData.paymentLink = e.target.value;
+      document.getElementById('s-contact').oninput = e => shopData.contact = e.target.value;
+    } else if(step === 3){
+      document.getElementById('s-banner').oninput = e => shopData.bannerImage = e.target.value;
+      document.getElementById('s-color').oninput = e => shopData.accentColor = e.target.value;
+    }
+
+    if(step > 0) document.getElementById('shop-prev-btn').onclick = ()=>{ step--; renderWizard(); };
+    if(step < SHOP_STEPS.length - 1){
+      document.getElementById('shop-next-btn').onclick = ()=>{
+        if(step === 0 && !shopData.shopName){ toast('Donne un nom à ta boutique'); return; }
+        if(step === 1 && (!shopData.paymentMethod || !shopData.paymentLink || !shopData.contact)){ toast('Complète les infos de paiement'); return; }
+        step++; renderWizard();
+      };
+    } else {
+      document.getElementById('shop-publish-btn').onclick = publishShop;
+    }
+  }
+
+  function renderItemsEditor(){
+    const box = document.getElementById('shop-items-editor');
+    box.innerHTML = shopData.items.map((item, i) => `
+      <div class="shop-item-row">
+        <input type="text" data-item-name="${i}" placeholder="Nom de l'objet" value="${escapeHtml(item.name)}">
+        <input type="text" data-item-price="${i}" placeholder="Prix" value="${escapeHtml(item.price)}">
+        <input type="text" data-item-desc="${i}" placeholder="Description" value="${escapeHtml(item.description||'')}">
+        <input type="text" data-item-image="${i}" placeholder="URL image (optionnel)" value="${escapeHtml(item.image||'')}">
+        <button class="tool-btn" data-remove-item="${i}" style="color:var(--red);">Retirer</button>
+      </div>
+    `).join('') || `<div class="empty-state">Aucun objet ajouté.</div>`;
+
+    box.querySelectorAll('[data-item-name]').forEach(el => el.oninput = e => shopData.items[el.dataset.itemName].name = e.target.value);
+    box.querySelectorAll('[data-item-price]').forEach(el => el.oninput = e => shopData.items[el.dataset.itemPrice].price = e.target.value);
+    box.querySelectorAll('[data-item-desc]').forEach(el => el.oninput = e => shopData.items[el.dataset.itemDesc].description = e.target.value);
+    box.querySelectorAll('[data-item-image]').forEach(el => el.oninput = e => shopData.items[el.dataset.itemImage].image = e.target.value);
+    box.querySelectorAll('[data-remove-item]').forEach(el => el.onclick = ()=>{ shopData.items.splice(el.dataset.removeItem, 1); renderItemsEditor(); });
+  }
+
+  async function publishShop(){
+    const btn = document.getElementById('shop-publish-btn');
     btn.disabled = true;
     btn.innerHTML = '<span class="spinner"></span>';
     try{
-      await api('/shop', { method:'POST', body:{ shopName, paymentMethod, paymentLink, contact, items } });
-      toast('Boutique enregistrée');
-      renderShop(c);
+      const data = await api('/shop', { method:'POST', body: shopData });
+      toast('Boutique générée !');
+      const link = `${API_BASE}/shopsite/${data.id}`;
+      navigator.clipboard.writeText(link);
+      toast('Lien copié : ' + link);
+      loadMyShops();
     } catch(e){ toast(e.message); }
-    finally{ btn.disabled = false; }
-  };
-
-  if(existingShop){
-    document.getElementById('shop-delete-btn').onclick = async ()=>{
-      if(!confirm('Supprimer ta boutique ?')) return;
-      try{ await api('/shop', { method:'DELETE' }); toast('Boutique supprimée'); renderShop(c); }
-      catch(e){ toast(e.message); }
-    };
+    finally{ btn.disabled = false; btn.textContent = 'Générer ma boutique'; }
   }
+
+  async function loadMyShops(){
+    const box = document.getElementById('my-shops-list');
+    try{
+      const data = await api('/shop/mine');
+      const shops = data.shops || [];
+      if(!shops.length){
+        box.innerHTML = `<div class="empty-state">Aucune boutique publiée pour l'instant.</div>`;
+        return;
+      }
+      box.innerHTML = shops.map(s => `
+        <div class="site-card">
+          <div class="site-card-info">
+            <div class="name">${escapeHtml(s.shopName)}</div>
+            <div class="link">${API_BASE}/shopsite/${s.id}</div>
+          </div>
+          <div class="actions">
+            <button class="tool-btn" data-copy-shop="${s.id}">Copier le lien</button>
+            <button class="tool-btn" data-del-shop="${s.id}" style="color:var(--red);">Supprimer</button>
+          </div>
+        </div>
+      `).join('');
+      box.querySelectorAll('[data-copy-shop]').forEach(btn=>{
+        btn.onclick = ()=>{ navigator.clipboard.writeText(`${API_BASE}/shopsite/${btn.dataset.copyShop}`); toast('Lien copié'); };
+      });
+      box.querySelectorAll('[data-del-shop]').forEach(btn=>{
+        btn.onclick = async ()=>{
+          try{ await api('/shop/' + btn.dataset.delShop, { method:'DELETE' }); toast('Boutique supprimée'); loadMyShops(); }
+          catch(e){ toast(e.message); }
+        };
+      });
+    } catch(e){
+      box.innerHTML = `<div class="empty-state" style="color:var(--red)">${escapeHtml(e.message)}</div>`;
+    }
+  }
+
+  renderWizard();
+  loadMyShops();
 }
 
 /* ---------- Boutiques : parcourir celles des autres membres ---------- */
@@ -1602,54 +1722,189 @@ async function renderShopBrowse(c){
       return;
     }
     list.innerHTML = shops.map(s => `
-      <div class="panel" style="margin-bottom:12px;">
-        <div style="font-weight:600; font-size:15px; margin-bottom:4px;">${escapeHtml(s.shopName)}</div>
-        <div style="font-size:12px; color:var(--text-faint); margin-bottom:10px;">par ${escapeHtml(s.owner)} · Paiement : ${escapeHtml(s.paymentMethod)}</div>
-        ${(s.items || []).length ? `
-          <div style="margin-bottom:10px;">
-            ${s.items.map(i => `<div style="font-size:13.5px; color:var(--text-dim); padding:4px 0; border-bottom:1px solid var(--border-soft);">${escapeHtml(i.name)} ${i.price ? '— ' + escapeHtml(i.price) : ''}</div>`).join('')}
-          </div>
-        ` : ''}
-        <div style="font-size:13px; color:var(--text-dim);">Contact : ${escapeHtml(s.contact)}</div>
+      <div class="site-card">
+        <div class="site-card-info">
+          <div class="name">${escapeHtml(s.shopName)}</div>
+          <div class="site-card-desc">par ${escapeHtml(s.owner)}</div>
+          <div class="link">${API_BASE}/shopsite/${s.id}</div>
+        </div>
+        <div class="actions">
+          <button class="tool-btn" data-visit-shop="${s.id}">Visiter</button>
+        </div>
       </div>
     `).join('');
+    list.querySelectorAll('[data-visit-shop]').forEach(btn=>{
+      btn.onclick = ()=> window.open(`${API_BASE}/shopsite/${btn.dataset.visitShop}`, '_blank');
+    });
   } catch(e){
     document.getElementById('shops-list').innerHTML = `<div class="empty-state" style="color:var(--red)">${escapeHtml(e.message)}</div>`;
   }
 }
-function renderCodeEditor(c, kind){
+const JS_KEYWORDS = ["const","let","var","function","return","if","else","for","while","class","import","export","async","await","true","false","null","undefined","console.log","document","window"];
+const CSS_KEYWORDS = ["display","flex","grid","color","background","margin","padding","border","width","height","position","absolute","relative","font-size","font-weight","border-radius","transition","transform"];
+const HTML_KEYWORDS = ["div","span","button","input","textarea","section","header","footer","nav","h1","h2","h3","p","a","img","ul","li","form","class","id"];
+
+const devFiles = {
+  html: { name:'index.html', content: `<h1>Hello world</h1>\n<p>Modifie ce fichier pour commencer.</p>\n<button onclick="sayHi()">Clique-moi</button>` },
+  css:  { name:'style.css', content: `body {\n  font-family: sans-serif;\n  background: #111;\n  color: #eee;\n  padding: 40px;\n}` },
+  js:   { name:'script.js', content: `function sayHi(){\n  console.log("Bonjour !");\n  alert("Bonjour !");\n}` }
+};
+let devActiveTab = 'html';
+let devMode = 'web'; // 'web' = éditeur multi-fichiers, 'lua' = éditeur Lua, 'run' = exécution Python/JS
+let luaCode = '';
+
+function devKeywordsFor(tab){
+  if(tab === 'html') return HTML_KEYWORDS;
+  if(tab === 'css') return CSS_KEYWORDS;
+  return JS_KEYWORDS;
+}
+
+function buildPreviewDoc(){
+  return `<!DOCTYPE html><html><head><style>${devFiles.css.content}</style></head><body>${devFiles.html.content}<script>${devFiles.js.content}<\/script></body></html>`;
+}
+
+function renderDevTools(c){
   c.innerHTML = `
     <div class="content-header">
-      <h2>Lua</h2>
-      <p>Écris ton script Lua et exécute-le pour de vrai.</p>
+      <h2>Dev Tools</h2>
+      <p>Construis un mini-site multi-fichiers, code en Lua, ou exécute du Python/JavaScript.</p>
     </div>
+    <div class="mode-switch" id="mode-tabs">
+      <div class="mode-btn ${devMode==='web'?'active':''}" data-mode="web">Éditeur web</div>
+      <div class="mode-btn ${devMode==='lua'?'active':''}" data-mode="lua">Lua</div>
+      <div class="mode-btn ${devMode==='run'?'active':''}" data-mode="run">Python / JS</div>
+    </div>
+    <div id="dev-body"></div>
+  `;
+
+  c.querySelectorAll('#mode-tabs .mode-btn').forEach(el=>{
+    el.onclick = ()=>{ devMode = el.dataset.mode; renderDevTools(c); };
+  });
+
+  if(devMode === 'web') renderDevWebEditor(document.getElementById('dev-body'));
+  else if(devMode === 'lua') renderDevLuaEditor(document.getElementById('dev-body'));
+  else renderDevRunEditor(document.getElementById('dev-body'));
+}
+
+function renderDevWebEditor(host){
+  host.innerHTML = `
+    <div class="file-tabs-bar">
+      <div class="file-tabs">
+        <div class="file-tab ${devActiveTab==='html'?'active':''}" data-tab="html">index.html</div>
+        <div class="file-tab ${devActiveTab==='css'?'active':''}" data-tab="css">style.css</div>
+        <div class="file-tab ${devActiveTab==='js'?'active':''}" data-tab="js">script.js</div>
+        <div class="file-tab ${devActiveTab==='preview'?'active':''}" data-tab="preview">Browser</div>
+      </div>
+      <button class="tool-btn" id="dev-dl-btn">Télécharger tout</button>
+    </div>
+    <div class="dev-editor-area">
+      <div class="editor-pane" style="border-radius:0 0 var(--radius) var(--radius); ${devActiveTab==='preview' ? 'display:none;' : ''}">
+        <textarea class="code-input" id="dev-code-input" spellcheck="false"></textarea>
+        <div class="autocomplete-box" id="dev-autocomplete"></div>
+      </div>
+      <div class="preview-frame-wrap" style="${devActiveTab==='preview' ? 'display:flex;' : 'display:none;'}">
+        <iframe id="dev-preview"></iframe>
+      </div>
+    </div>
+  `;
+
+  host.querySelectorAll('[data-tab]').forEach(el=>{
+    el.onclick = ()=>{
+      if(devActiveTab !== 'preview'){
+        devFiles[devActiveTab].content = document.getElementById('dev-code-input').value;
+      }
+      devActiveTab = el.dataset.tab;
+      renderDevWebEditor(host);
+    };
+  });
+
+  if(devActiveTab === 'preview'){
+    document.getElementById('dev-preview').srcdoc = buildPreviewDoc();
+  } else {
+    const input = document.getElementById('dev-code-input');
+    input.value = devFiles[devActiveTab].content;
+
+    const autoBox = document.getElementById('dev-autocomplete');
+    input.addEventListener('keyup', ()=>{
+      devFiles[devActiveTab].content = input.value;
+      const val = input.value;
+      const pos = input.selectionStart;
+      const before = val.slice(0, pos);
+      const match = before.match(/[a-zA-Z.-]+$/);
+      if(match && match[0].length >= 2){
+        const word = match[0];
+        const keywords = devKeywordsFor(devActiveTab);
+        const sugg = keywords.filter(k => k.startsWith(word) && k !== word);
+        if(sugg.length){
+          autoBox.style.display = 'block';
+          autoBox.style.left = '20px';
+          autoBox.style.top = '44px';
+          autoBox.innerHTML = sugg.slice(0,6).map(s => `<div class="autocomplete-item" data-word="${s}">${s}</div>`).join('');
+          autoBox.querySelectorAll('.autocomplete-item').forEach(item=>{
+            item.onclick = ()=>{
+              const w = item.dataset.word;
+              input.value = before.slice(0, before.length - word.length) + w + val.slice(pos);
+              devFiles[devActiveTab].content = input.value;
+              autoBox.style.display = 'none';
+              input.focus();
+            };
+          });
+          return;
+        }
+      }
+      autoBox.style.display = 'none';
+    });
+    input.addEventListener('blur', ()=>{
+      devFiles[devActiveTab].content = input.value;
+      setTimeout(()=> autoBox.style.display='none', 150);
+    });
+  }
+
+  document.getElementById('dev-dl-btn').onclick = ()=>{
+    if(devActiveTab !== 'preview'){
+      devFiles[devActiveTab].content = document.getElementById('dev-code-input').value;
+    }
+    Object.values(devFiles).forEach(f=>{
+      const blob = new Blob([f.content], {type:'text/plain'});
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = f.name;
+      a.click();
+    });
+    toast('Fichiers téléchargés');
+  };
+}
+
+function renderDevLuaEditor(host){
+  host.innerHTML = `
     <div class="editor-wrap">
       <div class="editor-pane">
         <div class="pane-bar">
-          <span>Script</span>
+          <span>Script Lua</span>
           <div class="tools">
-            <button class="pill-btn" id="dl-btn">Télécharger</button>
-            <button class="pill-btn run" id="run-btn">Exécuter</button>
+            <button class="tool-btn" id="dl-btn">Télécharger</button>
+            <button class="tool-btn primary" id="run-btn">Exécuter</button>
           </div>
         </div>
-        <textarea class="code-input" id="code-input" spellcheck="false" placeholder="-- écris ton script Lua ici"></textarea>
+        <textarea class="code-input" id="code-input" spellcheck="false" placeholder="-- écris ton script Lua ici">${escapeHtml(luaCode)}</textarea>
+        <div class="autocomplete-box" id="autocomplete"></div>
       </div>
       <div class="console-pane">
         <div class="pane-bar">
           <span>Console</span>
           <div class="tools">
-            <button class="pill-btn" id="copy-console">Copier</button>
-            <button class="pill-btn" id="clear-console">Vider</button>
+            <button class="tool-btn" id="copy-console">Copier</button>
+            <button class="tool-btn" id="clear-console">Vider</button>
           </div>
         </div>
         <div class="console-body" id="console-body"><div class="sys">// La console s'affichera ici après exécution.</div></div>
       </div>
     </div>
-    <div class="autocomplete-box" id="autocomplete"></div>
   `;
 
   const input = document.getElementById('code-input');
   const autoBox = document.getElementById('autocomplete');
+  input.addEventListener('input', ()=>{ luaCode = input.value; });
 
   input.addEventListener('keyup', ()=>{
     const val = input.value;
@@ -1668,6 +1923,7 @@ function renderCodeEditor(c, kind){
           item.onclick = ()=>{
             const w = item.dataset.word;
             input.value = before.slice(0, before.length - word.length) + w + val.slice(pos);
+            luaCode = input.value;
             autoBox.style.display = 'none';
             input.focus();
           };
@@ -1732,152 +1988,19 @@ function renderCodeEditor(c, kind){
   };
 }
 
-/* ---------- Dev Tools : éditeur multi-fichiers (HTML/CSS/JS + preview) + exécution Python/JS ---------- */
-const JS_KEYWORDS = ["const","let","var","function","return","if","else","for","while","class","import","export","async","await","true","false","null","undefined","console.log","document","window"];
-const CSS_KEYWORDS = ["display","flex","grid","color","background","margin","padding","border","width","height","position","absolute","relative","font-size","font-weight","border-radius","transition","transform"];
-const HTML_KEYWORDS = ["div","span","button","input","textarea","section","header","footer","nav","h1","h2","h3","p","a","img","ul","li","form","class","id"];
-
-const devFiles = {
-  html: { name:'index.html', content: `<h1>Hello world</h1>\n<p>Modifie ce fichier pour commencer.</p>\n<button onclick="sayHi()">Clique-moi</button>` },
-  css:  { name:'style.css', content: `body {\n  font-family: sans-serif;\n  background: #111;\n  color: #eee;\n  padding: 40px;\n}` },
-  js:   { name:'script.js', content: `function sayHi(){\n  console.log("Bonjour !");\n  alert("Bonjour !");\n}` }
-};
-let devActiveTab = 'html';
-let devMode = 'web'; // 'web' = éditeur multi-fichiers, 'run' = exécution Python/JS
-
-function devKeywordsFor(tab){
-  if(tab === 'html') return HTML_KEYWORDS;
-  if(tab === 'css') return CSS_KEYWORDS;
-  return JS_KEYWORDS;
-}
-
-function buildPreviewDoc(){
-  return `<!DOCTYPE html><html><head><style>${devFiles.css.content}</style></head><body>${devFiles.html.content}<script>${devFiles.js.content}<\/script></body></html>`;
-}
-
-function renderDevTools(c){
-  c.innerHTML = `
-    <div class="content-header">
-      <h2>Dev Tools</h2>
-      <p>Construis un mini-site multi-fichiers avec preview live, ou exécute du Python/JavaScript directement.</p>
-    </div>
-    <div class="lang-tabs" id="mode-tabs">
-      <div class="lang-tab ${devMode==='web'?'active':''}" data-mode="web">Éditeur web</div>
-      <div class="lang-tab ${devMode==='run'?'active':''}" data-mode="run">Exécuter Python / JS</div>
-    </div>
-    <div id="dev-body"></div>
-  `;
-
-  c.querySelectorAll('#mode-tabs .lang-tab').forEach(el=>{
-    el.onclick = ()=>{ devMode = el.dataset.mode; renderDevTools(c); };
-  });
-
-  if(devMode === 'web') renderDevWebEditor(document.getElementById('dev-body'));
-  else renderDevRunEditor(document.getElementById('dev-body'));
-}
-
-function renderDevWebEditor(host){
-  host.innerHTML = `
-    <div class="pane-bar" style="border:1px solid var(--border); border-radius:var(--radius) var(--radius) 0 0; background:var(--glass);">
-      <div class="tools" style="gap:4px;">
-        <div class="pill-btn ${devActiveTab==='html'?'run':''}" data-tab="html" style="cursor:pointer;">index.html</div>
-        <div class="pill-btn ${devActiveTab==='css'?'run':''}" data-tab="css" style="cursor:pointer;">style.css</div>
-        <div class="pill-btn ${devActiveTab==='js'?'run':''}" data-tab="js" style="cursor:pointer;">script.js</div>
-        <div class="pill-btn ${devActiveTab==='preview'?'run':''}" data-tab="preview" style="cursor:pointer;">Browser</div>
-      </div>
-      <button class="pill-btn" id="dev-dl-btn">Télécharger tout</button>
-    </div>
-    <div class="editor-wrap" style="margin-top:0;">
-      <div class="editor-pane" style="border-radius:0 0 var(--radius) var(--radius); ${devActiveTab==='preview' ? 'display:none;' : ''}">
-        <textarea class="code-input" id="dev-code-input" spellcheck="false"></textarea>
-        <div class="autocomplete-box" id="dev-autocomplete"></div>
-      </div>
-      <iframe id="dev-preview" style="${devActiveTab==='preview' ? 'display:flex; flex:1;' : 'display:none;'} border:1px solid var(--border); border-radius:var(--radius); background:#fff;"></iframe>
-    </div>
-  `;
-
-  host.querySelectorAll('[data-tab]').forEach(el=>{
-    el.onclick = ()=>{
-      // sauvegarde le fichier courant avant de changer d'onglet
-      if(devActiveTab !== 'preview'){
-        devFiles[devActiveTab].content = document.getElementById('dev-code-input').value;
-      }
-      devActiveTab = el.dataset.tab;
-      renderDevWebEditor(host);
-    };
-  });
-
-  if(devActiveTab === 'preview'){
-    document.getElementById('dev-preview').srcdoc = buildPreviewDoc();
-  } else {
-    const input = document.getElementById('dev-code-input');
-    input.value = devFiles[devActiveTab].content;
-    input.focus();
-
-    const autoBox = document.getElementById('dev-autocomplete');
-    input.addEventListener('keyup', ()=>{
-      devFiles[devActiveTab].content = input.value;
-      const val = input.value;
-      const pos = input.selectionStart;
-      const before = val.slice(0, pos);
-      const match = before.match(/[a-zA-Z.-]+$/);
-      if(match && match[0].length >= 2){
-        const word = match[0];
-        const keywords = devKeywordsFor(devActiveTab);
-        const sugg = keywords.filter(k => k.startsWith(word) && k !== word);
-        if(sugg.length){
-          autoBox.style.display = 'block';
-          autoBox.style.left = '20px';
-          autoBox.style.top = '44px';
-          autoBox.innerHTML = sugg.slice(0,6).map(s => `<div class="autocomplete-item" data-word="${s}">${s}</div>`).join('');
-          autoBox.querySelectorAll('.autocomplete-item').forEach(item=>{
-            item.onclick = ()=>{
-              const w = item.dataset.word;
-              input.value = before.slice(0, before.length - word.length) + w + val.slice(pos);
-              devFiles[devActiveTab].content = input.value;
-              autoBox.style.display = 'none';
-              input.focus();
-            };
-          });
-          return;
-        }
-      }
-      autoBox.style.display = 'none';
-    });
-    input.addEventListener('blur', ()=>{
-      devFiles[devActiveTab].content = input.value;
-      setTimeout(()=> autoBox.style.display='none', 150);
-    });
-  }
-
-  document.getElementById('dev-dl-btn').onclick = ()=>{
-    if(devActiveTab !== 'preview'){
-      devFiles[devActiveTab].content = document.getElementById('dev-code-input').value;
-    }
-    Object.values(devFiles).forEach(f=>{
-      const blob = new Blob([f.content], {type:'text/plain'});
-      const a = document.createElement('a');
-      a.href = URL.createObjectURL(blob);
-      a.download = f.name;
-      a.click();
-    });
-    toast('Fichiers téléchargés');
-  };
-}
-
 function renderDevRunEditor(host){
   host.innerHTML = `
-    <div class="lang-tabs" id="lang-tabs">
-      <div class="lang-tab active" data-lang="python">Python</div>
-      <div class="lang-tab" data-lang="javascript">JavaScript</div>
+    <div class="mode-switch" id="lang-tabs" style="margin-bottom:14px;">
+      <div class="mode-btn active" data-lang="python">Python</div>
+      <div class="mode-btn" data-lang="javascript">JavaScript</div>
     </div>
     <div class="editor-wrap">
       <div class="editor-pane">
         <div class="pane-bar">
           <span>Script</span>
           <div class="tools">
-            <button class="pill-btn" id="dl-btn">Télécharger</button>
-            <button class="pill-btn run" id="run-btn">Exécuter</button>
+            <button class="tool-btn" id="dl-btn">Télécharger</button>
+            <button class="tool-btn primary" id="run-btn">Exécuter</button>
           </div>
         </div>
         <textarea class="code-input" id="code-input" spellcheck="false" placeholder="# écris ton script ici"></textarea>
@@ -1886,8 +2009,8 @@ function renderDevRunEditor(host){
         <div class="pane-bar">
           <span>Console</span>
           <div class="tools">
-            <button class="pill-btn" id="copy-console">Copier</button>
-            <button class="pill-btn" id="clear-console">Vider</button>
+            <button class="tool-btn" id="copy-console">Copier</button>
+            <button class="tool-btn" id="clear-console">Vider</button>
           </div>
         </div>
         <div class="console-body" id="console-body"><div class="sys">// La console s'affichera ici après exécution.</div></div>
@@ -1896,9 +2019,9 @@ function renderDevRunEditor(host){
   `;
 
   let currentLang = 'python';
-  host.querySelectorAll('#lang-tabs .lang-tab').forEach(el=>{
+  host.querySelectorAll('#lang-tabs .mode-btn').forEach(el=>{
     el.onclick = ()=>{
-      host.querySelectorAll('#lang-tabs .lang-tab').forEach(x=>x.classList.remove('active'));
+      host.querySelectorAll('#lang-tabs .mode-btn').forEach(x=>x.classList.remove('active'));
       el.classList.add('active');
       currentLang = el.dataset.lang;
     };
@@ -1970,14 +2093,32 @@ async function renderHosting(c){
         <label>Nom du site</label>
         <input id="site-name" type="text" placeholder="mon-super-site">
       </div>
-      <div class="field" style="margin-bottom:14px;">
-        <label>Code HTML</label>
-        <textarea id="site-html" placeholder="<h1>Hello world</h1>" style="min-height:120px;"></textarea>
+      <div class="field" style="margin-bottom:10px;">
+        <label>Description (optionnelle)</label>
+        <input id="site-desc" type="text" placeholder="Un petit résumé de ce que fait ce site">
       </div>
-      <button class="pill-btn run" id="publish-btn">Publier</button>
+      <div class="field" style="margin-bottom:10px;">
+        <label>Code HTML</label>
+        <textarea id="site-html" placeholder="<h1>Hello world</h1>" style="min-height:140px; font-family:'SF Mono',Menlo,monospace; font-size:13px;"></textarea>
+      </div>
+      <div style="display:flex; gap:8px; margin-bottom:14px;">
+        <button class="tool-btn" id="site-preview-btn">Aperçu</button>
+      </div>
+      <div id="site-preview-box" class="preview-frame-wrap hidden" style="margin-bottom:14px; min-height:280px;">
+        <iframe id="site-preview-frame"></iframe>
+      </div>
+      <button class="tool-btn primary" id="publish-btn">Publier</button>
     </div>
     <div id="sites-list"><div class="empty-state">Chargement…</div></div>
   `;
+
+  document.getElementById('site-preview-btn').onclick = ()=>{
+    const box = document.getElementById('site-preview-box');
+    box.classList.toggle('hidden');
+    if(!box.classList.contains('hidden')){
+      document.getElementById('site-preview-frame').srcdoc = document.getElementById('site-html').value;
+    }
+  };
 
   async function loadList(){
     const list = document.getElementById('sites-list');
@@ -1989,14 +2130,17 @@ async function renderHosting(c){
         return;
       }
       list.innerHTML = sites.map(s => `
-        <div class="site-row">
-          <div>
+        <div class="site-card">
+          <div class="site-card-info">
             <div class="name">${escapeHtml(s.name)}</div>
+            ${s.description ? `<div class="site-card-desc">${escapeHtml(s.description)}</div>` : ''}
             <div class="link">${API_BASE}/site/${s.id}</div>
+            ${s.createdAt ? `<div class="site-card-date">Publié le ${new Date(s.createdAt).toLocaleDateString('fr-FR')}</div>` : ''}
           </div>
           <div class="actions">
-            <button class="pill-btn" data-copy="${s.id}">Copier</button>
-            <button class="pill-btn danger" data-del="${s.id}">Supprimer</button>
+            <button class="tool-btn" data-copy="${s.id}">Copier le lien</button>
+            <button class="tool-btn" data-visit="${s.id}">Ouvrir</button>
+            <button class="tool-btn" data-del="${s.id}" style="color:var(--red);">Supprimer</button>
           </div>
         </div>
       `).join('');
@@ -2005,6 +2149,9 @@ async function renderHosting(c){
           navigator.clipboard.writeText(`${API_BASE}/site/${btn.dataset.copy}`);
           toast('Lien copié');
         };
+      });
+      list.querySelectorAll('[data-visit]').forEach(btn=>{
+        btn.onclick = ()=> window.open(`${API_BASE}/site/${btn.dataset.visit}`, '_blank');
       });
       list.querySelectorAll('[data-del]').forEach(btn=>{
         btn.onclick = async ()=>{
@@ -2020,6 +2167,7 @@ async function renderHosting(c){
 
   document.getElementById('publish-btn').onclick = async ()=>{
     const name = document.getElementById('site-name').value.trim();
+    const description = document.getElementById('site-desc').value.trim();
     const html = document.getElementById('site-html').value;
     const btn = document.getElementById('publish-btn');
     if(!name){ toast('Donne un nom au site'); return; }
@@ -2027,9 +2175,11 @@ async function renderHosting(c){
     btn.disabled = true;
     btn.innerHTML = '<span class="spinner"></span>';
     try{
-      await api('/sites', { method:'POST', body:{ name, html } });
+      await api('/sites', { method:'POST', body:{ name, html, description } });
       document.getElementById('site-name').value = '';
+      document.getElementById('site-desc').value = '';
       document.getElementById('site-html').value = '';
+      document.getElementById('site-preview-box').classList.add('hidden');
       toast('Site publié');
       loadList();
     } catch(e){ toast(e.message); }
@@ -2042,12 +2192,16 @@ function renderDiscord(c){
   c.innerHTML = `
     <div class="content-header">
       <h2>Annonce Discord</h2>
-      <p>Envoie un embed via un webhook Discord. Le webhook est sauvegardé pour la prochaine fois.</p>
+      <p>Envoie un embed complet via un webhook Discord. Le webhook est sauvegardé pour la prochaine fois.</p>
     </div>
-    <div class="panel" style="max-width:560px;">
+    <div class="panel" style="max-width:600px;">
       <div class="field">
         <label>Webhook Discord</label>
         <input id="wh-url" type="text" placeholder="https://discord.com/api/webhooks/..." value="${escapeHtml(state.savedWebhook)}">
+      </div>
+      <div class="field">
+        <label>Nom d'affichage du bot (optionnel)</label>
+        <input id="wh-username" type="text" placeholder="ex : SpyHub Bot">
       </div>
       <div class="field">
         <label>Titre de l'embed</label>
@@ -2057,39 +2211,91 @@ function renderDiscord(c){
         <label>Description</label>
         <textarea id="embed-desc" placeholder="Contenu de l'annonce..."></textarea>
       </div>
-      <button class="pill-btn run" id="send-btn">Envoyer l'annonce</button>
-      <div class="embed-preview" id="preview" style="display:none;">
-        <div class="etitle" id="pv-title"></div>
-        <div class="edesc" id="pv-desc"></div>
+      <div class="field">
+        <label>Couleur de l'embed</label>
+        <input id="embed-color" type="color" value="#c9a8ff" style="height:42px; padding:4px; cursor:pointer;">
+      </div>
+      <div class="field">
+        <label>Image (URL, grande image en bas de l'embed)</label>
+        <input id="embed-image" type="text" placeholder="https://...">
+      </div>
+      <div class="field">
+        <label>Miniature (URL, petite image en haut à droite)</label>
+        <input id="embed-thumb" type="text" placeholder="https://...">
+      </div>
+      <div class="field">
+        <label>Nom de l'auteur (optionnel)</label>
+        <input id="embed-author" type="text" placeholder="ex : Équipe SpyHub">
+      </div>
+      <div class="field">
+        <label>Texte en pied de page (optionnel)</label>
+        <input id="embed-footer" type="text" placeholder="ex : Merci de nous suivre !">
+      </div>
+      <button class="tool-btn primary" id="send-btn">Envoyer l'annonce</button>
+      <div class="discord-preview" id="preview" style="display:none;">
+        <div class="dp-author" id="pv-author"></div>
+        <div class="dp-title" id="pv-title"></div>
+        <div class="dp-desc" id="pv-desc"></div>
+        <img id="pv-image" class="dp-image hidden">
+        <div class="dp-footer" id="pv-footer"></div>
       </div>
     </div>
   `;
 
-  const titleI = document.getElementById('embed-title');
-  const descI = document.getElementById('embed-desc');
+  const fields = ['embed-title','embed-desc','embed-color','embed-image','embed-thumb','embed-author','embed-footer'].map(id => document.getElementById(id));
+
   function updatePreview(){
-    const t = titleI.value, d = descI.value;
-    if(!t && !d){ document.getElementById('preview').style.display='none'; return; }
-    document.getElementById('preview').style.display='block';
-    document.getElementById('pv-title').textContent = t;
-    document.getElementById('pv-desc').textContent = d;
+    const title = document.getElementById('embed-title').value;
+    const desc = document.getElementById('embed-desc').value;
+    const author = document.getElementById('embed-author').value;
+    const footer = document.getElementById('embed-footer').value;
+    const image = document.getElementById('embed-image').value;
+    const color = document.getElementById('embed-color').value;
+
+    if(!title && !desc){ document.getElementById('preview').style.display='none'; return; }
+    const preview = document.getElementById('preview');
+    preview.style.display='block';
+    preview.style.borderLeftColor = color;
+    document.getElementById('pv-author').textContent = author;
+    document.getElementById('pv-author').style.display = author ? 'block' : 'none';
+    document.getElementById('pv-title').textContent = title;
+    document.getElementById('pv-desc').textContent = desc;
+    document.getElementById('pv-footer').textContent = footer;
+    document.getElementById('pv-footer').style.display = footer ? 'block' : 'none';
+    const img = document.getElementById('pv-image');
+    if(image){ img.src = image; img.classList.remove('hidden'); } else { img.classList.add('hidden'); }
   }
-  titleI.oninput = updatePreview;
-  descI.oninput = updatePreview;
+  fields.forEach(f => f.oninput = updatePreview);
 
   document.getElementById('send-btn').onclick = async ()=>{
     const url = document.getElementById('wh-url').value.trim();
-    const title = titleI.value.trim();
-    const desc = descI.value.trim();
+    const username = document.getElementById('wh-username').value.trim();
+    const title = document.getElementById('embed-title').value.trim();
+    const desc = document.getElementById('embed-desc').value.trim();
+    const colorHex = document.getElementById('embed-color').value;
+    const image = document.getElementById('embed-image').value.trim();
+    const thumb = document.getElementById('embed-thumb').value.trim();
+    const author = document.getElementById('embed-author').value.trim();
+    const footer = document.getElementById('embed-footer').value.trim();
     const btn = document.getElementById('send-btn');
     if(!url){ toast('Colle un lien de webhook'); return; }
     if(!title && !desc){ toast("Ajoute un titre ou une description"); return; }
+
+    const colorInt = parseInt(colorHex.replace('#',''), 16);
+    const embed = { title, description: desc, color: colorInt };
+    if(image) embed.image = { url: image };
+    if(thumb) embed.thumbnail = { url: thumb };
+    if(author) embed.author = { name: author };
+    if(footer) embed.footer = { text: footer };
+
     btn.disabled = true;
     btn.innerHTML = '<span class="spinner"></span>';
     try{
+      const payload = { embeds:[embed] };
+      if(username) payload.username = username;
       const res = await fetch(url, {
         method:'POST', headers:{'Content-Type':'application/json'},
-        body: JSON.stringify({ embeds:[{ title, description:desc, color: 12105912 }] })
+        body: JSON.stringify(payload)
       });
       if(!res.ok) throw new Error('Discord a refusé la requête (lien invalide ?)');
       localStorage.setItem('shgt_webhook', url);
@@ -2164,7 +2370,99 @@ function renderSettings(c){
         <button class="pill-btn danger" id="clear-wh-btn">Oublier ce webhook</button>
       </div>
     </div>
+
+    <div class="settings-section">
+      <h3>Densité d'affichage</h3>
+      <div class="panel" style="max-width:420px;">
+        <div class="mode-switch">
+          <div class="mode-btn ${state.density !== 'compact' ? 'active' : ''}" id="density-comfortable">Confortable</div>
+          <div class="mode-btn ${state.density === 'compact' ? 'active' : ''}" id="density-compact">Compact</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="settings-section">
+      <h3>Format de l'heure</h3>
+      <div class="panel" style="max-width:420px;">
+        <div class="mode-switch">
+          <div class="mode-btn ${state.timeFormat !== '12h' ? 'active' : ''}" id="time-24h">24h</div>
+          <div class="mode-btn ${state.timeFormat === '12h' ? 'active' : ''}" id="time-12h">12h (AM/PM)</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="settings-section">
+      <h3>Notifications de bienvenue</h3>
+      <div class="panel" style="max-width:420px; display:flex; align-items:center; justify-content:space-between;">
+        <span style="font-size:13.5px; color:var(--text-dim);">Afficher l'animation à chaque connexion</span>
+        <input type="checkbox" id="toggle-welcome-anim" ${state.skipWelcomeAnim ? '' : 'checked'}>
+      </div>
+    </div>
+
+    <div class="settings-section">
+      <h3>Exporter mes données</h3>
+      <div class="panel" style="max-width:420px;">
+        <div style="font-size:13px; color:var(--text-dim); margin-bottom:12px;">Télécharge une copie de ton profil enregistré localement (thème, notes, webhook).</div>
+        <button class="pill-btn" id="export-data-btn">Exporter en .json</button>
+      </div>
+    </div>
+
+    <div class="settings-section">
+      <h3>Vider le cache local</h3>
+      <div class="panel" style="max-width:420px;">
+        <div style="font-size:13px; color:var(--text-dim); margin-bottom:12px;">Efface les préférences stockées sur cet appareil (thème, webhook). Ne supprime pas ton compte.</div>
+        <button class="pill-btn danger" id="clear-cache-btn">Vider le cache local</button>
+      </div>
+    </div>
+
+    <div class="settings-section">
+      <h3>Zone dangereuse</h3>
+      <div class="panel" style="max-width:420px; border-color:rgba(255,107,107,0.3);">
+        <div style="font-size:13px; color:var(--text-dim); margin-bottom:12px;">La suppression de compte est définitive et ne peut pas être annulée.</div>
+        <button class="pill-btn danger" id="delete-account-btn">Supprimer mon compte</button>
+      </div>
+    </div>
   `;
+
+  document.getElementById('density-comfortable').onclick = ()=>{ state.density = 'comfortable'; localStorage.setItem('shgt_density','comfortable'); renderSettings(c); };
+  document.getElementById('density-compact').onclick = ()=>{ state.density = 'compact'; localStorage.setItem('shgt_density','compact'); renderSettings(c); };
+  document.getElementById('time-24h').onclick = ()=>{ state.timeFormat = '24h'; localStorage.setItem('shgt_timeformat','24h'); renderSettings(c); };
+  document.getElementById('time-12h').onclick = ()=>{ state.timeFormat = '12h'; localStorage.setItem('shgt_timeformat','12h'); renderSettings(c); };
+  document.getElementById('toggle-welcome-anim').onchange = (e)=>{
+    state.skipWelcomeAnim = !e.target.checked;
+    localStorage.setItem('shgt_skip_welcome', state.skipWelcomeAnim ? '1' : '');
+  };
+  document.getElementById('export-data-btn').onclick = ()=>{
+    const exportData = {
+      username: state.user.username,
+      nickname: state.user.nickname || '',
+      theme: currentTheme,
+      webhook: state.savedWebhook,
+      notes: loadNotes ? loadNotes() : []
+    };
+    const blob = new Blob([JSON.stringify(exportData, null, 2)], {type:'application/json'});
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'spyhub-export.json';
+    a.click();
+    toast('Export téléchargé');
+  };
+  document.getElementById('clear-cache-btn').onclick = ()=>{
+    if(!confirm('Vider le cache local ? Ton compte ne sera pas supprimé.')) return;
+    const keep = ['shgt_session'];
+    Object.keys(localStorage).forEach(k => { if(k.startsWith('shgt_') && !keep.includes(k)) localStorage.removeItem(k); });
+    toast('Cache local vidé');
+  };
+  document.getElementById('delete-account-btn').onclick = async ()=>{
+    if(!confirm('Supprimer définitivement ton compte ? Cette action est irréversible.')) return;
+    if(!confirm('Es-tu vraiment sûr ? Toutes tes données seront perdues.')) return;
+    try{
+      await api('/admin/accounts/' + state.user.username, { method:'DELETE' });
+      clearSession();
+      toast('Compte supprimé');
+      renderLogin('login');
+    } catch(e){ toast('Impossible de supprimer le compte : ' + e.message); }
+  };
 
   // Swatches (presets rapides)
   const swatchRow = document.getElementById('swatch-row');
@@ -2291,9 +2589,33 @@ async function renderAdmin(c){
       <div class="panel">
         <div style="overflow-x:auto;">
           <table class="table" id="accounts-table">
-            <thead><tr><th>Pseudo</th><th>Rôle</th><th>Sites</th><th></th></tr></thead>
-            <tbody><tr><td colspan="4">Chargement…</td></tr></tbody>
+            <thead><tr><th>Pseudo</th><th>Rôle</th><th>Sites</th><th>Dernière connexion</th><th></th></tr></thead>
+            <tbody><tr><td colspan="5">Chargement…</td></tr></tbody>
           </table>
+        </div>
+      </div>
+    </div>
+
+    <div class="settings-section">
+      <h3>Outils avancés</h3>
+      <div class="panel" style="max-width:520px;">
+        <div class="field" style="margin-bottom:10px;">
+          <label>Pseudo cible</label>
+          <input id="target-username" type="text" placeholder="pseudo du membre">
+        </div>
+        <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:14px;">
+          <button class="tool-btn" id="promote-btn">Promouvoir Owner</button>
+          <button class="tool-btn" id="demote-btn">Rétrograder Membre</button>
+          <button class="tool-btn" id="wipe-session-btn">Déconnecter</button>
+          <button class="tool-btn" id="skip-cooldown-btn">Skip son cooldown</button>
+        </div>
+        <div class="field" style="margin-bottom:10px;">
+          <label>Nouveau mot de passe (réinitialisation)</label>
+          <input id="reset-pass-input" type="text" placeholder="nouveau mot de passe">
+        </div>
+        <button class="tool-btn" id="reset-pass-btn" style="margin-bottom:16px;">Réinitialiser son mot de passe</button>
+        <div style="border-top:1px solid var(--border-soft); padding-top:14px; display:flex; gap:8px; flex-wrap:wrap;">
+          <button class="tool-btn" id="clear-chat-btn" style="color:var(--red);">Vider tout le chat</button>
         </div>
       </div>
     </div>
@@ -2311,12 +2633,22 @@ async function renderAdmin(c){
         <td>${escapeHtml(a.username)}</td>
         <td><span class="badge ${a.role}">${a.role === 'owner' ? 'Owner' : 'Membre'}</span></td>
         <td>${a.siteCount}</td>
+        <td style="font-size:12px; color:var(--text-faint);">${a.lastLoginAt ? new Date(a.lastLoginAt).toLocaleString('fr-FR') : '—'}${a.cooldownUntil && a.cooldownUntil > Date.now() ? '<br><span style="color:var(--red);">En cooldown</span>' : ''}</td>
         <td>${a.role !== 'owner' ? `
-          <button class="pill-btn danger" data-ban-user="${a.username}">Bannir</button>
-          <button class="pill-btn danger" data-del="${a.username}">Supprimer</button>
+          <button class="tool-btn" data-ban-user="${a.username}">Bannir</button>
+          <button class="tool-btn" data-ban-ip="${a.username}" style="color:var(--red);">Ban IP</button>
+          <button class="tool-btn" data-del="${a.username}" style="color:var(--red);">Supprimer</button>
         ` : ''}</td>
       </tr>
     `).join('');
+
+    tbody.querySelectorAll('[data-ban-ip]').forEach(btn=>{
+      btn.onclick = async ()=>{
+        if(!confirm(`Bannir toutes les IPs connues de ${btn.dataset.banIp} ?`)) return;
+        try{ await api('/admin/ban-user-ip', { method:'POST', body:{ username: btn.dataset.banIp } }); toast('IP(s) bannie(s)'); renderAdmin(c); }
+        catch(e){ toast(e.message); }
+      };
+    });
 
     tbody.querySelectorAll('[data-del]').forEach(btn=>{
       btn.onclick = async ()=>{
@@ -2333,7 +2665,7 @@ async function renderAdmin(c){
       };
     });
   } catch(e){
-    document.querySelector('#accounts-table tbody').innerHTML = `<tr><td colspan="4" style="color:var(--red)">${escapeHtml(e.message)}</td></tr>`;
+    document.querySelector('#accounts-table tbody').innerHTML = `<tr><td colspan="5" style="color:var(--red)">${escapeHtml(e.message)}</td></tr>`;
   }
 
   // ---- Mode maintenance ----
@@ -2408,6 +2740,49 @@ async function renderAdmin(c){
     }
   }
   loadBannedIps();
+
+  // ---- Outils avancés (7 nouvelles fonctions) ----
+  function getTarget(){
+    const u = document.getElementById('target-username').value.trim();
+    if(!u) toast('Renseigne un pseudo cible');
+    return u;
+  }
+
+  document.getElementById('promote-btn').onclick = async ()=>{
+    const u = getTarget(); if(!u) return;
+    try{ await api('/admin/promote', { method:'POST', body:{ username:u } }); toast(u + ' est maintenant Owner'); renderAdmin(c); }
+    catch(e){ toast(e.message); }
+  };
+  document.getElementById('demote-btn').onclick = async ()=>{
+    const u = getTarget(); if(!u) return;
+    try{ await api('/admin/demote', { method:'POST', body:{ username:u } }); toast(u + ' est maintenant Membre'); renderAdmin(c); }
+    catch(e){ toast(e.message); }
+  };
+  document.getElementById('wipe-session-btn').onclick = async ()=>{
+    const u = getTarget(); if(!u) return;
+    try{ await api('/admin/wipe-sessions', { method:'POST', body:{ username:u } }); toast(u + ' a été déconnecté'); }
+    catch(e){ toast(e.message); }
+  };
+  document.getElementById('skip-cooldown-btn').onclick = async ()=>{
+    const u = getTarget(); if(!u) return;
+    try{ await api('/admin/skip-cooldown', { method:'POST', body:{ username:u } }); toast('Cooldown levé pour ' + u); renderAdmin(c); }
+    catch(e){ toast(e.message); }
+  };
+  document.getElementById('reset-pass-btn').onclick = async ()=>{
+    const u = getTarget(); if(!u) return;
+    const newPassword = document.getElementById('reset-pass-input').value.trim();
+    if(!newPassword){ toast('Renseigne un nouveau mot de passe'); return; }
+    try{
+      await api('/admin/reset-password', { method:'POST', body:{ username:u, newPassword } });
+      toast('Mot de passe réinitialisé pour ' + u);
+      document.getElementById('reset-pass-input').value = '';
+    } catch(e){ toast(e.message); }
+  };
+  document.getElementById('clear-chat-btn').onclick = async ()=>{
+    if(!confirm('Vider tout le chat de la plateforme ?')) return;
+    try{ await api('/admin/clear-chat', { method:'POST' }); toast('Chat vidé'); }
+    catch(e){ toast(e.message); }
+  };
 }
 
 /* =========================================================
