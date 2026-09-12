@@ -3,507 +3,755 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Legacy</title>
+<title>Legacy — Panel</title>
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap');
-
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap');
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-
 :root{
-  --bg:#06060f;
-  --s1:rgba(255,255,255,0.03);
-  --s2:rgba(255,255,255,0.055);
-  --b:rgba(255,255,255,0.07);
-  --b2:rgba(160,100,255,0.22);
-  --p1:#a78bfa;
-  --p2:#7c3aed;
-  --p3:#c4b5fd;
-  --tx:#ede9fe;
-  --mt:rgba(237,233,254,0.42);
-  --red:#f87171;
-  --grn:#34d399;
+  --bg:#05050e;--s1:rgba(255,255,255,0.03);--s2:rgba(255,255,255,0.055);
+  --b:rgba(255,255,255,0.07);--b2:rgba(120,70,255,0.22);
+  --p1:#a78bfa;--p2:#7c3aed;--p3:#c4b5fd;--p4:#ddd6fe;
+  --tx:#ede9fe;--mt:rgba(237,233,254,0.38);
+  --red:#f87171;--grn:#34d399;--amb:#fbbf24;
+  --mono:'JetBrains Mono',monospace;
 }
-
 body{font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--tx);min-height:100vh;overflow-x:hidden}
+#app{position:relative;z-index:1}
 
-/* dotted grid background */
-body::before{
-  content:'';position:fixed;inset:0;
-  background-image:radial-gradient(circle,rgba(160,100,255,0.18) 1px,transparent 1px);
-  background-size:28px 28px;
-  pointer-events:none;z-index:0;opacity:.6;
+/* ══════════════════════════════════════════
+   AUTH — Redesign complet
+══════════════════════════════════════════ */
+#auth{
+  min-height:100vh;
+  display:flex;
+  align-items:stretch;
+  position:relative;
+  overflow:hidden;
 }
-body::after{
-  content:'';position:fixed;inset:0;
+
+/* Fond global animé */
+#auth::before{
+  content:'';position:absolute;inset:0;
   background:
-    radial-gradient(ellipse 70% 55% at 15% 5%,rgba(109,40,217,0.22) 0%,transparent 65%),
-    radial-gradient(ellipse 55% 45% at 85% 85%,rgba(167,139,250,0.12) 0%,transparent 60%);
+    radial-gradient(ellipse 60% 70% at 0% 50%, rgba(90,30,180,0.35) 0%, transparent 55%),
+    radial-gradient(ellipse 50% 60% at 100% 20%, rgba(150,80,255,0.2) 0%, transparent 50%),
+    radial-gradient(ellipse 40% 40% at 60% 80%, rgba(60,10,120,0.25) 0%, transparent 55%);
   pointer-events:none;z-index:0;
 }
 
-#app{position:relative;z-index:1}
-
-/* ── AUTH ── */
-#auth-screen{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px}
-
-.auth-card{
-  width:100%;max-width:400px;
-  background:rgba(13,10,28,0.72);
-  border:1px solid var(--b2);
-  border-radius:20px;
-  padding:44px 36px;
-  backdrop-filter:blur(48px);
-  box-shadow:0 0 0 1px rgba(124,58,237,0.08),0 40px 80px rgba(0,0,0,0.55),inset 0 1px 0 rgba(255,255,255,0.06);
+/* Grille de points */
+#auth::after{
+  content:'';position:absolute;inset:0;
+  background-image:radial-gradient(circle, rgba(130,80,255,0.14) 1px, transparent 1px);
+  background-size:24px 24px;
+  pointer-events:none;z-index:0;
 }
 
-.auth-wordmark{text-align:center;margin-bottom:36px}
-.auth-wordmark h1{font-size:20px;font-weight:600;letter-spacing:-.2px;color:var(--tx)}
-.auth-wordmark p{color:var(--mt);font-size:13px;margin-top:5px}
-.auth-wordmark .line{width:32px;height:2px;background:linear-gradient(90deg,var(--p2),var(--p1));border-radius:1px;margin:12px auto 0}
+/* ── Panneau gauche (terminal/info) ── */
+.auth-left{
+  flex:1;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  padding:64px 56px;
+  position:relative;
+  z-index:1;
+}
 
-.tab-switch{display:flex;background:var(--s1);border:1px solid var(--b);border-radius:10px;padding:3px;margin-bottom:24px}
-.tab-btn{flex:1;padding:9px;background:none;border:none;color:var(--mt);font-size:13px;font-weight:500;cursor:pointer;border-radius:8px;transition:all .18s;font-family:inherit}
-.tab-btn.active{background:rgba(124,58,237,0.35);color:var(--p3);box-shadow:inset 0 1px 0 rgba(255,255,255,0.08)}
+.auth-brand{
+  display:flex;align-items:center;gap:10px;
+  margin-bottom:60px;
+}
+.auth-brand .logo{
+  width:34px;height:34px;
+  background:linear-gradient(135deg,var(--p2),#4c1d95);
+  border-radius:9px;
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:0 4px 20px rgba(100,40,200,0.4);
+}
+.auth-brand .logo svg{width:18px;height:18px;fill:none;stroke:#fff;stroke-width:2}
+.auth-brand span{font-size:16px;font-weight:600;color:var(--tx);letter-spacing:-.1px}
 
-.field{margin-bottom:14px}
-.field label{display:block;font-size:11px;font-weight:500;color:var(--mt);margin-bottom:7px;letter-spacing:.4px;text-transform:uppercase}
-.field input{
-  width:100%;padding:11px 14px;
+.auth-tagline{
+  margin-bottom:48px;
+}
+.auth-tagline h2{
+  font-size:32px;font-weight:600;letter-spacing:-.5px;
+  line-height:1.2;color:var(--tx);
+  margin-bottom:12px;
+}
+.auth-tagline h2 em{
+  font-style:normal;
+  background:linear-gradient(135deg,var(--p1),var(--p4));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+}
+.auth-tagline p{font-size:14px;color:var(--mt);line-height:1.6;max-width:340px}
+
+/* Terminal */
+.terminal{
+  background:rgba(0,0,0,0.45);
+  border:1px solid rgba(255,255,255,0.07);
+  border-radius:14px;
+  overflow:hidden;
+  max-width:420px;
+  backdrop-filter:blur(12px);
+  box-shadow:0 20px 60px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.05);
+}
+.term-bar{
+  display:flex;align-items:center;gap:6px;
+  padding:10px 14px;
+  background:rgba(255,255,255,0.03);
+  border-bottom:1px solid rgba(255,255,255,0.06);
+}
+.term-dot{width:10px;height:10px;border-radius:50%}
+.term-dot:nth-child(1){background:#ff5f57}
+.term-dot:nth-child(2){background:#febc2e}
+.term-dot:nth-child(3){background:#28c840}
+.term-title{
+  font-family:var(--mono);font-size:11px;color:var(--mt);
+  margin-left:auto;margin-right:auto;
+}
+.term-body{padding:18px;font-family:var(--mono);font-size:12px;line-height:1.8}
+.term-line{display:flex;gap:8px;margin-bottom:2px}
+.term-prompt{color:var(--p1);user-select:none}
+.term-cmd{color:rgba(237,233,254,0.75)}
+.term-out{color:var(--mt);padding-left:16px}
+.term-out.ok{color:var(--grn)}
+.term-out.err{color:var(--red)}
+.term-out.dim{color:rgba(237,233,254,0.28)}
+.term-cursor{
+  display:inline-block;width:7px;height:13px;
+  background:var(--p1);border-radius:1px;
+  animation:blink 1.1s steps(1) infinite;
+  vertical-align:middle;margin-left:2px;
+}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
+
+/* Stats row */
+.auth-stats{
+  display:flex;gap:32px;
+  margin-top:40px;
+}
+.auth-stat .val{font-size:20px;font-weight:600;color:var(--tx)}
+.auth-stat .lbl{font-size:11px;color:var(--mt);margin-top:2px}
+
+/* ── Panneau droit (form) ── */
+.auth-right{
+  width:420px;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+  padding:40px 40px;
+  position:relative;z-index:1;
+  border-left:1px solid rgba(255,255,255,0.05);
+  background:rgba(5,5,14,0.6);
+  backdrop-filter:blur(32px);
+}
+
+.auth-form-wrap{width:100%;max-width:340px}
+
+.form-header{margin-bottom:32px}
+.form-header .eyebrow{
+  font-family:var(--mono);
+  font-size:10px;color:var(--p1);
+  letter-spacing:1.5px;text-transform:uppercase;
+  margin-bottom:8px;
+}
+.form-header h3{font-size:22px;font-weight:600;color:var(--tx);letter-spacing:-.2px}
+.form-header p{font-size:13px;color:var(--mt);margin-top:5px;line-height:1.5}
+
+/* Tab toggle */
+.tsw{
+  display:flex;
+  background:rgba(255,255,255,0.03);
+  border:1px solid rgba(255,255,255,0.07);
+  border-radius:10px;padding:3px;
+  margin-bottom:28px;
+}
+.tbtn{
+  flex:1;padding:9px;background:none;border:none;
+  color:var(--mt);font-size:12px;font-weight:500;
+  cursor:pointer;border-radius:8px;transition:all .18s;
+  font-family:inherit;
+}
+.tbtn.on{
+  background:rgba(100,40,200,0.28);
+  color:var(--p3);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,0.06);
+}
+
+/* Fields */
+.fld{margin-bottom:16px}
+.fld label{
+  display:flex;align-items:center;justify-content:space-between;
+  font-size:11px;font-weight:500;color:var(--mt);
+  margin-bottom:7px;letter-spacing:.3px;
+}
+.fld label span{font-size:10px;color:var(--p1);cursor:pointer}
+.inp-wrap{position:relative}
+.inp-wrap .ico{
+  position:absolute;left:13px;top:50%;transform:translateY(-50%);
+  width:15px;height:15px;opacity:.35;pointer-events:none;
+}
+.fld input{
+  width:100%;padding:11px 13px 11px 38px;
   background:rgba(255,255,255,0.04);
-  border:1px solid var(--b);
+  border:1px solid rgba(255,255,255,0.08);
   border-radius:10px;color:var(--tx);
-  font-size:14px;font-family:inherit;
-  transition:border-color .18s,box-shadow .18s;outline:none;
+  font-size:13px;font-family:inherit;
+  outline:none;transition:border-color .18s,box-shadow .18s,background .18s;
 }
-.field input:focus{border-color:rgba(124,58,237,0.6);box-shadow:0 0 0 3px rgba(124,58,237,0.12)}
-.field input::placeholder{color:rgba(237,233,254,0.22)}
+.fld input:focus{
+  border-color:rgba(120,70,255,0.55);
+  box-shadow:0 0 0 3px rgba(100,40,200,0.12);
+  background:rgba(255,255,255,0.055);
+}
+.fld input::placeholder{color:rgba(237,233,254,0.18)}
 
-.btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;padding:11px 18px;border:none;border-radius:10px;font-size:13px;font-weight:500;font-family:inherit;cursor:pointer;transition:all .18s;white-space:nowrap}
-.btn-primary{width:100%;background:linear-gradient(135deg,var(--p2),#5b21b6);color:#fff;box-shadow:0 4px 18px rgba(109,40,217,0.3);margin-top:6px}
-.btn-primary:hover{box-shadow:0 6px 24px rgba(109,40,217,0.42);transform:translateY(-1px)}
-.btn-primary:active{transform:none}
-.btn-ghost{background:var(--s1);border:1px solid var(--b);color:var(--tx)}
-.btn-ghost:hover{background:var(--s2);border-color:var(--b2)}
-.btn-red{background:rgba(248,113,113,0.1);border:1px solid rgba(248,113,113,0.25);color:var(--red)}
-.btn-red:hover{background:rgba(248,113,113,0.18)}
-.btn-grn{background:rgba(52,211,153,0.1);border:1px solid rgba(52,211,153,0.25);color:var(--grn)}
-.btn-grn:hover{background:rgba(52,211,153,0.18)}
-.btn-sm{padding:6px 13px;font-size:12px;border-radius:8px}
+/* Security notice */
+.sec-notice{
+  display:flex;align-items:center;gap:8px;
+  padding:10px 12px;
+  background:rgba(52,211,153,0.07);
+  border:1px solid rgba(52,211,153,0.15);
+  border-radius:9px;
+  margin-bottom:20px;
+  font-size:11px;color:rgba(52,211,153,0.8);
+}
+.sec-notice svg{width:13px;height:13px;flex-shrink:0;stroke:currentColor;fill:none;stroke-width:2}
 
-.msg{margin-top:14px;padding:11px 14px;border-radius:9px;font-size:12px;font-weight:500;display:none}
-.msg.error{background:rgba(248,113,113,0.1);border:1px solid rgba(248,113,113,0.25);color:var(--red)}
-.msg.success{background:rgba(52,211,153,0.1);border:1px solid rgba(52,211,153,0.25);color:var(--grn)}
+/* Bouton principal */
+.btn-main{
+  width:100%;
+  padding:13px;
+  background:linear-gradient(135deg,#6d28d9,#7c3aed,#8b5cf6);
+  border:none;border-radius:11px;
+  color:#fff;font-size:13px;font-weight:600;font-family:inherit;
+  cursor:pointer;position:relative;overflow:hidden;
+  box-shadow:0 4px 20px rgba(100,40,200,0.35),0 1px 0 rgba(255,255,255,0.1) inset;
+  transition:all .2s;
+  letter-spacing:.1px;
+}
+.btn-main::before{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(135deg,rgba(255,255,255,0.1),transparent);
+  pointer-events:none;
+}
+.btn-main:hover{
+  transform:translateY(-1px);
+  box-shadow:0 8px 28px rgba(100,40,200,0.45),0 1px 0 rgba(255,255,255,0.1) inset;
+}
+.btn-main:active{transform:none;box-shadow:0 2px 10px rgba(100,40,200,0.3)}
+
+/* Divider */
+.divider{
+  display:flex;align-items:center;gap:12px;
+  margin:20px 0;
+  font-size:11px;color:var(--mt);
+}
+.divider::before,.divider::after{content:'';flex:1;height:1px;background:rgba(255,255,255,0.06)}
+
+/* Terms */
+.terms{
+  font-size:11px;color:var(--mt);text-align:center;
+  margin-top:20px;line-height:1.6;
+}
+.terms a{color:var(--p1);text-decoration:none}
+.terms a:hover{text-decoration:underline}
+
+/* msg */
+.msg{margin-top:14px;padding:10px 13px;border-radius:9px;font-size:12px;font-weight:500;display:none}
+.msg.err{background:rgba(248,113,113,0.09);border:1px solid rgba(248,113,113,0.2);color:var(--red)}
+.msg.suc{background:rgba(52,211,153,0.09);border:1px solid rgba(52,211,153,0.2);color:var(--grn)}
 .msg.show{display:block}
 
-/* ── TOPBAR ── */
-#dashboard-screen{display:none;min-height:100vh}
-.topbar{
-  position:sticky;top:0;z-index:100;
-  display:flex;align-items:center;justify-content:space-between;
-  padding:0 28px;height:58px;
-  background:rgba(6,6,15,0.82);
-  border-bottom:1px solid var(--b);
-  backdrop-filter:blur(24px);
+/* ── Responsive mobile ── */
+@media(max-width:860px){
+  #auth{flex-direction:column}
+  .auth-left{padding:40px 24px 24px;border-bottom:1px solid rgba(255,255,255,0.05)}
+  .terminal{display:none}
+  .auth-right{width:100%;border-left:none;padding:28px 24px 40px}
+  .auth-stats{display:none}
+  .auth-tagline h2{font-size:24px}
 }
-.topbar-brand{font-size:15px;font-weight:600;color:var(--tx);letter-spacing:-.1px;display:flex;align-items:center;gap:10px}
-.topbar-brand .pip{width:6px;height:6px;background:var(--grn);border-radius:50%;box-shadow:0 0 7px var(--grn)}
-.topbar-r{display:flex;align-items:center;gap:10px}
 
-.badge{padding:4px 11px;border-radius:20px;font-size:11px;font-weight:500;letter-spacing:.3px}
-.badge-owner{background:rgba(167,139,250,0.14);border:1px solid rgba(167,139,250,0.3);color:var(--p3)}
-.badge-admin{background:rgba(124,58,237,0.12);border:1px solid rgba(124,58,237,0.28);color:var(--p1)}
-
-/* ── MAIN ── */
-.main{padding:28px;max-width:1100px;margin:0 auto}
-
-.nav-tabs{display:flex;gap:2px;margin-bottom:28px;background:var(--s1);border:1px solid var(--b);border-radius:12px;padding:4px;width:fit-content}
-.nav-tab{padding:8px 18px;background:none;border:none;color:var(--mt);font-size:13px;font-weight:500;cursor:pointer;border-radius:9px;transition:all .18s;font-family:inherit}
-.nav-tab.active{background:rgba(124,58,237,0.3);color:var(--p3)}
-.tab-content{display:none}
-.tab-content.active{display:block}
-
-/* ── STAT CARDS ── */
-.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:14px;margin-bottom:28px}
-.stat-card{
-  background:rgba(13,10,28,0.5);
-  border:1px solid var(--b);
-  border-radius:15px;padding:22px;
-  backdrop-filter:blur(16px);
-  position:relative;overflow:hidden;
-  transition:border-color .2s,transform .2s;
-}
-.stat-card::after{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(167,139,250,0.35),transparent)}
-.stat-card:hover{border-color:var(--b2);transform:translateY(-2px)}
-.stat-lbl{font-size:10px;font-weight:500;color:var(--mt);text-transform:uppercase;letter-spacing:.9px;margin-bottom:10px}
-.stat-val{font-size:32px;font-weight:600;letter-spacing:-1px;color:var(--p3);line-height:1}
-
-/* ── TABLES ── */
-.section-hd{font-size:13px;font-weight:500;color:var(--tx);margin-bottom:14px;display:flex;align-items:center;gap:8px}
-.cnt{font-size:11px;padding:2px 9px;background:var(--s2);border-radius:20px;color:var(--mt)}
-
-.gt{width:100%;background:rgba(13,10,28,0.45);border:1px solid var(--b);border-radius:14px;overflow:hidden;backdrop-filter:blur(16px);margin-bottom:24px}
+/* ══════════════════════════════════════════
+   DASHBOARD (inchangé, styles minifiés)
+══════════════════════════════════════════ */
+#dash{display:none;min-height:100vh}
+body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(circle,rgba(130,80,255,0.13) 1px,transparent 1px);background-size:26px 26px;pointer-events:none;z-index:0;opacity:.45}
+.topbar{position:sticky;top:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:0 24px;height:54px;background:rgba(5,5,14,0.88);border-bottom:1px solid var(--b);backdrop-filter:blur(20px)}
+.tbrand{display:flex;align-items:center;gap:9px;font-size:14px;font-weight:600;color:var(--tx)}
+.pip{width:6px;height:6px;background:var(--grn);border-radius:50%;box-shadow:0 0 6px var(--grn)}
+.tright{display:flex;align-items:center;gap:9px}
+.badge{padding:3px 10px;border-radius:20px;font-size:10px;font-weight:500}
+.bo{background:rgba(167,139,250,0.12);border:1px solid rgba(167,139,250,0.28);color:var(--p3)}
+.ba{background:rgba(100,40,200,0.1);border:1px solid rgba(100,40,200,0.25);color:var(--p1)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:10px 16px;border:none;border-radius:9px;font-size:12px;font-weight:500;font-family:inherit;cursor:pointer;transition:all .15s;white-space:nowrap}
+.bgh{background:var(--s1);border:1px solid var(--b);color:var(--tx)}.bgh:hover{background:var(--s2);border-color:var(--b2)}
+.bred{background:rgba(248,113,113,0.09);border:1px solid rgba(248,113,113,0.22);color:var(--red)}.bred:hover{background:rgba(248,113,113,0.16)}
+.bgrn{background:rgba(52,211,153,0.09);border:1px solid rgba(52,211,153,0.22);color:var(--grn)}.bgrn:hover{background:rgba(52,211,153,0.16)}
+.bamb{background:rgba(251,191,36,0.09);border:1px solid rgba(251,191,36,0.22);color:var(--amb)}.bamb:hover{background:rgba(251,191,36,0.16)}
+.bsm{padding:5px 12px;font-size:11px;border-radius:7px}
+.main{padding:24px;max-width:1080px;margin:0 auto}
+.ntabs{display:flex;gap:2px;margin-bottom:24px;background:var(--s1);border:1px solid var(--b);border-radius:11px;padding:3px;width:fit-content;overflow-x:auto}
+.ntab{padding:7px 16px;background:none;border:none;color:var(--mt);font-size:12px;font-weight:500;cursor:pointer;border-radius:8px;transition:all .15s;font-family:inherit;white-space:nowrap}
+.ntab.on{background:rgba(100,40,200,0.28);color:var(--p3)}
+.tc{display:none}.tc.on{display:block}
+.sgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;margin-bottom:24px}
+.sc{background:rgba(12,8,26,0.5);border:1px solid var(--b);border-radius:13px;padding:20px;backdrop-filter:blur(14px);position:relative;overflow:hidden;transition:border-color .2s,transform .2s}
+.sc::after{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(150,100,255,0.3),transparent)}
+.sc:hover{border-color:var(--b2);transform:translateY(-1px)}
+.slbl{font-size:10px;font-weight:500;color:var(--mt);text-transform:uppercase;letter-spacing:.8px;margin-bottom:8px}
+.sval{font-size:28px;font-weight:600;letter-spacing:-1px;color:var(--p3);line-height:1}
+.shd{font-size:12px;font-weight:500;color:var(--tx);margin-bottom:12px;display:flex;align-items:center;gap:7px}
+.cnt{font-size:10px;padding:2px 8px;background:var(--s2);border-radius:20px;color:var(--mt)}
+.gt{width:100%;background:rgba(12,8,26,0.45);border:1px solid var(--b);border-radius:13px;overflow:hidden;backdrop-filter:blur(14px);margin-bottom:22px}
 .gt table{width:100%;border-collapse:collapse}
-.gt thead th{padding:12px 18px;text-align:left;font-size:10px;font-weight:500;color:var(--mt);text-transform:uppercase;letter-spacing:.7px;border-bottom:1px solid var(--b);background:rgba(255,255,255,0.015)}
-.gt tbody td{padding:12px 18px;font-size:13px;color:var(--tx);border-bottom:1px solid rgba(255,255,255,0.035)}
+.gt thead th{padding:10px 16px;text-align:left;font-size:9px;font-weight:500;color:var(--mt);text-transform:uppercase;letter-spacing:.7px;border-bottom:1px solid var(--b);background:rgba(255,255,255,0.015)}
+.gt tbody td{padding:10px 16px;font-size:12px;color:var(--tx);border-bottom:1px solid rgba(255,255,255,0.03)}
 .gt tbody tr:last-child td{border-bottom:none}
-.gt tbody tr:hover td{background:rgba(167,139,250,0.04)}
-
-.uid{font-family:'Courier New',monospace;font-size:11px;color:var(--p1);background:rgba(124,58,237,0.1);padding:3px 7px;border-radius:5px}
-.muted{color:var(--mt);font-size:12px}
-
-/* ── BAN FORM ── */
-.ban-box{background:rgba(13,10,28,0.45);border:1px solid var(--b);border-radius:15px;padding:24px;backdrop-filter:blur(16px);margin-bottom:24px}
-.form-row{display:flex;gap:10px;align-items:flex-end}
-.form-row .field{flex:1;margin-bottom:0}
-.form-row .btn{flex-shrink:0;padding:11px 18px}
-
-/* ── REFRESH BAR ── */
+.gt tbody tr:hover td{background:rgba(150,100,255,0.04)}
+.uid{font-family:var(--mono);font-size:10px;color:var(--p1);background:rgba(100,40,200,0.09);padding:2px 6px;border-radius:5px}
+.mt-c{color:var(--mt);font-size:11px}
+.acts{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.odot{width:7px;height:7px;background:var(--grn);border-radius:50%;display:inline-block;box-shadow:0 0 5px var(--grn);margin-right:5px}
+.ann-banner{background:rgba(251,191,36,0.08);border:1px solid rgba(251,191,36,0.2);border-radius:10px;padding:10px 14px;margin-bottom:16px;font-size:12px;color:var(--amb);display:none}
+.ann-banner.show{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.maint-bar{background:rgba(248,113,113,0.08);border:1px solid rgba(248,113,113,0.2);border-radius:10px;padding:10px 14px;margin-bottom:16px;font-size:12px;color:var(--red);display:none;align-items:center;justify-content:space-between;gap:10px}
+.maint-bar.show{display:flex}
+.box{background:rgba(12,8,26,0.45);border:1px solid var(--b);border-radius:13px;padding:22px;backdrop-filter:blur(14px);margin-bottom:22px}
+.frow{display:flex;gap:9px;align-items:flex-end;flex-wrap:wrap}
+.frow .fld2{flex:1;min-width:120px;margin-bottom:0}
+.fld2 label{display:block;font-size:10px;font-weight:500;color:var(--mt);margin-bottom:6px;letter-spacing:.4px;text-transform:uppercase}
+.fld2 input{width:100%;padding:10px 13px;background:rgba(255,255,255,0.04);border:1px solid var(--b);border-radius:9px;color:var(--tx);font-size:13px;font-family:inherit;outline:none;transition:border-color .15s,box-shadow .15s}
+.fld2 input:focus{border-color:rgba(100,40,200,0.5);box-shadow:0 0 0 3px rgba(100,40,200,0.1)}
+.fld2 input::placeholder{color:rgba(237,233,254,0.18)}
 .rbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:22px}
-.rbar-lbl{font-size:12px;color:var(--mt)}
-
-/* ── EMPTY ── */
-.empty{text-align:center;padding:40px 20px;color:var(--mt);font-size:13px}
-
-/* ── TOAST ── */
-#toast{position:fixed;bottom:28px;right:28px;padding:13px 18px;border-radius:12px;font-size:13px;font-weight:500;backdrop-filter:blur(20px);z-index:9999;transform:translateY(70px);opacity:0;transition:all .28s cubic-bezier(.34,1.56,.64,1);max-width:300px;pointer-events:none}
+.rbar-l{font-size:12px;color:var(--mt)}
+.empty-s{text-align:center;padding:36px 20px;color:var(--mt);font-size:12px}
+#toast{position:fixed;bottom:24px;right:24px;padding:12px 16px;border-radius:11px;font-size:12px;font-weight:500;backdrop-filter:blur(20px);z-index:9999;transform:translateY(60px);opacity:0;transition:all .25s cubic-bezier(.34,1.56,.64,1);max-width:280px;pointer-events:none}
 #toast.show{transform:translateY(0);opacity:1}
-#toast.success{background:rgba(52,211,153,0.13);border:1px solid rgba(52,211,153,0.3);color:var(--grn)}
-#toast.error{background:rgba(248,113,113,0.13);border:1px solid rgba(248,113,113,0.3);color:var(--red)}
-
-/* ── SPINNER ── */
-.spin{display:inline-block;width:15px;height:15px;border:2px solid rgba(255,255,255,0.15);border-top-color:rgba(255,255,255,0.6);border-radius:50%;animation:sp .65s linear infinite}
+#toast.suc{background:rgba(52,211,153,0.12);border:1px solid rgba(52,211,153,0.28);color:var(--grn)}
+#toast.err{background:rgba(248,113,113,0.12);border:1px solid rgba(248,113,113,0.28);color:var(--red)}
+.spin{display:inline-block;width:14px;height:14px;border:2px solid rgba(255,255,255,0.12);border-top-color:rgba(255,255,255,0.5);border-radius:50%;animation:sp .6s linear infinite}
 @keyframes sp{to{transform:rotate(360deg)}}
-
-/* ── BUTTON WRAP style (inspired by reference) ── */
-.btn-wrap{position:relative;display:inline-block}
-.btn-wrap .btn-shadow{position:absolute;bottom:-3px;left:2px;right:-2px;height:100%;background:rgba(109,40,217,0.3);border-radius:10px;z-index:-1;filter:blur(6px)}
-
-@media(max-width:640px){
-  .topbar{padding:0 16px}
-  .main{padding:16px}
-  .auth-card{padding:30px 20px}
-  .form-row{flex-direction:column}
-  .form-row .btn{width:100%}
-  .stats-grid{grid-template-columns:1fr 1fr}
-  #toast{bottom:14px;right:14px;left:14px;max-width:none}
-  .nav-tabs{overflow-x:auto;width:100%}
-}
+@media(max-width:600px){.topbar{padding:0 14px}.main{padding:14px}.frow{flex-direction:column}.frow .btn{width:100%}.ntabs{width:100%}#toast{bottom:12px;right:12px;left:12px;max-width:none}}
 </style>
 </head>
 <body>
 <div id="app">
 
-<!-- AUTH -->
-<div id="auth-screen">
-  <div class="auth-card">
-    <div class="auth-wordmark">
-      <h1>Legacy</h1>
-      <p>Panneau de contrôle</p>
-      <div class="line"></div>
+<!-- ══ AUTH ══ -->
+<div id="auth">
+
+  <!-- Panneau gauche -->
+  <div class="auth-left">
+    <div class="auth-brand">
+      <div class="logo">
+        <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+      </div>
+      <span>Legacy</span>
     </div>
-    <div class="tab-switch">
-      <button class="tab-btn active" onclick="switchAuthTab('login')">Connexion</button>
-      <button class="tab-btn" onclick="switchAuthTab('register')">Créer un compte</button>
+
+    <div class="auth-tagline">
+      <h2>Control panel<br><em>built different.</em></h2>
+      <p>Monitor executions, manage bans, broadcast announcements and control your script from one place.</p>
     </div>
-    <div id="form-login">
-      <div class="field"><label>Identifiant</label><input type="text" id="lu" placeholder="admin" autocomplete="username"></div>
-      <div class="field"><label>Mot de passe</label><input type="password" id="lp" placeholder="••••••••" autocomplete="current-password"></div>
-      <div class="btn-wrap"><button class="btn btn-primary" onclick="doLogin()">Se connecter</button><div class="btn-shadow"></div></div>
-      <div class="msg" id="lmsg"></div>
+
+    <div class="terminal">
+      <div class="term-bar">
+        <div class="term-dot"></div>
+        <div class="term-dot"></div>
+        <div class="term-dot"></div>
+        <div class="term-title">legacy — system status</div>
+      </div>
+      <div class="term-body">
+        <div class="term-line"><span class="term-prompt">$</span><span class="term-cmd">legacy status --check</span></div>
+        <div class="term-out ok">✓ Worker online — legacy.spyuhq.workers.dev</div>
+        <div class="term-out ok">✓ JSONBin storage — connected</div>
+        <div class="term-out ok">✓ Auth system — operational</div>
+        <div class="term-line" style="margin-top:8px"><span class="term-prompt">$</span><span class="term-cmd">legacy --version</span></div>
+        <div class="term-out">Legacy Control Panel v2.0.0</div>
+        <div class="term-out dim">Build: 2024-12 · Cloudflare Workers</div>
+        <div class="term-line" style="margin-top:8px"><span class="term-prompt">$</span><span class="term-cursor"></span></div>
+      </div>
     </div>
-    <div id="form-register" style="display:none">
-      <div class="field"><label>Identifiant</label><input type="text" id="ru" placeholder="monpseudo" autocomplete="username"></div>
-      <div class="field"><label>Mot de passe</label><input type="password" id="rp" placeholder="Min. 6 caractères" autocomplete="new-password"></div>
-      <div class="btn-wrap"><button class="btn btn-primary" onclick="doRegister()">Créer le compte</button><div class="btn-shadow"></div></div>
-      <div class="msg" id="rmsg"></div>
+
+    <div class="auth-stats">
+      <div class="auth-stat"><div class="val" id="stat-exec">—</div><div class="lbl">Executions</div></div>
+      <div class="auth-stat"><div class="val" id="stat-online">—</div><div class="lbl">Online now</div></div>
+      <div class="auth-stat"><div class="val" id="stat-bans">—</div><div class="lbl">Banned</div></div>
+    </div>
+  </div>
+
+  <!-- Panneau droit -->
+  <div class="auth-right">
+    <div class="auth-form-wrap">
+
+      <div class="form-header">
+        <div class="eyebrow">// secure access</div>
+        <h3 id="fh-title">Sign in to Legacy</h3>
+        <p id="fh-sub">Enter your credentials to access the control panel.</p>
+      </div>
+
+      <div class="tsw">
+        <button class="tbtn on" onclick="atab('login')">Sign in</button>
+        <button class="tbtn" onclick="atab('reg')">Create account</button>
+      </div>
+
+      <!-- LOGIN -->
+      <div id="fl">
+        <div class="fld">
+          <label>Username</label>
+          <div class="inp-wrap">
+            <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            <input id="lu" placeholder="Enter username" autocomplete="username">
+          </div>
+        </div>
+        <div class="fld">
+          <label>Password</label>
+          <div class="inp-wrap">
+            <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+            <input id="lp" type="password" placeholder="Enter password" autocomplete="current-password">
+          </div>
+        </div>
+        <div class="sec-notice">
+          <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          Connection encrypted — credentials never stored locally
+        </div>
+        <button class="btn-main" onclick="doLogin()">Sign in to Legacy</button>
+        <div class="msg" id="lm"></div>
+        <div class="terms">By signing in, you agree to the <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a>.</div>
+      </div>
+
+      <!-- REGISTER -->
+      <div id="fr" style="display:none">
+        <div class="fld">
+          <label>Username</label>
+          <div class="inp-wrap">
+            <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            <input id="ru" placeholder="Choose a username" autocomplete="username">
+          </div>
+        </div>
+        <div class="fld">
+          <label>Password</label>
+          <div class="inp-wrap">
+            <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+            <input id="rp" type="password" placeholder="Min. 6 characters" autocomplete="new-password">
+          </div>
+        </div>
+        <div class="sec-notice">
+          <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          First account created automatically becomes Owner
+        </div>
+        <button class="btn-main" onclick="doReg()">Create account</button>
+        <div class="msg" id="rm"></div>
+        <div class="terms">By creating an account, you agree to the <a href="#">Terms of Service</a>.</div>
+      </div>
+
     </div>
   </div>
 </div>
 
-<!-- DASHBOARD -->
-<div id="dashboard-screen">
+<!-- ══ DASHBOARD ══ -->
+<div id="dash">
   <div class="topbar">
-    <div class="topbar-brand">
-      <div class="pip"></div>
-      Legacy
-    </div>
-    <div class="topbar-r">
-      <span class="badge" id="role-badge"></span>
-      <button class="btn btn-ghost btn-sm" onclick="doLogout()">Déconnexion</button>
+    <div class="tbrand"><div class="pip"></div>Legacy</div>
+    <div class="tright">
+      <span class="badge" id="rbadge"></span>
+      <button class="btn bgh bsm" onclick="doOut()">Sign out</button>
     </div>
   </div>
-
   <div class="main">
-    <div class="nav-tabs">
-      <button class="nav-tab active" onclick="switchTab('stats',this)">Statistiques</button>
-      <button class="nav-tab" onclick="switchTab('players',this)">Joueurs</button>
-      <button class="nav-tab" onclick="switchTab('bans',this)">Bans</button>
-      <button class="nav-tab owner-only" onclick="switchTab('accounts',this)" style="display:none">Comptes</button>
+    <div id="maint-bar" class="maint-bar">
+      <span id="maint-msg">Maintenance active</span>
+      <button class="btn bred bsm" onclick="setMaint(false)">Disable</button>
+    </div>
+    <div id="ann-bar" class="ann-banner">
+      <span id="ann-msg"></span>
+      <button class="btn bamb bsm" onclick="clearAnn()">Clear</button>
+    </div>
+    <div class="ntabs">
+      <button class="ntab on" onclick="sw('overview',this)">Overview</button>
+      <button class="ntab" onclick="sw('online',this)">Online</button>
+      <button class="ntab" onclick="sw('players',this)">Players</button>
+      <button class="ntab" onclick="sw('bans',this)">Bans</button>
+      <button class="ntab" onclick="sw('logs',this)">Logs</button>
+      <button class="ntab" onclick="sw('broadcast',this)">Broadcast</button>
+      <button class="ntab owner-only" onclick="sw('accounts',this)" style="display:none">Accounts</button>
     </div>
 
-    <!-- Stats -->
-    <div id="tab-stats" class="tab-content active">
+    <!-- OVERVIEW -->
+    <div id="tc-overview" class="tc on">
       <div class="rbar">
-        <div class="section-hd">Vue d'ensemble</div>
-        <div style="display:flex;align-items:center;gap:10px">
-          <span class="rbar-lbl" id="last-upd"></span>
-          <button class="btn btn-ghost btn-sm" onclick="loadStats()">Actualiser</button>
+        <div class="shd" style="margin-bottom:0">Overview</div>
+        <div style="display:flex;align-items:center;gap:9px">
+          <span class="rbar-l" id="lupd"></span>
+          <button class="btn bgh bsm" onclick="load()">Refresh</button>
         </div>
       </div>
-      <div class="stats-grid">
-        <div class="stat-card"><div class="stat-lbl">Exécutions</div><div class="stat-val" id="s-total">—</div></div>
-        <div class="stat-card"><div class="stat-lbl">Joueurs uniques</div><div class="stat-val" id="s-players">—</div></div>
-        <div class="stat-card"><div class="stat-lbl">Bannis</div><div class="stat-val" id="s-bans">—</div></div>
+      <div class="sgrid">
+        <div class="sc"><div class="slbl">Total executions</div><div class="sval" id="s-tot">—</div></div>
+        <div class="sc"><div class="slbl">Unique players</div><div class="sval" id="s-uniq">—</div></div>
+        <div class="sc"><div class="slbl">Online now</div><div class="sval" id="s-on">—</div></div>
+        <div class="sc"><div class="slbl">Banned</div><div class="sval" id="s-ban">—</div></div>
       </div>
-      <div class="section-hd">Activité récente</div>
+      <div class="shd">Recent activity</div>
       <div class="gt"><table>
-        <thead><tr><th>Joueur</th><th>User ID</th><th>Place ID</th><th>Date</th></tr></thead>
-        <tbody id="recent-tb"><tr><td colspan="4"><div class="empty"><div class="spin"></div></div></td></tr></tbody>
+        <thead><tr><th>Player</th><th>User ID</th><th>Game</th><th>Place ID</th><th>Date</th></tr></thead>
+        <tbody id="tb-recent"><tr><td colspan="5"><div class="empty-s"><div class="spin"></div></div></td></tr></tbody>
       </table></div>
     </div>
 
-    <!-- Players -->
-    <div id="tab-players" class="tab-content">
-      <div class="section-hd">Top joueurs <span class="cnt" id="pl-cnt">0</span></div>
+    <!-- ONLINE -->
+    <div id="tc-online" class="tc">
+      <div class="shd">Online players <span class="cnt" id="on-cnt">0</span></div>
       <div class="gt"><table>
-        <thead><tr><th>Joueur</th><th>User ID</th><th>Exécutions</th><th>Dernière activité</th><th>Action</th></tr></thead>
-        <tbody id="players-tb"><tr><td colspan="5"><div class="empty"><div class="spin"></div></div></td></tr></tbody>
+        <thead><tr><th>Player</th><th>User ID</th><th>Game</th><th>Last seen</th><th>Actions</th></tr></thead>
+        <tbody id="tb-online"><tr><td colspan="5"><div class="empty-s"><div class="spin"></div></div></td></tr></tbody>
       </table></div>
     </div>
 
-    <!-- Bans -->
-    <div id="tab-bans" class="tab-content">
-      <div class="ban-box">
-        <div class="section-hd" style="margin-bottom:16px">Bannir un joueur</div>
-        <div class="form-row">
-          <div class="field"><label>User ID Roblox</label><input type="text" id="ban-uid" placeholder="123456789"></div>
-          <div class="field"><label>Raison</label><input type="text" id="ban-rsn" placeholder="Exploit, cheat..."></div>
-          <button class="btn btn-red" onclick="doBan()">Bannir</button>
+    <!-- PLAYERS -->
+    <div id="tc-players" class="tc">
+      <div class="shd">All players <span class="cnt" id="pl-cnt">0</span></div>
+      <div class="gt"><table>
+        <thead><tr><th>Player</th><th>User ID</th><th>Executions</th><th>Last game</th><th>Last seen</th><th>Actions</th></tr></thead>
+        <tbody id="tb-players"><tr><td colspan="6"><div class="empty-s"><div class="spin"></div></div></td></tr></tbody>
+      </table></div>
+    </div>
+
+    <!-- BANS -->
+    <div id="tc-bans" class="tc">
+      <div class="box">
+        <div class="shd" style="margin-bottom:14px">Ban a player</div>
+        <div class="frow">
+          <div class="fld2"><label>User ID</label><input id="ban-uid" placeholder="123456789"></div>
+          <div class="fld2"><label>Reason</label><input id="ban-rsn" placeholder="Exploiting..."></div>
+          <button class="btn bred" onclick="doBan()">Ban</button>
         </div>
       </div>
-      <div class="section-hd">Bannis actifs <span class="cnt" id="bn-cnt">0</span></div>
+      <div class="shd">Active bans <span class="cnt" id="bn-cnt">0</span></div>
       <div class="gt"><table>
-        <thead><tr><th>User ID</th><th>Raison</th><th>Date</th><th>Par</th><th>Action</th></tr></thead>
-        <tbody id="bans-tb"><tr><td colspan="5"><div class="empty"><div class="spin"></div></div></td></tr></tbody>
+        <thead><tr><th>User ID</th><th>Reason</th><th>Banned by</th><th>Date</th><th>Action</th></tr></thead>
+        <tbody id="tb-bans"><tr><td colspan="5"><div class="empty-s"><div class="spin"></div></div></td></tr></tbody>
       </table></div>
     </div>
 
-    <!-- Accounts -->
-    <div id="tab-accounts" class="tab-content">
-      <div class="section-hd">Comptes</div>
+    <!-- LOGS -->
+    <div id="tc-logs" class="tc">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+        <div class="shd" style="margin-bottom:0">Execution logs <span class="cnt" id="log-cnt">0</span></div>
+        <button class="btn bgh bsm" onclick="load()">Refresh</button>
+      </div>
       <div class="gt"><table>
-        <thead><tr><th>Identifiant</th><th>Rôle</th><th>Créé le</th><th>Actions</th></tr></thead>
-        <tbody id="acc-tb"><tr><td colspan="4"><div class="empty"><div class="spin"></div></div></td></tr></tbody>
+        <thead><tr><th>Player</th><th>User ID</th><th>Game</th><th>Place ID</th><th>Date</th></tr></thead>
+        <tbody id="tb-logs"><tr><td colspan="5"><div class="empty-s"><div class="spin"></div></div></td></tr></tbody>
       </table></div>
     </div>
+
+    <!-- BROADCAST -->
+    <div id="tc-broadcast" class="tc">
+      <div class="box">
+        <div class="shd" style="margin-bottom:14px">Send announcement</div>
+        <div class="frow">
+          <div class="fld2" style="flex:2"><label>Message</label><input id="ann-txt" placeholder="Server update incoming..."></div>
+          <div class="fld2"><label>Duration (seconds)</label><input id="ann-dur" placeholder="300" type="number" value="300"></div>
+          <button class="btn bamb" onclick="sendAnn()">Send</button>
+        </div>
+        <div style="margin-top:10px;font-size:11px;color:var(--mt)">Displayed on next script execution. Auto-expires after the set duration.</div>
+      </div>
+      <div class="box">
+        <div class="shd" style="margin-bottom:14px">Maintenance mode</div>
+        <div class="frow">
+          <div class="fld2"><label>Message (optional)</label><input id="maint-txt" placeholder="Maintenance in progress, try again later."></div>
+          <button class="btn bred" onclick="setMaint(true)">Enable</button>
+          <button class="btn bgrn" onclick="setMaint(false)">Disable</button>
+        </div>
+        <div style="margin-top:10px;font-size:11px;color:var(--mt)">Blocks all script executions when active.</div>
+      </div>
+    </div>
+
+    <!-- ACCOUNTS -->
+    <div id="tc-accounts" class="tc">
+      <div class="shd">Accounts</div>
+      <div class="gt"><table>
+        <thead><tr><th>Username</th><th>Role</th><th>Created</th><th>Actions</th></tr></thead>
+        <tbody id="tb-acc"><tr><td colspan="4"><div class="empty-s"><div class="spin"></div></div></td></tr></tbody>
+      </table></div>
+    </div>
+
   </div>
 </div>
 </div>
-
 <div id="toast"></div>
 
 <script>
 const W="https://legacy.spyuhq.workers.dev";
-let token=localStorage.getItem("sh_t")||null;
-let me=localStorage.getItem("sh_u")||null;
-let role=localStorage.getItem("sh_r")||null;
+let token=localStorage.getItem("lt")||null;
+let me=localStorage.getItem("lu2")||null;
+let role=localStorage.getItem("lr")||null;
 let cache=null;
 
-token?( showDash(), loadStats() ) : (document.getElementById("auth-screen").style.display="flex");
+// Charger les stats publiques pour le panneau gauche
+async function loadPublicStats(){
+  try{
+    const r=await fetch(`${W}/health`);
+    const d=await r.json();
+    if(d.ok){
+      document.getElementById("stat-exec").textContent="active";
+      document.getElementById("stat-online").textContent="live";
+      document.getElementById("stat-bans").textContent="on";
+    }
+  }catch{}
+}
 
-function switchAuthTab(t){
-  document.getElementById("form-login").style.display=t==="login"?"block":"none";
-  document.getElementById("form-register").style.display=t==="register"?"block":"none";
-  document.querySelectorAll(".tab-btn").forEach((b,i)=>b.classList.toggle("active",(i===0&&t==="login")||(i===1&&t==="register")));
+if(token){showDash();load();}
+else{
+  document.getElementById("auth").style.display="flex";
+  loadPublicStats();
+  typeTerminal();
+}
+
+// Animation terminal
+function typeTerminal(){
+  const lines=document.querySelectorAll(".term-out");
+  lines.forEach((l,i)=>{
+    l.style.opacity="0";
+    setTimeout(()=>{
+      l.style.transition="opacity .3s";
+      l.style.opacity="1";
+    },600+i*220);
+  });
+}
+
+function atab(t){
+  document.getElementById("fl").style.display=t==="login"?"block":"none";
+  document.getElementById("fr").style.display=t==="reg"?"block":"none";
+  document.querySelectorAll(".tbtn").forEach((b,i)=>b.classList.toggle("on",(i===0&&t==="login")||(i===1&&t==="reg")));
+  document.getElementById("fh-title").textContent=t==="login"?"Sign in to Legacy":"Create an account";
+  document.getElementById("fh-sub").textContent=t==="login"?"Enter your credentials to access the control panel.":"First account created becomes Owner automatically.";
 }
 
 async function doLogin(){
-  const u=document.getElementById("lu").value.trim(),p=document.getElementById("lp").value,m=document.getElementById("lmsg");
-  if(!u||!p){showMsg(m,"error","Remplis tous les champs");return}
+  const u=document.getElementById("lu").value.trim(),p=document.getElementById("lp").value,m=document.getElementById("lm");
+  if(!u||!p){sm(m,"err","Please fill all fields");return}
   try{
     const r=await fetch(`${W}/api/login`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({username:u,password:p})});
     const d=await r.json();
-    if(!d.success){showMsg(m,"error",d.error||"Erreur");return}
-    save(d.token,d.username,d.role);showDash();loadStats();
-  }catch(e){showMsg(m,"error","Serveur inaccessible")}
+    if(!d.ok){sm(m,"err",d.error||"Authentication failed");return}
+    save(d.token,d.username,d.role);showDash();load();
+  }catch{sm(m,"err","Could not reach server")}
 }
 
-async function doRegister(){
-  const u=document.getElementById("ru").value.trim(),p=document.getElementById("rp").value,m=document.getElementById("rmsg");
-  if(!u||!p){showMsg(m,"error","Remplis tous les champs");return}
+async function doReg(){
+  const u=document.getElementById("ru").value.trim(),p=document.getElementById("rp").value,m=document.getElementById("rm");
+  if(!u||!p){sm(m,"err","Please fill all fields");return}
   try{
     const r=await fetch(`${W}/api/register`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({username:u,password:p})});
     const d=await r.json();
-    if(!d.success){showMsg(m,"error",d.error||"Erreur");return}
-    if(d.token){save(d.token,d.username||u,d.role);showDash();loadStats();}
-    else showMsg(m,"success",d.message||"Compte créé, en attente d'activation");
-  }catch(e){showMsg(m,"error","Serveur inaccessible")}
+    if(!d.ok){sm(m,"err",d.error||"Error");return}
+    if(d.token){save(d.token,d.username||u,d.role);showDash();load();}
+    else sm(m,"suc",d.pending?"Account created — waiting for approval by owner.":"Account created.");
+  }catch{sm(m,"err","Could not reach server")}
 }
 
-function save(t,u,r){
-  token=t;me=u;role=r;
-  localStorage.setItem("sh_t",t);localStorage.setItem("sh_u",u);localStorage.setItem("sh_r",r);
-}
-
-function doLogout(){
-  token=me=role=null;
-  ["sh_t","sh_u","sh_r"].forEach(k=>localStorage.removeItem(k));
-  document.getElementById("dashboard-screen").style.display="none";
-  document.getElementById("auth-screen").style.display="flex";
-}
+function save(t,u,r){token=t;me=u;role=r;localStorage.setItem("lt",t);localStorage.setItem("lu2",u);localStorage.setItem("lr",r)}
+function doOut(){token=me=role=null;["lt","lu2","lr"].forEach(k=>localStorage.removeItem(k));document.getElementById("dash").style.display="none";document.getElementById("auth").style.display="flex";loadPublicStats();typeTerminal();}
 
 function showDash(){
-  document.getElementById("auth-screen").style.display="none";
-  document.getElementById("dashboard-screen").style.display="block";
-  const b=document.getElementById("role-badge");
+  document.getElementById("auth").style.display="none";
+  document.getElementById("dash").style.display="block";
+  const b=document.getElementById("rbadge");
   b.textContent=role==="owner"?"Owner":"Admin";
-  b.className="badge "+(role==="owner"?"badge-owner":"badge-admin");
+  b.className="badge "+(role==="owner"?"bo":"ba");
   document.querySelectorAll(".owner-only").forEach(el=>el.style.display=role==="owner"?"":"none");
 }
 
-function switchTab(name,el){
-  document.querySelectorAll(".tab-content").forEach(x=>x.classList.remove("active"));
-  document.querySelectorAll(".nav-tab").forEach(x=>x.classList.remove("active"));
-  document.getElementById(`tab-${name}`).classList.add("active");
-  el.classList.add("active");
-  if(name==="accounts"&&role==="owner")loadAccounts();
+function sw(name,el){
+  document.querySelectorAll(".tc").forEach(x=>x.classList.remove("on"));
+  document.querySelectorAll(".ntab").forEach(x=>x.classList.remove("on"));
+  document.getElementById(`tc-${name}`).classList.add("on");
+  el.classList.add("on");
+  if(name==="accounts"&&role==="owner")loadAcc();
 }
 
 async function api(path,method="GET",body=null){
-  const opts={method,headers:{"Content-Type":"application/json","Authorization":`Bearer ${token}`}};
-  if(body)opts.body=JSON.stringify(body);
-  const r=await fetch(`${W}${path}`,opts);
-  if(r.status===401){doLogout();throw new Error("Session expirée")}
+  const o={method,headers:{"Content-Type":"application/json","Authorization":`Bearer ${token}`}};
+  if(body)o.body=JSON.stringify(body);
+  const r=await fetch(`${W}${path}`,o);
+  if(r.status===401){doOut();throw new Error("expired")}
   return r.json();
 }
 
-async function loadStats(){
+async function load(){
   try{
     const d=await api("/api/stats");cache=d;
-    document.getElementById("s-total").textContent=(d.totalExecutions||0).toLocaleString();
-    document.getElementById("s-players").textContent=(d.uniquePlayers||0).toLocaleString();
-    document.getElementById("s-bans").textContent=(d.bannedCount||0).toLocaleString();
-    document.getElementById("last-upd").textContent="Mis à jour "+new Date().toLocaleTimeString("fr-FR");
-    renderRecent(d.recentExecutions||[]);
-    renderPlayers(d.topPlayers||[]);
-    renderBans(d.bans||{});
-  }catch(e){toast("Erreur de chargement","error")}
+    document.getElementById("s-tot").textContent=(d.total||0).toLocaleString();
+    document.getElementById("s-uniq").textContent=(d.uniquePlayers||0).toLocaleString();
+    document.getElementById("s-on").textContent=(d.onlinePlayers||[]).length;
+    document.getElementById("s-ban").textContent=(d.bannedCount||0).toLocaleString();
+    document.getElementById("lupd").textContent="Updated "+new Date().toLocaleTimeString("fr-FR");
+    const mb=document.getElementById("maint-bar");
+    if(d.maintenance){mb.classList.add("show");document.getElementById("maint-msg").textContent="Maintenance active"+(d.maintenanceMsg?": "+d.maintenanceMsg:"");}
+    else mb.classList.remove("show");
+    const ab=document.getElementById("ann-bar");
+    if(d.announce){ab.classList.add("show");document.getElementById("ann-msg").textContent="Announcement active: "+d.announce.msg;}
+    else ab.classList.remove("show");
+    rRecent(d.recentLogs||[]);rOnline(d.onlinePlayers||[]);rPlayers(d.topPlayers||[]);rBans(d.bans||{});rLogs(d.recentLogs||[]);
+  }catch(e){if(e.message!=="expired")toast("Load failed","err")}
 }
 
-function renderRecent(ex){
-  const tb=document.getElementById("recent-tb");
-  if(!ex.length){tb.innerHTML=`<tr><td colspan="4"><div class="empty">Aucune exécution</div></td></tr>`;return}
-  tb.innerHTML=ex.map(e=>`<tr>
-    <td><strong>${esc(e.username||"inconnu")}</strong></td>
-    <td><span class="uid">${esc(e.userId)}</span></td>
-    <td><span class="uid">${esc(e.placeId||"—")}</span></td>
-    <td><span class="muted">${fd(e.timestamp)}</span></td>
-  </tr>`).join("");
+function rRecent(ex){
+  const tb=document.getElementById("tb-recent");
+  if(!ex.length){tb.innerHTML=`<tr><td colspan="5"><div class="empty-s">No executions yet</div></td></tr>`;return}
+  tb.innerHTML=ex.slice(0,15).map(e=>`<tr><td><strong>${esc(e.uname||"unknown")}</strong></td><td><span class="uid">${esc(e.uid)}</span></td><td class="mt-c">${esc(e.gname||"—")}</td><td><span class="uid">${esc(e.pid||"—")}</span></td><td class="mt-c">${fd(e.ts)}</td></tr>`).join("");
 }
 
-function renderPlayers(pl){
+function rOnline(pl){
+  document.getElementById("on-cnt").textContent=pl.length;
+  const tb=document.getElementById("tb-online");
+  if(!pl.length){tb.innerHTML=`<tr><td colspan="5"><div class="empty-s">No players online</div></td></tr>`;return}
+  tb.innerHTML=pl.map(p=>`<tr><td><span class="odot"></span><strong>${esc(p.uname||"unknown")}</strong></td><td><span class="uid">${esc(p.uid)}</span></td><td class="mt-c">${esc(p.gname||"—")}</td><td class="mt-c">${fd(p.ts)}</td><td><div class="acts">${cache?.bans?.[p.uid]?`<button class="btn bgrn bsm" onclick="doUnban('${esc(p.uid)}')">Unban</button>`:`<button class="btn bred bsm" onclick="pBan('${esc(p.uid)}')">Ban</button>`}<button class="btn bamb bsm" onclick="doKick('${esc(p.uid)}','${esc(p.uname||"")}')">Kick</button></div></td></tr>`).join("");
+}
+
+function rPlayers(pl){
   document.getElementById("pl-cnt").textContent=pl.length;
-  const tb=document.getElementById("players-tb");
-  if(!pl.length){tb.innerHTML=`<tr><td colspan="5"><div class="empty">Aucun joueur</div></td></tr>`;return}
-  tb.innerHTML=pl.map(p=>`<tr>
-    <td><strong>${esc(p.username||"inconnu")}</strong></td>
-    <td><span class="uid">${esc(p.userId)}</span></td>
-    <td><strong>${p.count}</strong></td>
-    <td><span class="muted">${fd(p.lastSeen)}</span></td>
-    <td>${cache?.bans?.[p.userId]
-      ?`<button class="btn btn-grn btn-sm" onclick="doUnban('${esc(p.userId)}')">Débannir</button>`
-      :`<button class="btn btn-red btn-sm" onclick="prefillBan('${esc(p.userId)}')">Bannir</button>`
-    }</td>
-  </tr>`).join("");
+  const tb=document.getElementById("tb-players");
+  if(!pl.length){tb.innerHTML=`<tr><td colspan="6"><div class="empty-s">No players yet</div></td></tr>`;return}
+  tb.innerHTML=pl.map(p=>`<tr><td><strong>${esc(p.uname||"unknown")}</strong></td><td><span class="uid">${esc(p.uid)}</span></td><td><strong>${p.count}</strong></td><td class="mt-c">${esc(p.gname||"—")}</td><td class="mt-c">${fd(p.last)}</td><td><div class="acts">${cache?.bans?.[p.uid]?`<button class="btn bgrn bsm" onclick="doUnban('${esc(p.uid)}')">Unban</button>`:`<button class="btn bred bsm" onclick="pBan('${esc(p.uid)}')">Ban</button>`}<button class="btn bamb bsm" onclick="doKick('${esc(p.uid)}','${esc(p.uname||"")}')">Kick</button></div></td></tr>`).join("");
 }
 
-function renderBans(bans){
-  const entries=Object.entries(bans);
-  document.getElementById("bn-cnt").textContent=entries.length;
-  const tb=document.getElementById("bans-tb");
-  if(!entries.length){tb.innerHTML=`<tr><td colspan="5"><div class="empty">Aucun joueur banni</div></td></tr>`;return}
-  tb.innerHTML=entries.map(([uid,b])=>`<tr>
-    <td><span class="uid">${esc(uid)}</span></td>
-    <td>${esc(b.reason||"—")}</td>
-    <td><span class="muted">${fd(b.bannedAt)}</span></td>
-    <td>${esc(b.bannedBy||"—")}</td>
-    <td><button class="btn btn-grn btn-sm" onclick="doUnban('${esc(uid)}')">Débannir</button></td>
-  </tr>`).join("");
+function rBans(bans){
+  const e=Object.entries(bans);
+  document.getElementById("bn-cnt").textContent=e.length;
+  const tb=document.getElementById("tb-bans");
+  if(!e.length){tb.innerHTML=`<tr><td colspan="5"><div class="empty-s">No active bans</div></td></tr>`;return}
+  tb.innerHTML=e.map(([uid,b])=>`<tr><td><span class="uid">${esc(uid)}</span></td><td>${esc(b.reason||"—")}</td><td class="mt-c">${esc(b.by||"—")}</td><td class="mt-c">${fd(b.at)}</td><td><button class="btn bgrn bsm" onclick="doUnban('${esc(uid)}')">Unban</button></td></tr>`).join("");
 }
 
-function prefillBan(uid){
-  document.getElementById("ban-uid").value=uid;
-  document.querySelector("[onclick*=\"switchTab('bans'\"]").click();
-  document.getElementById("ban-uid").focus();
+function rLogs(logs){
+  document.getElementById("log-cnt").textContent=logs.length;
+  const tb=document.getElementById("tb-logs");
+  if(!logs.length){tb.innerHTML=`<tr><td colspan="5"><div class="empty-s">No logs</div></td></tr>`;return}
+  tb.innerHTML=logs.map(e=>`<tr><td><strong>${esc(e.uname||"unknown")}</strong></td><td><span class="uid">${esc(e.uid)}</span></td><td class="mt-c">${esc(e.gname||"—")}</td><td><span class="uid">${esc(e.pid||"—")}</span></td><td class="mt-c">${fd(e.ts)}</td></tr>`).join("");
 }
 
-async function doBan(){
-  const uid=document.getElementById("ban-uid").value.trim();
-  const rsn=document.getElementById("ban-rsn").value.trim();
-  if(!uid){toast("Entre un User ID","error");return}
-  try{
-    const d=await api("/api/ban","POST",{userId:uid,reason:rsn});
-    if(!d.success){toast(d.error||"Erreur","error");return}
-    toast(`Joueur ${uid} banni`,"success");
-    document.getElementById("ban-uid").value="";document.getElementById("ban-rsn").value="";
-    await loadStats();
-  }catch(e){toast("Erreur serveur","error")}
-}
-
-async function doUnban(uid){
-  try{
-    const d=await api("/api/unban","POST",{userId:uid});
-    if(!d.success){toast(d.error||"Erreur","error");return}
-    toast(`Joueur ${uid} débanni`,"success");await loadStats();
-  }catch(e){toast("Erreur","error")}
-}
-
-async function loadAccounts(){
-  try{
-    const d=await api("/api/accounts");
-    const tb=document.getElementById("acc-tb");
-    if(!d.accounts?.length){tb.innerHTML=`<tr><td colspan="4"><div class="empty">Aucun compte</div></td></tr>`;return}
-    tb.innerHTML=d.accounts.map(a=>`<tr>
-      <td><strong>${esc(a.username)}</strong></td>
-      <td><span class="badge ${a.role==="owner"?"badge-owner":a.role==="pending"?"":"badge-admin"}">${a.role==="owner"?"Owner":a.role==="pending"?"En attente":"Admin"}</span></td>
-      <td><span class="muted">${fd(a.createdAt)}</span></td>
-      <td style="display:flex;gap:6px;flex-wrap:wrap">
-        ${a.role==="pending"?`<button class="btn btn-grn btn-sm" onclick="approveAcc('${esc(a.username)}')">Activer</button>`:""}
-        ${a.role!=="owner"?`<button class="btn btn-red btn-sm" onclick="deleteAcc('${esc(a.username)}')">Supprimer</button>`:""}
-      </td>
-    </tr>`).join("");
-  }catch(e){toast("Erreur comptes","error")}
-}
-
-async function approveAcc(u){
-  const d=await api("/api/accounts/approve","POST",{username:u});
-  if(d.success){toast(`${u} est admin`,"success");loadAccounts();}else toast(d.error,"error");
-}
-
-async function deleteAcc(u){
-  if(!confirm(`Supprimer "${u}" ?`))return;
-  const d=await api("/api/accounts/delete","POST",{username:u});
-  if(d.success){toast(`${u} supprimé`,"success");loadAccounts();}else toast(d.error,"error");
-}
-
+function pBan(uid){document.getElementById("ban-uid").value=uid;document.querySelector(".ntab:nth-child(4)").click();document.getElementById("ban-uid").focus()}
+async function doBan(){const uid=document.getElementById("ban-uid").value.trim(),rsn=document.getElementById("ban-rsn").value.trim();if(!uid){toast("Enter a user ID","err");return}const d=await api("/api/ban","POST",{userId:uid,reason:rsn});if(d.ok){toast("Player banned","suc");document.getElementById("ban-uid").value="";document.getElementById("ban-rsn").value="";await load();}else toast(d.error||"Error","err")}
+async function doUnban(uid){const d=await api("/api/unban","POST",{userId:uid});if(d.ok){toast("Player unbanned","suc");await load();}else toast(d.error||"Error","err")}
+async function doKick(uid,uname){const r=prompt(`Kick reason for ${uname||uid}:`);if(r===null)return;const d=await api("/api/kick","POST",{userId:uid,reason:r||"Kicked by admin."});if(d.ok)toast("Kick queued","suc");else toast(d.error||"Error","err")}
+async function sendAnn(){const msg=document.getElementById("ann-txt").value.trim(),dur=Number(document.getElementById("ann-dur").value)||300;if(!msg){toast("Enter a message","err");return}const d=await api("/api/announce","POST",{msg,duration:dur});if(d.ok){toast("Announcement sent","suc");document.getElementById("ann-txt").value="";await load();}else toast(d.error||"Error","err")}
+async function clearAnn(){const d=await api("/api/announce","POST",{msg:""});if(d.ok){toast("Announcement cleared","suc");await load();}}
+async function setMaint(on){const msg=on?document.getElementById("maint-txt").value.trim():"";const d=await api("/api/maintenance","POST",{on,msg});if(d.ok){toast(on?"Maintenance enabled":"Maintenance disabled","suc");await load();}else toast(d.error||"Error","err")}
+async function loadAcc(){const d=await api("/api/accounts");const tb=document.getElementById("tb-acc");if(!d.accounts?.length){tb.innerHTML=`<tr><td colspan="4"><div class="empty-s">No accounts</div></td></tr>`;return}tb.innerHTML=d.accounts.map(a=>`<tr><td><strong>${esc(a.username)}</strong></td><td><span class="badge ${a.role==="owner"?"bo":a.role==="pending"?"":"ba"}">${a.role==="owner"?"Owner":a.role==="pending"?"Pending":"Admin"}</span></td><td class="mt-c">${fd(a.created)}</td><td><div class="acts">${a.role==="pending"?`<button class="btn bgrn bsm" onclick="appAcc('${esc(a.username)}')">Approve</button>`:""}${a.role!=="owner"?`<button class="btn bred bsm" onclick="delAcc('${esc(a.username)}')">Delete</button>`:""}</div></td></tr>`).join("")}
+async function appAcc(u){const d=await api("/api/accounts/approve","POST",{username:u});if(d.ok){toast(`${u} is now admin`,"suc");loadAcc();}else toast(d.error,"err")}
+async function delAcc(u){if(!confirm(`Delete "${u}"?`))return;const d=await api("/api/accounts/delete","POST",{username:u});if(d.ok){toast(`${u} deleted`,"suc");loadAcc();}else toast(d.error,"err")}
 function esc(s){return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;")}
 function fd(ts){if(!ts)return"—";return new Date(ts).toLocaleString("fr-FR",{day:"2-digit",month:"2-digit",hour:"2-digit",minute:"2-digit"})}
-
-function showMsg(el,type,text){el.className=`msg ${type} show`;el.textContent=text}
-
+function sm(el,t,tx){el.className=`msg ${t} show`;el.textContent=tx}
 let tt;
-function toast(text,type="success"){
-  const el=document.getElementById("toast");
-  el.textContent=text;el.className=`show ${type}`;
-  clearTimeout(tt);tt=setTimeout(()=>{el.className=""},3000);
-}
-
-document.addEventListener("keydown",e=>{
-  if(e.key==="Enter"&&document.getElementById("auth-screen").style.display!=="none"){
-    const loginVisible=document.getElementById("form-login").style.display!=="none";
-    if(loginVisible)doLogin();else doRegister();
-  }
-});
+function toast(text,type="suc"){const el=document.getElementById("toast");el.textContent=text;el.className=`show ${type}`;clearTimeout(tt);tt=setTimeout(()=>{el.className=""},3000)}
+document.addEventListener("keydown",e=>{if(e.key==="Enter"&&document.getElementById("auth").style.display!=="none"){if(document.getElementById("fl").style.display!=="none")doLogin();else doReg();}});
 </script>
 </body>
 </html>
