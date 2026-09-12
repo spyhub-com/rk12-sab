@@ -2,2803 +2,508 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>SpyHub Gen Tools</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SpyHub</title>
 <style>
-  :root{
-    --bg:#0A0A0B;
-    --glass:rgba(255,255,255,0.045);
-    --border:rgba(255,255,255,0.10);
-    --border-soft:rgba(255,255,255,0.06);
-    --text:#F2F2F3;
-    --text-dim:#9A9AA0;
-    --text-faint:#5C5C62;
-    --accent:#C9A8FF;       /* violet clair par défaut */
-    --accent-2:#8B6FCE;     /* dégradé secondaire violet */
-    --accent-text:#0A0A0B;
-    --red:#FF6B6B;
-    --green:#5FD98A;
-    --radius:18px;
-    --radius-sm:12px;
-    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Segoe UI", Roboto, sans-serif;
-  }
-  *{box-sizing:border-box; margin:0; padding:0;}
-  html,body{ background:var(--bg); color:var(--text); min-height:100%; -webkit-font-smoothing:antialiased; overflow-y:auto; overflow-x:hidden; }
-  body{ background-image:
-      radial-gradient(circle at 12% 15%, color-mix(in srgb, var(--accent) 10%, transparent), transparent 45%),
-      radial-gradient(circle at 88% 82%, color-mix(in srgb, var(--accent-2) 8%, transparent), transparent 50%); }
-  #app{ min-height:100vh; width:100vw; }
-  ::-webkit-scrollbar{ width:8px; height:8px; }
-  ::-webkit-scrollbar-thumb{ background:rgba(255,255,255,0.12); border-radius:8px; }
-  ::-webkit-scrollbar-track{ background:transparent; }
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap');
 
-  /* ---- Login ---- */
-  .login-wrap{ min-height:100%; width:100%; display:flex; align-items:center; justify-content:center; padding:20px; padding-top:80px; overflow-y:auto; }
-  .login-card{ width:100%; max-width:380px; padding:36px 32px; background:var(--glass); border:1px solid var(--border);
-    border-radius:24px; backdrop-filter:blur(30px) saturate(160%); -webkit-backdrop-filter:blur(30px) saturate(160%);
-    box-shadow:0 30px 80px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.06);
-    animation:riseIn .5s cubic-bezier(.16,1,.3,1); }
-  @keyframes riseIn{ from{ opacity:0; transform:translateY(14px) scale(.98); } to{ opacity:1; transform:translateY(0) scale(1); } }
-  .login-mark{ width:44px; height:44px; border-radius:13px; background:linear-gradient(155deg, var(--accent), var(--accent-2));
-    display:flex; align-items:center; justify-content:center; font-size:18px; font-weight:700; margin-bottom:20px; color:var(--accent-text); }
-  .login-card h1{ font-size:21px; font-weight:600; letter-spacing:-0.01em; margin-bottom:6px; }
-  .login-card p.sub{ color:var(--text-dim); font-size:13.5px; margin-bottom:26px; }
-  .field{ margin-bottom:14px; }
-  .field label{ display:block; font-size:12.5px; color:var(--text-dim); margin-bottom:7px; font-weight:500; }
-  .field input, .field textarea{ width:100%; background:rgba(255,255,255,0.04); border:1px solid var(--border-soft);
-    border-radius:11px; padding:12px 14px; color:var(--text); font-size:14.5px; outline:none;
-    transition:border-color .15s, background .15s; font-family:inherit; }
-  .field input:focus, .field textarea:focus{ border-color:rgba(184,184,190,0.55); border-color:color-mix(in srgb, var(--accent) 55%, transparent); background:rgba(255,255,255,0.06); }
-  .btn-primary{ width:100%; background:linear-gradient(120deg, var(--accent), var(--accent-2)); color:var(--accent-text);
-    border:none; border-radius:11px; padding:12px 0; font-size:14.5px; font-weight:600; cursor:pointer; margin-top:8px;
-    transition:filter .15s, transform .1s; }
-  .btn-primary:hover{ filter:brightness(1.08); }
-  .btn-primary:active{ transform:scale(0.98); }
-  .btn-primary:disabled{ opacity:0.5; cursor:not-allowed; }
-  .login-toggle{ text-align:center; margin-top:18px; font-size:13.5px; color:var(--text-dim); }
-  .login-toggle span{ color:var(--text); text-decoration:underline; cursor:pointer; }
-  .login-error{ color:var(--red); font-size:13px; margin-top:10px; display:none; }
-  .login-note{ color:var(--text-faint); font-size:11.5px; margin-top:14px; text-align:center; }
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 
-  /* ---- Topbar (mobile-first) ---- */
-  .topbar{
-    height:56px; flex-shrink:0;
-    display:flex; align-items:center; gap:12px;
-    padding:0 16px;
-    border-bottom:1px solid var(--border-soft);
-    background:rgba(255,255,255,0.02);
-    backdrop-filter:blur(20px);
-  }
-  .hamburger{
-    width:34px; height:34px; border-radius:9px;
-    display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4px;
-    cursor:pointer; background:rgba(255,255,255,0.04); border:1px solid var(--border-soft);
-    flex-shrink:0;
-  }
-  .hamburger span{ width:15px; height:1.5px; background:var(--text); border-radius:2px; }
-  .topbar-title{ font-size:15px; font-weight:600; letter-spacing:-0.01em; flex:1; }
-  .topbar .mark{ width:26px; height:26px; border-radius:8px; background:linear-gradient(155deg, var(--accent), var(--accent-2));
-    display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:700; color:var(--accent-text); flex-shrink:0; }
-  .topbar .avatar-sm{ width:30px; height:30px; border-radius:50%; background:rgba(255,255,255,0.06); border:1px solid var(--border);
-    display:flex; align-items:center; justify-content:center; font-size:11.5px; font-weight:600; color:var(--text-dim); flex-shrink:0; }
+:root{
+  --bg:#06060f;
+  --s1:rgba(255,255,255,0.03);
+  --s2:rgba(255,255,255,0.055);
+  --b:rgba(255,255,255,0.07);
+  --b2:rgba(160,100,255,0.22);
+  --p1:#a78bfa;
+  --p2:#7c3aed;
+  --p3:#c4b5fd;
+  --tx:#ede9fe;
+  --mt:rgba(237,233,254,0.42);
+  --red:#f87171;
+  --grn:#34d399;
+}
 
-  /* ---- Layout ---- */
-  .main-layout{ display:flex; flex-direction:column; min-height:100vh; width:100%; }
-  .body-row{ display:flex; flex:1; min-height:0; position:relative; }
+body{font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--tx);min-height:100vh;overflow-x:hidden}
 
-  .sidebar-overlay{
-    position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:90;
-    opacity:0; pointer-events:none; transition:opacity .2s;
-  }
-  .sidebar-overlay.show{ opacity:1; pointer-events:auto; }
+/* dotted grid background */
+body::before{
+  content:'';position:fixed;inset:0;
+  background-image:radial-gradient(circle,rgba(160,100,255,0.18) 1px,transparent 1px);
+  background-size:28px 28px;
+  pointer-events:none;z-index:0;opacity:.6;
+}
+body::after{
+  content:'';position:fixed;inset:0;
+  background:
+    radial-gradient(ellipse 70% 55% at 15% 5%,rgba(109,40,217,0.22) 0%,transparent 65%),
+    radial-gradient(ellipse 55% 45% at 85% 85%,rgba(167,139,250,0.12) 0%,transparent 60%);
+  pointer-events:none;z-index:0;
+}
 
-  .sidebar{
-    width:250px; flex-shrink:0; background:rgba(12,12,14,0.98); border-right:1px solid var(--border-soft);
-    display:flex; flex-direction:column; padding:16px 12px;
-    position:fixed; top:0; left:0; bottom:0; z-index:95;
-    transform:translateX(-100%); transition:transform .25s cubic-bezier(.16,1,.3,1);
-    backdrop-filter:blur(20px);
-  }
-  .sidebar.open{ transform:translateX(0); }
-  @media (min-width:860px){
-    .sidebar{ position:static; transform:none; background:rgba(255,255,255,0.02); }
-    .sidebar-overlay{ display:none; }
-    .hamburger{ display:none; }
-  }
+#app{position:relative;z-index:1}
 
-  .sidebar-close{ display:flex; justify-content:flex-end; padding:4px 4px 10px 4px; }
-  @media (min-width:860px){ .sidebar-close{ display:none; } }
+/* ── AUTH ── */
+#auth-screen{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px}
 
-  .nav-group{ margin-bottom:16px; }
-  .nav-label{ font-size:11px; color:var(--text-faint); padding:0 10px; margin-bottom:6px; font-weight:600; }
-  .nav-item{ display:flex; align-items:center; gap:10px; padding:10px 10px; border-radius:9px; color:var(--text-dim);
-    font-size:14px; cursor:pointer; transition:background .12s, color .12s; user-select:none; }
-  .nav-item:hover{ background:rgba(255,255,255,0.045); color:var(--text); }
-  .nav-item.active{ background:rgba(184,184,190,0.16); background:color-mix(in srgb, var(--accent) 16%, transparent); color:var(--text); }
-  .nav-item .dot{ width:6px; height:6px; border-radius:50%; background:currentColor; opacity:0.5; flex-shrink:0; }
-  .nav-item.active .dot{ background:var(--accent); opacity:1; }
-  .sidebar-footer{ margin-top:auto; border-top:1px solid var(--border-soft); padding-top:14px; display:flex;
-    align-items:center; gap:10px; padding-left:8px; }
-  .avatar{ width:32px; height:32px; border-radius:50%; background:rgba(255,255,255,0.06);
-    display:flex; align-items:center; justify-content:center; font-size:13px; font-weight:600; color:var(--text-dim);
-    border:1px solid var(--border); flex-shrink:0; }
-  .user-meta{ line-height:1.25; overflow:hidden; }
-  .user-meta .uname{ font-size:13.5px; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-  .user-meta .urole{ font-size:11.5px; color:var(--text-faint); }
-  .logout-btn{ margin-left:auto; color:var(--text-faint); cursor:pointer; font-size:12px; flex-shrink:0; }
-  .logout-btn:hover{ color:var(--red); }
+.auth-card{
+  width:100%;max-width:400px;
+  background:rgba(13,10,28,0.72);
+  border:1px solid var(--b2);
+  border-radius:20px;
+  padding:44px 36px;
+  backdrop-filter:blur(48px);
+  box-shadow:0 0 0 1px rgba(124,58,237,0.08),0 40px 80px rgba(0,0,0,0.55),inset 0 1px 0 rgba(255,255,255,0.06);
+}
 
-  .content{ flex:1; overflow-y:auto; padding:22px 18px; }
-  @media (min-width:860px){ .content{ padding:34px 42px; } }
-  .content-header{ margin-bottom:22px; }
-  .content-header h2{ font-size:21px; font-weight:600; letter-spacing:-0.015em; margin-bottom:5px; }
-  .content-header p{ color:var(--text-dim); font-size:13.5px; max-width:560px; }
+.auth-wordmark{text-align:center;margin-bottom:36px}
+.auth-wordmark h1{font-size:20px;font-weight:600;letter-spacing:-.2px;color:var(--tx)}
+.auth-wordmark p{color:var(--mt);font-size:13px;margin-top:5px}
+.auth-wordmark .line{width:32px;height:2px;background:linear-gradient(90deg,var(--p2),var(--p1));border-radius:1px;margin:12px auto 0}
 
-  .panel{ background:var(--glass); border:1px solid var(--border); border-radius:var(--radius);
-    backdrop-filter:blur(20px) saturate(140%); -webkit-backdrop-filter:blur(20px) saturate(140%); padding:18px; }
-  @media (min-width:860px){ .panel{ padding:22px; } }
+.tab-switch{display:flex;background:var(--s1);border:1px solid var(--b);border-radius:10px;padding:3px;margin-bottom:24px}
+.tab-btn{flex:1;padding:9px;background:none;border:none;color:var(--mt);font-size:13px;font-weight:500;cursor:pointer;border-radius:8px;transition:all .18s;font-family:inherit}
+.tab-btn.active{background:rgba(124,58,237,0.35);color:var(--p3);box-shadow:inset 0 1px 0 rgba(255,255,255,0.08)}
 
-  .grid-cards{ display:grid; grid-template-columns:repeat(auto-fill, minmax(160px, 1fr)); gap:12px; margin-top:6px; }
-  @media (min-width:860px){ .grid-cards{ grid-template-columns:repeat(auto-fill, minmax(220px, 1fr)); gap:14px; } }
-  .stat-card{ background:var(--glass); border:1px solid var(--border); border-radius:var(--radius-sm); padding:16px; }
-  .stat-card .label{ font-size:12px; color:var(--text-dim); margin-bottom:8px; }
-  .stat-card .value{ font-size:22px; font-weight:600; letter-spacing:-0.02em; }
-  .stat-card .value.accent{ color:var(--accent); }
+.field{margin-bottom:14px}
+.field label{display:block;font-size:11px;font-weight:500;color:var(--mt);margin-bottom:7px;letter-spacing:.4px;text-transform:uppercase}
+.field input{
+  width:100%;padding:11px 14px;
+  background:rgba(255,255,255,0.04);
+  border:1px solid var(--b);
+  border-radius:10px;color:var(--tx);
+  font-size:14px;font-family:inherit;
+  transition:border-color .18s,box-shadow .18s;outline:none;
+}
+.field input:focus{border-color:rgba(124,58,237,0.6);box-shadow:0 0 0 3px rgba(124,58,237,0.12)}
+.field input::placeholder{color:rgba(237,233,254,0.22)}
 
-  .editor-wrap{ display:flex; flex-direction:column; gap:12px; }
-  @media (min-width:860px){ .editor-wrap{ flex-direction:row; height:calc(100vh - 210px); } }
-  .editor-wrap.chat-height{ display:flex; flex-direction:column; }
-  .editor-pane, .console-pane{ flex:1; background:var(--glass); border:1px solid var(--border); border-radius:var(--radius);
-    display:flex; flex-direction:column; overflow:hidden; min-height:220px; }
-  .pane-bar{ display:flex; align-items:center; justify-content:space-between; padding:10px 14px;
-    border-bottom:1px solid var(--border-soft); font-size:12px; color:var(--text-dim); }
-  .pane-bar .tools{ display:flex; gap:8px; }
-  .pill-btn{ background:rgba(255,255,255,0.05); border:1px solid var(--border-soft); color:var(--text-dim);
-    font-size:12px; padding:6px 11px; border-radius:8px; cursor:pointer; transition:background .12s, color .12s; }
-  .pill-btn:hover{ background:rgba(255,255,255,0.09); color:var(--text); }
-  .pill-btn.run{ background:linear-gradient(120deg, var(--accent), var(--accent-2)); color:var(--accent-text); border:none; font-weight:600; }
-  .pill-btn.run:hover{ filter:brightness(1.08); }
-  .pill-btn.run:disabled{ opacity:0.5; cursor:not-allowed; }
-  .pill-btn.danger:hover{ color:var(--red); }
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;padding:11px 18px;border:none;border-radius:10px;font-size:13px;font-weight:500;font-family:inherit;cursor:pointer;transition:all .18s;white-space:nowrap}
+.btn-primary{width:100%;background:linear-gradient(135deg,var(--p2),#5b21b6);color:#fff;box-shadow:0 4px 18px rgba(109,40,217,0.3);margin-top:6px}
+.btn-primary:hover{box-shadow:0 6px 24px rgba(109,40,217,0.42);transform:translateY(-1px)}
+.btn-primary:active{transform:none}
+.btn-ghost{background:var(--s1);border:1px solid var(--b);color:var(--tx)}
+.btn-ghost:hover{background:var(--s2);border-color:var(--b2)}
+.btn-red{background:rgba(248,113,113,0.1);border:1px solid rgba(248,113,113,0.25);color:var(--red)}
+.btn-red:hover{background:rgba(248,113,113,0.18)}
+.btn-grn{background:rgba(52,211,153,0.1);border:1px solid rgba(52,211,153,0.25);color:var(--grn)}
+.btn-grn:hover{background:rgba(52,211,153,0.18)}
+.btn-sm{padding:6px 13px;font-size:12px;border-radius:8px}
 
-  /* Boutons d'outils bien dimensionnés (ni trop grands, ni trop petits) */
-  .tool-btn{ background:rgba(255,255,255,0.06); border:1px solid var(--border-soft); color:var(--text-dim);
-    font-size:12.5px; font-weight:500; padding:7px 13px; border-radius:9px; cursor:pointer;
-    transition:background .12s, color .12s, transform .1s; white-space:nowrap; }
-  .tool-btn:hover{ background:rgba(255,255,255,0.11); color:var(--text); }
-  .tool-btn:active{ transform:scale(0.96); }
-  .tool-btn.primary{ background:linear-gradient(120deg, var(--accent), var(--accent-2)); color:var(--accent-text); border:none; font-weight:600; }
-  .tool-btn.primary:hover{ filter:brightness(1.08); }
-  .tool-btn:disabled{ opacity:0.5; cursor:not-allowed; }
+.msg{margin-top:14px;padding:11px 14px;border-radius:9px;font-size:12px;font-weight:500;display:none}
+.msg.error{background:rgba(248,113,113,0.1);border:1px solid rgba(248,113,113,0.25);color:var(--red)}
+.msg.success{background:rgba(52,211,153,0.1);border:1px solid rgba(52,211,153,0.25);color:var(--grn)}
+.msg.show{display:block}
 
-  textarea.code-input{ flex:1; background:transparent; border:none; outline:none; resize:none; color:var(--text);
-    font-family:"SF Mono", Menlo, Consolas, monospace; font-size:13px; line-height:1.6; padding:14px; min-height:160px; }
-  .console-body{ flex:1; padding:14px; font-family:"SF Mono", Menlo, Consolas, monospace; font-size:12.5px;
-    line-height:1.7; overflow-y:auto; color:var(--text-dim); white-space:pre-wrap; }
-  .console-body .err{ color:var(--red); }
-  .console-body .ok{ color:var(--green); }
-  .console-body .sys{ color:var(--text-faint); }
+/* ── TOPBAR ── */
+#dashboard-screen{display:none;min-height:100vh}
+.topbar{
+  position:sticky;top:0;z-index:100;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 28px;height:58px;
+  background:rgba(6,6,15,0.82);
+  border-bottom:1px solid var(--b);
+  backdrop-filter:blur(24px);
+}
+.topbar-brand{font-size:15px;font-weight:600;color:var(--tx);letter-spacing:-.1px;display:flex;align-items:center;gap:10px}
+.topbar-brand .pip{width:6px;height:6px;background:var(--grn);border-radius:50%;box-shadow:0 0 7px var(--grn)}
+.topbar-r{display:flex;align-items:center;gap:10px}
 
-  .autocomplete-box{ position:absolute; background:rgba(20,20,22,0.97); border:1px solid var(--border); border-radius:9px;
-    padding:5px; font-family:"SF Mono", Menlo, Consolas, monospace; font-size:13px; backdrop-filter:blur(20px);
-    box-shadow:0 12px 30px rgba(0,0,0,0.5); display:none; z-index:50; }
-  .autocomplete-item{ padding:6px 10px; border-radius:6px; cursor:pointer; color:var(--text-dim); }
-  .autocomplete-item:hover, .autocomplete-item.sel{ background:rgba(184,184,190,0.18); background:color-mix(in srgb, var(--accent) 18%, transparent); color:var(--text); }
+.badge{padding:4px 11px;border-radius:20px;font-size:11px;font-weight:500;letter-spacing:.3px}
+.badge-owner{background:rgba(167,139,250,0.14);border:1px solid rgba(167,139,250,0.3);color:var(--p3)}
+.badge-admin{background:rgba(124,58,237,0.12);border:1px solid rgba(124,58,237,0.28);color:var(--p1)}
 
-  .lang-tabs{ display:flex; gap:8px; margin-bottom:16px; flex-wrap:wrap; }
-  .lang-tab{ padding:7px 14px; border-radius:9px; background:rgba(255,255,255,0.04); border:1px solid var(--border-soft);
-    font-size:13px; color:var(--text-dim); cursor:pointer; }
-  .lang-tab.active{ background:rgba(184,184,190,0.18); background:color-mix(in srgb, var(--accent) 18%, transparent); color:var(--text); border-color:rgba(184,184,190,0.35); border-color:color-mix(in srgb, var(--accent) 35%, transparent); }
+/* ── MAIN ── */
+.main{padding:28px;max-width:1100px;margin:0 auto}
 
-  /* Sélecteur de mode (remplace/complète lang-tabs pour Dev Tools) */
-  .mode-switch{ display:flex; gap:6px; margin-bottom:16px; flex-wrap:wrap; background:rgba(255,255,255,0.03);
-    border:1px solid var(--border-soft); border-radius:12px; padding:5px; }
-  .mode-btn{ padding:8px 16px; border-radius:9px; font-size:13px; font-weight:500; color:var(--text-dim);
-    cursor:pointer; text-align:center; flex:1; min-width:90px; transition:background .15s, color .15s; }
-  .mode-btn.active{ background:linear-gradient(120deg, var(--accent), var(--accent-2)); color:var(--accent-text); font-weight:600; }
+.nav-tabs{display:flex;gap:2px;margin-bottom:28px;background:var(--s1);border:1px solid var(--b);border-radius:12px;padding:4px;width:fit-content}
+.nav-tab{padding:8px 18px;background:none;border:none;color:var(--mt);font-size:13px;font-weight:500;cursor:pointer;border-radius:9px;transition:all .18s;font-family:inherit}
+.nav-tab.active{background:rgba(124,58,237,0.3);color:var(--p3)}
+.tab-content{display:none}
+.tab-content.active{display:block}
 
-  /* Onglets de fichiers (Dev Tools éditeur web) */
-  .file-tabs-bar{ display:flex; align-items:center; justify-content:space-between; gap:8px; flex-wrap:wrap;
-    background:var(--glass); border:1px solid var(--border); border-radius:var(--radius) var(--radius) 0 0; padding:8px 10px; }
-  .file-tabs{ display:flex; gap:4px; flex-wrap:wrap; }
-  .file-tab{ padding:6px 12px; border-radius:8px; font-size:12.5px; color:var(--text-dim); cursor:pointer; white-space:nowrap; }
-  .file-tab.active{ background:rgba(255,255,255,0.1); color:var(--text); font-weight:600; }
-  .dev-editor-area{ display:flex; flex-direction:column; }
-  .dev-editor-area .editor-pane{ min-height:280px; }
-  .preview-frame-wrap{ display:flex; flex-direction:column; min-height:400px; border:1px solid var(--border);
-    border-radius:0 0 var(--radius) var(--radius); overflow:hidden; background:#fff; }
-  .preview-frame-wrap iframe{ flex:1; width:100%; height:100%; min-height:400px; border:none; }
-  @media (min-width:860px){
-    .preview-frame-wrap{ min-height:520px; }
-    .preview-frame-wrap iframe{ min-height:520px; }
-  }
+/* ── STAT CARDS ── */
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:14px;margin-bottom:28px}
+.stat-card{
+  background:rgba(13,10,28,0.5);
+  border:1px solid var(--b);
+  border-radius:15px;padding:22px;
+  backdrop-filter:blur(16px);
+  position:relative;overflow:hidden;
+  transition:border-color .2s,transform .2s;
+}
+.stat-card::after{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(167,139,250,0.35),transparent)}
+.stat-card:hover{border-color:var(--b2);transform:translateY(-2px)}
+.stat-lbl{font-size:10px;font-weight:500;color:var(--mt);text-transform:uppercase;letter-spacing:.9px;margin-bottom:10px}
+.stat-val{font-size:32px;font-weight:600;letter-spacing:-1px;color:var(--p3);line-height:1}
 
-  .site-row{ display:flex; align-items:center; justify-content:space-between; padding:14px; border-radius:12px;
-    background:rgba(255,255,255,0.03); border:1px solid var(--border-soft); margin-bottom:10px; gap:12px; flex-wrap:wrap; }
-  .site-row .link{ color:var(--text); opacity:0.8; font-size:13px; font-family:"SF Mono", Menlo, monospace; word-break:break-all; }
-  .site-row .name{ font-size:14px; font-weight:500; margin-bottom:3px; }
-  .site-row .actions{ display:flex; gap:8px; flex-shrink:0; }
+/* ── TABLES ── */
+.section-hd{font-size:13px;font-weight:500;color:var(--tx);margin-bottom:14px;display:flex;align-items:center;gap:8px}
+.cnt{font-size:11px;padding:2px 9px;background:var(--s2);border-radius:20px;color:var(--mt)}
 
-  .empty-state{ text-align:center; padding:50px 20px; color:var(--text-faint); }
-  .empty-state .big{ font-size:15px; color:var(--text-dim); margin-bottom:4px; }
+.gt{width:100%;background:rgba(13,10,28,0.45);border:1px solid var(--b);border-radius:14px;overflow:hidden;backdrop-filter:blur(16px);margin-bottom:24px}
+.gt table{width:100%;border-collapse:collapse}
+.gt thead th{padding:12px 18px;text-align:left;font-size:10px;font-weight:500;color:var(--mt);text-transform:uppercase;letter-spacing:.7px;border-bottom:1px solid var(--b);background:rgba(255,255,255,0.015)}
+.gt tbody td{padding:12px 18px;font-size:13px;color:var(--tx);border-bottom:1px solid rgba(255,255,255,0.035)}
+.gt tbody tr:last-child td{border-bottom:none}
+.gt tbody tr:hover td{background:rgba(167,139,250,0.04)}
 
-  .discord-preview{ border-left:4px solid var(--accent); background:#2b2d31; border-radius:8px;
-    padding:14px 16px; margin-top:16px; }
-  .dp-author{ font-weight:600; font-size:13px; color:#fff; margin-bottom:6px; }
-  .dp-title{ font-weight:700; font-size:15px; margin-bottom:6px; color:#fff; }
-  .dp-desc{ font-size:13.5px; color:#dbdee1; line-height:1.5; white-space:pre-wrap; }
-  .dp-image{ width:100%; max-height:220px; object-fit:cover; border-radius:6px; margin-top:10px; }
-  .dp-footer{ font-size:11.5px; color:#949ba4; margin-top:10px; }
+.uid{font-family:'Courier New',monospace;font-size:11px;color:var(--p1);background:rgba(124,58,237,0.1);padding:3px 7px;border-radius:5px}
+.muted{color:var(--mt);font-size:12px}
 
-  .toast{ position:fixed; bottom:20px; left:50%; transform:translateX(-50%) translateY(20px);
-    background:rgba(20,20,22,0.95); border:1px solid var(--border); padding:12px 20px; border-radius:12px;
-    font-size:13.5px; backdrop-filter:blur(20px); opacity:0; pointer-events:none; transition:opacity .2s, transform .2s;
-    z-index:200; max-width:88vw; text-align:center; }
-  .toast.show{ opacity:1; transform:translateX(-50%) translateY(0); }
+/* ── BAN FORM ── */
+.ban-box{background:rgba(13,10,28,0.45);border:1px solid var(--b);border-radius:15px;padding:24px;backdrop-filter:blur(16px);margin-bottom:24px}
+.form-row{display:flex;gap:10px;align-items:flex-end}
+.form-row .field{flex:1;margin-bottom:0}
+.form-row .btn{flex-shrink:0;padding:11px 18px}
 
-  .table{ width:100%; border-collapse:collapse; margin-top:10px; font-size:13px; }
-  .table th{ text-align:left; font-size:11.5px; color:var(--text-faint); padding:8px 8px; border-bottom:1px solid var(--border-soft); }
-  .table td{ padding:10px 8px; border-bottom:1px solid var(--border-soft); }
-  .badge{ display:inline-block; padding:3px 9px; border-radius:7px; font-size:11px; font-weight:600; }
-  .badge.owner{ background:rgba(184,184,190,0.20); background:color-mix(in srgb, var(--accent) 20%, transparent); color:var(--text); }
-  .badge.member{ background:rgba(255,255,255,0.07); color:var(--text-dim); }
+/* ── REFRESH BAR ── */
+.rbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:22px}
+.rbar-lbl{font-size:12px;color:var(--mt)}
 
-  .settings-section{ margin-bottom:26px; }
-  .settings-section h3{ font-size:14.5px; font-weight:600; margin-bottom:12px; }
+/* ── EMPTY ── */
+.empty{text-align:center;padding:40px 20px;color:var(--mt);font-size:13px}
 
-  /* ---- Color picker (sidenard) ---- */
-  .swatch-row{ display:flex; gap:10px; flex-wrap:wrap; margin-bottom:16px; }
-  .swatch{ width:34px; height:34px; border-radius:10px; cursor:pointer; border:2px solid transparent; flex-shrink:0; }
-  .swatch.sel{ border-color:#fff; }
-  .picker-row{ display:flex; gap:16px; align-items:flex-start; flex-wrap:wrap; }
-  .picker-strip-wrap{
-    display:flex; flex-direction:column; align-items:center; gap:6px;
-  }
-  .picker-strip{
-    width:34px; height:180px; border-radius:17px; position:relative; cursor:pointer;
-    touch-action:none;
-    background:linear-gradient(180deg,
-      #ff3b30, #ff9500, #ffcc00, #34c759, #30b0c7, #007aff, #5856d6, #af52de, #ff2d55, #ff3b30);
-    border:1px solid var(--border);
-  }
-  .picker-handle{
-    position:absolute; left:50%; width:22px; height:22px; border-radius:50%;
-    background:#fff; border:3px solid #0A0A0B; transform:translate(-50%,-50%);
-    box-shadow:0 2px 8px rgba(0,0,0,0.4); pointer-events:none;
-  }
-  .picker-label{ font-size:11.5px; color:var(--text-faint); }
-  .gradient-preview{
-    flex:1; min-width:160px; height:90px; border-radius:14px;
-    background:linear-gradient(120deg, var(--accent), var(--accent-2));
-    border:1px solid var(--border);
-  }
+/* ── TOAST ── */
+#toast{position:fixed;bottom:28px;right:28px;padding:13px 18px;border-radius:12px;font-size:13px;font-weight:500;backdrop-filter:blur(20px);z-index:9999;transform:translateY(70px);opacity:0;transition:all .28s cubic-bezier(.34,1.56,.64,1);max-width:300px;pointer-events:none}
+#toast.show{transform:translateY(0);opacity:1}
+#toast.success{background:rgba(52,211,153,0.13);border:1px solid rgba(52,211,153,0.3);color:var(--grn)}
+#toast.error{background:rgba(248,113,113,0.13);border:1px solid rgba(248,113,113,0.3);color:var(--red)}
 
-  .hidden{ display:none !important; }
-  .spinner{ display:inline-block; width:13px; height:13px; border:2px solid rgba(0,0,0,0.3);
-    border-top-color:currentColor; border-radius:50%; animation:spin .6s linear infinite; }
-  @keyframes spin{ to{ transform:rotate(360deg); } }
-  .thinking-dots{ display:inline-flex; gap:4px; align-items:center; height:14px; }
-  .thinking-dots span{ width:6px; height:6px; border-radius:50%; background:var(--text-dim); animation:thinkPulse 1.2s infinite ease-in-out; }
-  .thinking-dots span:nth-child(2){ animation-delay:0.2s; }
-  .thinking-dots span:nth-child(3){ animation-delay:0.4s; }
-  @keyframes thinkPulse{ 0%,60%,100%{ opacity:0.3; transform:scale(0.8); } 30%{ opacity:1; transform:scale(1); } }
+/* ── SPINNER ── */
+.spin{display:inline-block;width:15px;height:15px;border:2px solid rgba(255,255,255,0.15);border-top-color:rgba(255,255,255,0.6);border-radius:50%;animation:sp .65s linear infinite}
+@keyframes sp{to{transform:rotate(360deg)}}
 
-  /* ---- Landing page Accueil ---- */
-  .landing-topbar{
-    display:flex; align-items:center; gap:12px; flex-wrap:wrap;
-    background:rgba(255,255,255,0.045); border:1px solid var(--border);
-    border-radius:20px; padding:14px 20px; margin-bottom:26px;
-    backdrop-filter:blur(24px) saturate(160%);
-    box-shadow:0 20px 50px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.06);
-  }
-  .landing-logo{ display:flex; align-items:center; gap:10px; font-weight:700; font-size:15px; }
-  .landing-logo .mark{ width:32px; height:32px; border-radius:10px; background:linear-gradient(155deg, var(--accent), var(--accent-2));
-    display:flex; align-items:center; justify-content:center; font-weight:700; color:var(--accent-text); }
-  .landing-status-pill{ display:flex; align-items:center; gap:7px; font-size:12.5px; color:var(--text-dim);
-    background:rgba(255,255,255,0.05); border:1px solid var(--border-soft); border-radius:20px; padding:6px 14px; }
-  .dot-live{ width:7px; height:7px; border-radius:50%; background:var(--green); box-shadow:0 0 8px var(--green); }
-  .landing-discord-btn{ margin-left:auto; background:linear-gradient(120deg, var(--accent), var(--accent-2)); color:var(--accent-text);
-    font-size:13px; font-weight:600; padding:9px 18px; border-radius:12px; text-decoration:none; transition:filter .15s; }
-  .landing-discord-btn:hover{ filter:brightness(1.1); }
+/* ── BUTTON WRAP style (inspired by reference) ── */
+.btn-wrap{position:relative;display:inline-block}
+.btn-wrap .btn-shadow{position:absolute;bottom:-3px;left:2px;right:-2px;height:100%;background:rgba(109,40,217,0.3);border-radius:10px;z-index:-1;filter:blur(6px)}
 
-  .landing-hero{
-    position:relative; text-align:center; padding:60px 24px; border-radius:28px; overflow:hidden;
-    background:linear-gradient(160deg, rgba(201,168,255,0.14), rgba(139,111,206,0.05));
-    border:1px solid var(--border); margin-bottom:26px;
-  }
-  .landing-hero-glow{
-    position:absolute; top:-40%; left:50%; width:500px; height:500px; transform:translateX(-50%);
-    background:radial-gradient(circle, color-mix(in srgb, var(--accent) 35%, transparent), transparent 70%);
-    filter:blur(10px); pointer-events:none;
-  }
-  .landing-hero h1{ position:relative; font-size:28px; font-weight:700; letter-spacing:-0.02em; margin-bottom:10px; }
-  .landing-hero p{ position:relative; color:var(--text-dim); font-size:15px; }
-  @media (min-width:860px){ .landing-hero h1{ font-size:36px; } .landing-hero{ padding:80px 40px; } }
-
-  .landing-info-grid{ display:grid; grid-template-columns:repeat(2,1fr); gap:12px; margin-bottom:26px; }
-  @media (min-width:640px){ .landing-info-grid{ grid-template-columns:repeat(4,1fr); } }
-  .landing-info-card{
-    background:var(--glass); border:1px solid var(--border); border-radius:18px; padding:20px;
-    text-align:center; transition:transform .2s; backdrop-filter:blur(16px);
-  }
-  .landing-info-card:hover{ transform:translateY(-3px); }
-  .li-label{ font-size:12px; color:var(--text-dim); margin-bottom:8px; }
-  .li-value{ font-size:24px; font-weight:700; background:linear-gradient(120deg, var(--accent), var(--accent-2));
-    -webkit-background-clip:text; background-clip:text; color:transparent; }
-
-  .landing-quicklinks{ display:grid; grid-template-columns:repeat(2,1fr); gap:12px; }
-  @media (min-width:640px){ .landing-quicklinks{ grid-template-columns:repeat(4,1fr); } }
-  .landing-qlink{
-    background:var(--glass); border:1px solid var(--border); border-radius:16px; padding:22px 16px;
-    text-align:center; font-size:13.5px; font-weight:600; cursor:pointer; transition:transform .15s, border-color .15s;
-  }
-  .landing-qlink:hover{ transform:translateY(-3px); border-color:color-mix(in srgb, var(--accent) 45%, transparent); border-color:rgba(201,168,255,0.45); }
-
-  /* ---- News enrichi ---- */
-  .news-card{ background:var(--glass); border:1px solid var(--border); border-left:3px solid var(--accent);
-    border-radius:16px; padding:16px 18px; margin-bottom:12px; backdrop-filter:blur(16px); }
-  .news-card-top{ display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin-bottom:8px; }
-  .news-badge{ font-size:11px; font-weight:700; padding:3px 10px; border-radius:20px; }
-  .news-time{ font-size:11.5px; color:var(--text-faint); }
-  .news-card-title{ font-size:16px; font-weight:700; margin-bottom:6px; }
-  .news-card-body{ font-size:13.5px; color:var(--text-dim); line-height:1.55; white-space:pre-wrap; margin-bottom:10px; }
-  .news-card-author{ font-size:11.5px; color:var(--text-faint); }
-
-  .site-card{ background:var(--glass); border:1px solid var(--border); border-radius:16px; padding:16px 18px;
-    margin-bottom:12px; display:flex; flex-direction:column; gap:12px; }
-  @media (min-width:640px){ .site-card{ flex-direction:row; align-items:center; justify-content:space-between; } }
-  .site-card-info .name{ font-size:15px; font-weight:700; margin-bottom:3px; }
-  .site-card-desc{ font-size:13px; color:var(--text-dim); margin-bottom:5px; }
-  .site-card-date{ font-size:11px; color:var(--text-faint); margin-top:4px; }
-  .site-card .actions{ display:flex; gap:8px; flex-wrap:wrap; }
-
-  .shop-item-row{ display:grid; grid-template-columns:1fr; gap:8px; background:rgba(255,255,255,0.03);
-    border:1px solid var(--border-soft); border-radius:12px; padding:12px; margin-bottom:10px; }
-  @media (min-width:640px){ .shop-item-row{ grid-template-columns:1fr 1fr; } }
-  .shop-item-row input{ background:rgba(255,255,255,0.04); border:1px solid var(--border-soft); border-radius:9px;
-    padding:9px 11px; color:var(--text); font-size:13px; outline:none; }
-
-  /* ---- Chat GPT (nouveau style) ---- */
-  .chat-panel{ display:flex; flex-direction:column; height:calc(100vh - 210px); min-height:460px;
-    background:var(--glass); border:1px solid var(--border); border-radius:var(--radius); overflow:hidden; }
-  .chat-panel-bar{ display:flex; align-items:center; justify-content:space-between; padding:12px 16px;
-    border-bottom:1px solid var(--border-soft); font-size:13px; color:var(--text-dim); flex-shrink:0; }
-  .chat-messages-area{ flex:1; overflow-y:auto; padding:18px; display:flex; flex-direction:column; gap:16px; min-height:0; }
-  .chat-empty-hint{ color:var(--text-faint); font-size:13.5px; text-align:center; margin-top:40px; }
-  .chat-bubble-row{ display:flex; flex-direction:column; max-width:82%; }
-  .chat-bubble-row.user{ align-self:flex-end; align-items:flex-end; }
-  .chat-bubble-row.assistant{ align-self:flex-start; align-items:flex-start; }
-  .chat-bubble-label{ font-size:11px; color:var(--text-faint); margin-bottom:4px; padding:0 4px; }
-  .chat-bubble{ border-radius:16px; padding:11px 15px; font-size:13.5px; line-height:1.6; color:var(--text); }
-  .chat-bubble.user{ background:linear-gradient(120deg, var(--accent), var(--accent-2)); color:var(--accent-text); border-bottom-right-radius:4px; }
-  .chat-bubble.assistant{ background:rgba(255,255,255,0.05); border:1px solid var(--border-soft); border-bottom-left-radius:4px; }
-  .chat-input-bar{ border-top:1px solid var(--border-soft); padding:12px; flex-shrink:0; }
-  .chat-attach-row{ display:flex; gap:6px; flex-wrap:wrap; margin-bottom:8px; }
-  .chat-attach-chip{ background:rgba(255,255,255,0.06); border:1px solid var(--border-soft); border-radius:8px;
-    padding:5px 10px; font-size:11.5px; color:var(--text-dim); display:flex; align-items:center; gap:6px; }
-  .chat-attach-chip span{ cursor:pointer; color:var(--red); font-weight:700; }
-  .chat-input-row{ display:flex; gap:8px; align-items:flex-end; }
-  .chat-textarea{ flex:1; min-height:42px; max-height:110px; background:rgba(255,255,255,0.04);
-    border:1px solid var(--border-soft); border-radius:12px; padding:10px 14px; color:var(--text);
-    font-size:14px; outline:none; resize:none; font-family:inherit; }
-
-  /* ---- Debug console ---- */
-  .debug-console{
-    position:fixed; top:0; left:0; right:0; z-index:300;
-    background:rgba(8,8,9,0.97); border-bottom:1px solid var(--border);
-    backdrop-filter:blur(20px);
-    font-family:"SF Mono", Menlo, Consolas, monospace;
-  }
-  .debug-console-bar{
-    display:flex; align-items:center; justify-content:space-between;
-    padding:8px 14px; font-size:12px; color:var(--text-dim); cursor:pointer;
-    user-select:none;
-  }
-  .debug-console-body{
-    max-height:34vh; overflow-y:auto; padding:0 14px 10px 14px;
-    font-size:11.5px; line-height:1.6;
-  }
-  .dbg-line{ white-space:pre-wrap; word-break:break-all; color:var(--text-dim); }
-  .dbg-line.dbg-req{ color:#7fb8ff; }
-  .dbg-line.dbg-status{ color:var(--text-dim); }
-  .dbg-line.dbg-body{ color:var(--text-faint); }
-  .dbg-line.dbg-ok{ color:var(--green); }
-  .dbg-line.dbg-err{ color:var(--red); font-weight:600; }
-
-  /* ---- Social login buttons ---- */
-  .social-row{ display:flex; flex-direction:column; gap:10px; margin-bottom:18px; }
-  .social-btn{
-    display:flex; align-items:center; justify-content:center; gap:10px;
-    width:100%; padding:11px 0; border-radius:11px;
-    background:rgba(255,255,255,0.05); border:1px solid var(--border-soft);
-    color:var(--text); font-size:14px; font-weight:500; cursor:pointer;
-    transition:background .15s;
-  }
-  .social-btn:hover{ background:rgba(255,255,255,0.09); }
-  .social-icon{ font-weight:700; font-size:15px; }
-  .divider{ display:flex; align-items:center; text-align:center; margin-bottom:18px; color:var(--text-faint); font-size:12px; }
-  .divider::before, .divider::after{ content:""; flex:1; height:1px; background:var(--border-soft); }
-  .divider span{ padding:0 10px; }
-
-  /* ---- CGU checkbox + modal ---- */
-  .tos-row{ display:flex; align-items:flex-start; gap:8px; margin-bottom:14px; font-size:12.5px; color:var(--text-dim); }
-  .tos-row input{ margin-top:2px; }
-  .tos-row span{ color:var(--text); text-decoration:underline; cursor:pointer; }
-  .tos-modal-overlay{
-    position:fixed; inset:0; background:rgba(0,0,0,0.6); z-index:400;
-    display:flex; align-items:center; justify-content:center; padding:20px;
-    opacity:0; pointer-events:none; transition:opacity .2s;
-  }
-  .tos-modal-overlay.show{ opacity:1; pointer-events:auto; }
-  .tos-modal{
-    max-width:440px; width:100%; background:rgba(18,18,20,0.98); border:1px solid var(--border);
-    border-radius:20px; padding:26px; backdrop-filter:blur(20px);
-  }
-  .tos-modal h3{ font-size:16px; font-weight:600; margin-bottom:14px; }
-  .tos-body{ font-size:13px; color:var(--text-dim); line-height:1.6; margin-bottom:20px; max-height:40vh; overflow-y:auto; }
-
-  /* ---- Loader global ---- */
-  .global-loader{
-    position:fixed; inset:0; background:var(--bg); z-index:500;
-    display:flex; align-items:center; justify-content:center;
-    opacity:0; pointer-events:none; transition:opacity .2s;
-  }
-  .global-loader.show{ opacity:1; pointer-events:auto; }
-  .loader-spin{
-    width:34px; height:34px; border-radius:50%;
-    border:3px solid rgba(255,255,255,0.12); border-top-color:var(--accent);
-    animation:spin .7s linear infinite;
-  }
-
-  /* ---- Langue select ---- */
-  .lang-select{
-    width:100%; background:rgba(255,255,255,0.04); border:1px solid var(--border-soft);
-    border-radius:11px; padding:12px 14px; color:var(--text); font-size:14.5px; outline:none;
-  }
-
-  /* ---- Écran de bienvenue animé ---- */
-  .welcome-wrap{
-    height:100%; width:100%; display:flex; flex-direction:column;
-    align-items:center; justify-content:center; text-align:center; padding:20px;
-    animation:fadeIn .4s ease;
-  }
-  @keyframes fadeIn{ from{ opacity:0; } to{ opacity:1; } }
-  .welcome-title{ font-size:20px; font-weight:600; letter-spacing:-0.01em; margin-top:10px; max-width:340px; }
-  .welcome-sub{ color:var(--text-dim); font-size:13.5px; margin-top:6px; }
-
-  .cloud-anim-container{
-    width:220px; height:220px; padding:15px;
-    display:flex; align-items:center; justify-content:center;
-    position:relative;
-  }
-  .cloud-anim-container .cloud{
-    width:220px; display:inline; position:absolute; z-index:11;
-    animation:clouds 8s infinite; animation-timing-function:ease-in-out;
-  }
-  .cloud-anim-container .front{ padding-top:40px; margin-left:20px; animation-duration:8s; }
-  .cloud-anim-container .back{ margin-top:-26px; margin-left:130px; z-index:12; animation-duration:12s; }
-  .right-front{ width:40px; height:40px; border-radius:50% 50% 50% 0%; background-color:var(--accent); display:inline-block; margin-left:-22px; z-index:5; }
-  .left-front{ width:58px; height:58px; border-radius:50% 50% 0% 50%; background-color:var(--accent); display:inline-block; z-index:5; }
-  .right-back{ width:44px; height:44px; border-radius:50% 50% 50% 0%; background-color:var(--accent-2); display:inline-block; margin-left:-18px; z-index:5; }
-  .left-back{ width:26px; height:26px; border-radius:50% 50% 0% 50%; background-color:var(--accent-2); display:inline-block; z-index:5; }
-  .sun{ width:100px; height:100px; background:linear-gradient(to right, var(--accent-2), var(--accent)); border-radius:50px; position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); z-index:1; }
-  .sunshine{ animation:sunshines 2s infinite; }
-  @keyframes sunshines{ 0%{ transform:translate(-50%,-50%) scale(1); opacity:0.5; } 100%{ transform:translate(-50%,-50%) scale(1.4); opacity:0; } }
-  @keyframes clouds{ 0%{ transform:translateX(12px); } 50%{ transform:translateX(0px); } 100%{ transform:translateX(12px); } }
+@media(max-width:640px){
+  .topbar{padding:0 16px}
+  .main{padding:16px}
+  .auth-card{padding:30px 20px}
+  .form-row{flex-direction:column}
+  .form-row .btn{width:100%}
+  .stats-grid{grid-template-columns:1fr 1fr}
+  #toast{bottom:14px;right:14px;left:14px;max-width:none}
+  .nav-tabs{overflow-x:auto;width:100%}
+}
 </style>
 </head>
 <body>
-<div id="app"></div>
-<div id="crash-reporter" style="display:none; position:fixed; inset:0; background:#0A0A0B; color:#FF6B6B; font-family:monospace; font-size:13px; padding:20px; z-index:9999; overflow:auto; white-space:pre-wrap; line-height:1.6;"></div>
+<div id="app">
+
+<!-- AUTH -->
+<div id="auth-screen">
+  <div class="auth-card">
+    <div class="auth-wordmark">
+      <h1>SpyHub</h1>
+      <p>Panneau de contrôle</p>
+      <div class="line"></div>
+    </div>
+    <div class="tab-switch">
+      <button class="tab-btn active" onclick="switchAuthTab('login')">Connexion</button>
+      <button class="tab-btn" onclick="switchAuthTab('register')">Créer un compte</button>
+    </div>
+    <div id="form-login">
+      <div class="field"><label>Identifiant</label><input type="text" id="lu" placeholder="admin" autocomplete="username"></div>
+      <div class="field"><label>Mot de passe</label><input type="password" id="lp" placeholder="••••••••" autocomplete="current-password"></div>
+      <div class="btn-wrap"><button class="btn btn-primary" onclick="doLogin()">Se connecter</button><div class="btn-shadow"></div></div>
+      <div class="msg" id="lmsg"></div>
+    </div>
+    <div id="form-register" style="display:none">
+      <div class="field"><label>Identifiant</label><input type="text" id="ru" placeholder="monpseudo" autocomplete="username"></div>
+      <div class="field"><label>Mot de passe</label><input type="password" id="rp" placeholder="Min. 6 caractères" autocomplete="new-password"></div>
+      <div class="btn-wrap"><button class="btn btn-primary" onclick="doRegister()">Créer le compte</button><div class="btn-shadow"></div></div>
+      <div class="msg" id="rmsg"></div>
+    </div>
+  </div>
+</div>
+
+<!-- DASHBOARD -->
+<div id="dashboard-screen">
+  <div class="topbar">
+    <div class="topbar-brand">
+      <div class="pip"></div>
+      SpyHub
+    </div>
+    <div class="topbar-r">
+      <span class="badge" id="role-badge"></span>
+      <button class="btn btn-ghost btn-sm" onclick="doLogout()">Déconnexion</button>
+    </div>
+  </div>
+
+  <div class="main">
+    <div class="nav-tabs">
+      <button class="nav-tab active" onclick="switchTab('stats',this)">Statistiques</button>
+      <button class="nav-tab" onclick="switchTab('players',this)">Joueurs</button>
+      <button class="nav-tab" onclick="switchTab('bans',this)">Bans</button>
+      <button class="nav-tab owner-only" onclick="switchTab('accounts',this)" style="display:none">Comptes</button>
+    </div>
+
+    <!-- Stats -->
+    <div id="tab-stats" class="tab-content active">
+      <div class="rbar">
+        <div class="section-hd">Vue d'ensemble</div>
+        <div style="display:flex;align-items:center;gap:10px">
+          <span class="rbar-lbl" id="last-upd"></span>
+          <button class="btn btn-ghost btn-sm" onclick="loadStats()">Actualiser</button>
+        </div>
+      </div>
+      <div class="stats-grid">
+        <div class="stat-card"><div class="stat-lbl">Exécutions</div><div class="stat-val" id="s-total">—</div></div>
+        <div class="stat-card"><div class="stat-lbl">Joueurs uniques</div><div class="stat-val" id="s-players">—</div></div>
+        <div class="stat-card"><div class="stat-lbl">Bannis</div><div class="stat-val" id="s-bans">—</div></div>
+      </div>
+      <div class="section-hd">Activité récente</div>
+      <div class="gt"><table>
+        <thead><tr><th>Joueur</th><th>User ID</th><th>Place ID</th><th>Date</th></tr></thead>
+        <tbody id="recent-tb"><tr><td colspan="4"><div class="empty"><div class="spin"></div></div></td></tr></tbody>
+      </table></div>
+    </div>
+
+    <!-- Players -->
+    <div id="tab-players" class="tab-content">
+      <div class="section-hd">Top joueurs <span class="cnt" id="pl-cnt">0</span></div>
+      <div class="gt"><table>
+        <thead><tr><th>Joueur</th><th>User ID</th><th>Exécutions</th><th>Dernière activité</th><th>Action</th></tr></thead>
+        <tbody id="players-tb"><tr><td colspan="5"><div class="empty"><div class="spin"></div></div></td></tr></tbody>
+      </table></div>
+    </div>
+
+    <!-- Bans -->
+    <div id="tab-bans" class="tab-content">
+      <div class="ban-box">
+        <div class="section-hd" style="margin-bottom:16px">Bannir un joueur</div>
+        <div class="form-row">
+          <div class="field"><label>User ID Roblox</label><input type="text" id="ban-uid" placeholder="123456789"></div>
+          <div class="field"><label>Raison</label><input type="text" id="ban-rsn" placeholder="Exploit, cheat..."></div>
+          <button class="btn btn-red" onclick="doBan()">Bannir</button>
+        </div>
+      </div>
+      <div class="section-hd">Bannis actifs <span class="cnt" id="bn-cnt">0</span></div>
+      <div class="gt"><table>
+        <thead><tr><th>User ID</th><th>Raison</th><th>Date</th><th>Par</th><th>Action</th></tr></thead>
+        <tbody id="bans-tb"><tr><td colspan="5"><div class="empty"><div class="spin"></div></div></td></tr></tbody>
+      </table></div>
+    </div>
+
+    <!-- Accounts -->
+    <div id="tab-accounts" class="tab-content">
+      <div class="section-hd">Comptes</div>
+      <div class="gt"><table>
+        <thead><tr><th>Identifiant</th><th>Rôle</th><th>Créé le</th><th>Actions</th></tr></thead>
+        <tbody id="acc-tb"><tr><td colspan="4"><div class="empty"><div class="spin"></div></div></td></tr></tbody>
+      </table></div>
+    </div>
+  </div>
+</div>
+</div>
+
+<div id="toast"></div>
 
 <script>
-window.addEventListener('error', function(e){
-  var box = document.getElementById('crash-reporter');
-  if(box){
-    box.style.display = 'block';
-    box.textContent = "ERREUR DÉTECTÉE :\n\n" + e.message + "\n\nFichier : " + e.filename + "\nLigne : " + e.lineno + ", colonne : " + e.colno + (e.error && e.error.stack ? "\n\nDétail :\n" + e.error.stack : "");
+const W="https://legacy.spyuhq.workers.dev";
+let token=localStorage.getItem("sh_t")||null;
+let me=localStorage.getItem("sh_u")||null;
+let role=localStorage.getItem("sh_r")||null;
+let cache=null;
+
+token?( showDash(), loadStats() ) : (document.getElementById("auth-screen").style.display="flex");
+
+function switchAuthTab(t){
+  document.getElementById("form-login").style.display=t==="login"?"block":"none";
+  document.getElementById("form-register").style.display=t==="register"?"block":"none";
+  document.querySelectorAll(".tab-btn").forEach((b,i)=>b.classList.toggle("active",(i===0&&t==="login")||(i===1&&t==="register")));
+}
+
+async function doLogin(){
+  const u=document.getElementById("lu").value.trim(),p=document.getElementById("lp").value,m=document.getElementById("lmsg");
+  if(!u||!p){showMsg(m,"error","Remplis tous les champs");return}
+  try{
+    const r=await fetch(`${W}/api/login`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({username:u,password:p})});
+    const d=await r.json();
+    if(!d.success){showMsg(m,"error",d.error||"Erreur");return}
+    save(d.token,d.username,d.role);showDash();loadStats();
+  }catch(e){showMsg(m,"error","Serveur inaccessible")}
+}
+
+async function doRegister(){
+  const u=document.getElementById("ru").value.trim(),p=document.getElementById("rp").value,m=document.getElementById("rmsg");
+  if(!u||!p){showMsg(m,"error","Remplis tous les champs");return}
+  try{
+    const r=await fetch(`${W}/api/register`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({username:u,password:p})});
+    const d=await r.json();
+    if(!d.success){showMsg(m,"error",d.error||"Erreur");return}
+    if(d.token){save(d.token,d.username||u,d.role);showDash();loadStats();}
+    else showMsg(m,"success",d.message||"Compte créé, en attente d'activation");
+  }catch(e){showMsg(m,"error","Serveur inaccessible")}
+}
+
+function save(t,u,r){
+  token=t;me=u;role=r;
+  localStorage.setItem("sh_t",t);localStorage.setItem("sh_u",u);localStorage.setItem("sh_r",r);
+}
+
+function doLogout(){
+  token=me=role=null;
+  ["sh_t","sh_u","sh_r"].forEach(k=>localStorage.removeItem(k));
+  document.getElementById("dashboard-screen").style.display="none";
+  document.getElementById("auth-screen").style.display="flex";
+}
+
+function showDash(){
+  document.getElementById("auth-screen").style.display="none";
+  document.getElementById("dashboard-screen").style.display="block";
+  const b=document.getElementById("role-badge");
+  b.textContent=role==="owner"?"Owner":"Admin";
+  b.className="badge "+(role==="owner"?"badge-owner":"badge-admin");
+  document.querySelectorAll(".owner-only").forEach(el=>el.style.display=role==="owner"?"":"none");
+}
+
+function switchTab(name,el){
+  document.querySelectorAll(".tab-content").forEach(x=>x.classList.remove("active"));
+  document.querySelectorAll(".nav-tab").forEach(x=>x.classList.remove("active"));
+  document.getElementById(`tab-${name}`).classList.add("active");
+  el.classList.add("active");
+  if(name==="accounts"&&role==="owner")loadAccounts();
+}
+
+async function api(path,method="GET",body=null){
+  const opts={method,headers:{"Content-Type":"application/json","Authorization":`Bearer ${token}`}};
+  if(body)opts.body=JSON.stringify(body);
+  const r=await fetch(`${W}${path}`,opts);
+  if(r.status===401){doLogout();throw new Error("Session expirée")}
+  return r.json();
+}
+
+async function loadStats(){
+  try{
+    const d=await api("/api/stats");cache=d;
+    document.getElementById("s-total").textContent=(d.totalExecutions||0).toLocaleString();
+    document.getElementById("s-players").textContent=(d.uniquePlayers||0).toLocaleString();
+    document.getElementById("s-bans").textContent=(d.bannedCount||0).toLocaleString();
+    document.getElementById("last-upd").textContent="Mis à jour "+new Date().toLocaleTimeString("fr-FR");
+    renderRecent(d.recentExecutions||[]);
+    renderPlayers(d.topPlayers||[]);
+    renderBans(d.bans||{});
+  }catch(e){toast("Erreur de chargement","error")}
+}
+
+function renderRecent(ex){
+  const tb=document.getElementById("recent-tb");
+  if(!ex.length){tb.innerHTML=`<tr><td colspan="4"><div class="empty">Aucune exécution</div></td></tr>`;return}
+  tb.innerHTML=ex.map(e=>`<tr>
+    <td><strong>${esc(e.username||"inconnu")}</strong></td>
+    <td><span class="uid">${esc(e.userId)}</span></td>
+    <td><span class="uid">${esc(e.placeId||"—")}</span></td>
+    <td><span class="muted">${fd(e.timestamp)}</span></td>
+  </tr>`).join("");
+}
+
+function renderPlayers(pl){
+  document.getElementById("pl-cnt").textContent=pl.length;
+  const tb=document.getElementById("players-tb");
+  if(!pl.length){tb.innerHTML=`<tr><td colspan="5"><div class="empty">Aucun joueur</div></td></tr>`;return}
+  tb.innerHTML=pl.map(p=>`<tr>
+    <td><strong>${esc(p.username||"inconnu")}</strong></td>
+    <td><span class="uid">${esc(p.userId)}</span></td>
+    <td><strong>${p.count}</strong></td>
+    <td><span class="muted">${fd(p.lastSeen)}</span></td>
+    <td>${cache?.bans?.[p.userId]
+      ?`<button class="btn btn-grn btn-sm" onclick="doUnban('${esc(p.userId)}')">Débannir</button>`
+      :`<button class="btn btn-red btn-sm" onclick="prefillBan('${esc(p.userId)}')">Bannir</button>`
+    }</td>
+  </tr>`).join("");
+}
+
+function renderBans(bans){
+  const entries=Object.entries(bans);
+  document.getElementById("bn-cnt").textContent=entries.length;
+  const tb=document.getElementById("bans-tb");
+  if(!entries.length){tb.innerHTML=`<tr><td colspan="5"><div class="empty">Aucun joueur banni</div></td></tr>`;return}
+  tb.innerHTML=entries.map(([uid,b])=>`<tr>
+    <td><span class="uid">${esc(uid)}</span></td>
+    <td>${esc(b.reason||"—")}</td>
+    <td><span class="muted">${fd(b.bannedAt)}</span></td>
+    <td>${esc(b.bannedBy||"—")}</td>
+    <td><button class="btn btn-grn btn-sm" onclick="doUnban('${esc(uid)}')">Débannir</button></td>
+  </tr>`).join("");
+}
+
+function prefillBan(uid){
+  document.getElementById("ban-uid").value=uid;
+  document.querySelector("[onclick*=\"switchTab('bans'\"]").click();
+  document.getElementById("ban-uid").focus();
+}
+
+async function doBan(){
+  const uid=document.getElementById("ban-uid").value.trim();
+  const rsn=document.getElementById("ban-rsn").value.trim();
+  if(!uid){toast("Entre un User ID","error");return}
+  try{
+    const d=await api("/api/ban","POST",{userId:uid,reason:rsn});
+    if(!d.success){toast(d.error||"Erreur","error");return}
+    toast(`Joueur ${uid} banni`,"success");
+    document.getElementById("ban-uid").value="";document.getElementById("ban-rsn").value="";
+    await loadStats();
+  }catch(e){toast("Erreur serveur","error")}
+}
+
+async function doUnban(uid){
+  try{
+    const d=await api("/api/unban","POST",{userId:uid});
+    if(!d.success){toast(d.error||"Erreur","error");return}
+    toast(`Joueur ${uid} débanni`,"success");await loadStats();
+  }catch(e){toast("Erreur","error")}
+}
+
+async function loadAccounts(){
+  try{
+    const d=await api("/api/accounts");
+    const tb=document.getElementById("acc-tb");
+    if(!d.accounts?.length){tb.innerHTML=`<tr><td colspan="4"><div class="empty">Aucun compte</div></td></tr>`;return}
+    tb.innerHTML=d.accounts.map(a=>`<tr>
+      <td><strong>${esc(a.username)}</strong></td>
+      <td><span class="badge ${a.role==="owner"?"badge-owner":a.role==="pending"?"":"badge-admin"}">${a.role==="owner"?"Owner":a.role==="pending"?"En attente":"Admin"}</span></td>
+      <td><span class="muted">${fd(a.createdAt)}</span></td>
+      <td style="display:flex;gap:6px;flex-wrap:wrap">
+        ${a.role==="pending"?`<button class="btn btn-grn btn-sm" onclick="approveAcc('${esc(a.username)}')">Activer</button>`:""}
+        ${a.role!=="owner"?`<button class="btn btn-red btn-sm" onclick="deleteAcc('${esc(a.username)}')">Supprimer</button>`:""}
+      </td>
+    </tr>`).join("");
+  }catch(e){toast("Erreur comptes","error")}
+}
+
+async function approveAcc(u){
+  const d=await api("/api/accounts/approve","POST",{username:u});
+  if(d.success){toast(`${u} est admin`,"success");loadAccounts();}else toast(d.error,"error");
+}
+
+async function deleteAcc(u){
+  if(!confirm(`Supprimer "${u}" ?`))return;
+  const d=await api("/api/accounts/delete","POST",{username:u});
+  if(d.success){toast(`${u} supprimé`,"success");loadAccounts();}else toast(d.error,"error");
+}
+
+function esc(s){return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;")}
+function fd(ts){if(!ts)return"—";return new Date(ts).toLocaleString("fr-FR",{day:"2-digit",month:"2-digit",hour:"2-digit",minute:"2-digit"})}
+
+function showMsg(el,type,text){el.className=`msg ${type} show`;el.textContent=text}
+
+let tt;
+function toast(text,type="success"){
+  const el=document.getElementById("toast");
+  el.textContent=text;el.className=`show ${type}`;
+  clearTimeout(tt);tt=setTimeout(()=>{el.className=""},3000);
+}
+
+document.addEventListener("keydown",e=>{
+  if(e.key==="Enter"&&document.getElementById("auth-screen").style.display!=="none"){
+    const loginVisible=document.getElementById("form-login").style.display!=="none";
+    if(loginVisible)doLogin();else doRegister();
   }
 });
-
-if('serviceWorker' in navigator){
-  navigator.serviceWorker.getRegistrations().then(function(regs){
-    regs.forEach(function(reg){ reg.unregister(); });
-  }).catch(function(){});
-}
-if('caches' in window){
-  caches.keys().then(function(names){
-    names.forEach(function(name){ caches.delete(name); });
-  }).catch(function(){});
-}
-</script>
-
-<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-<meta http-equiv="Pragma" content="no-cache">
-<meta http-equiv="Expires" content="0">
-
-<script src="https://cdn.jsdelivr.net/npm/eruda"></script>
-<script>eruda.init();</script>
-
-<script>
-/* =========================================================
-   CONFIG
-   ========================================================= */
-const API_BASE = "https://host.spyuhq.workers.dev";
-const APP_NAME = "SpyHub Gen Tools";
-const APP_INITIAL = "S";
-
-/* =========================================================
-   THEME (couleurs custom, sauvegardées en localStorage)
-   ========================================================= */
-const DEFAULT_THEME = { accent: "#C9A8FF", accent2: "#8B6FCE" };
-function loadTheme(){
-  try{ return JSON.parse(localStorage.getItem('shgt_theme')) || DEFAULT_THEME; }
-  catch(e){ return DEFAULT_THEME; }
-}
-function applyTheme(theme){
-  document.documentElement.style.setProperty('--accent', theme.accent);
-  document.documentElement.style.setProperty('--accent-2', theme.accent2);
-  // texte du bouton lisible selon la luminosité de l'accent
-  const hex = theme.accent.replace('#','');
-  const r = parseInt(hex.substr(0,2),16), g = parseInt(hex.substr(2,2),16), b = parseInt(hex.substr(4,2),16);
-  const lum = (0.299*r + 0.587*g + 0.114*b) / 255;
-  document.documentElement.style.setProperty('--accent-text', lum > 0.6 ? '#0A0A0B' : '#F2F2F3');
-}
-let currentTheme = loadTheme();
-applyTheme(currentTheme);
-
-/* =========================================================
-   ÉTAT
-   ========================================================= */
-const state = {
-  user: null,
-  section: 'overview',
-  savedWebhook: localStorage.getItem('shgt_webhook') || '',
-  sidebarOpen: false
-};
-
-const LUA_KEYWORDS = ["local","function","end","if","then","else","elseif","for","while","do","return","true","false","nil","and","or","not","repeat","until","break","print"];
-
-function toast(msg){
-  const t = document.getElementById('toast');
-  if(!t) return;
-  t.textContent = msg;
-  t.classList.add('show');
-  clearTimeout(window._toastTimer);
-  window._toastTimer = setTimeout(()=>t.classList.remove('show'), 2600);
-}
-
-/* =========================================================
-   LOGS SYSTÈME (gardés en mémoire pour la console Owner, plus affichés sur le login)
-   ========================================================= */
-const debugLog = [];
-function dlog(kind, msg){
-  const time = new Date().toLocaleTimeString('fr-FR', { hour12:false });
-  debugLog.push({ kind, msg, time });
-  if(debugLog.length > 300) debugLog.shift();
-}
-
-/* =========================================================
-   API
-   ========================================================= */
-let _apiInFlight = 0;
-
-async function apiRaw(path, opts){
-  const headers = Object.assign({ 'Content-Type': 'application/json' }, opts.headers || {});
-  if(state.user && state.user.token) headers['Authorization'] = 'Bearer ' + state.user.token;
-  const fullUrl = API_BASE + path;
-  dlog('req', `→ ${opts.method || 'GET'} ${fullUrl}` + (opts.body ? ` body=${JSON.stringify(opts.body).slice(0,200)}` : ''));
-  const res = await fetch(fullUrl, {
-    method: opts.method || 'GET',
-    headers,
-    body: opts.body ? JSON.stringify(opts.body) : undefined
-  });
-  dlog('status', `← statut HTTP ${res.status} ${res.statusText}`);
-  let rawText = '';
-  try{ rawText = await res.clone().text(); } catch(e){}
-  let data = null;
-  try{ data = JSON.parse(rawText); } catch(e){}
-  return { res, data, rawText };
-}
-
-async function api(path, opts){
-  opts = opts || {};
-
-  // Anti double-clic / anti-rafale : si beaucoup de requêtes sont déjà en vol,
-  // on retarde légèrement plutôt que d'en ajouter une de plus tout de suite.
-  if(_apiInFlight >= 2){
-    await new Promise(r => setTimeout(r, 400));
-  }
-  _apiInFlight++;
-
-  const maxRetries = 3;
-  let lastErr = null;
-
-  try{
-    for(let attempt = 0; attempt <= maxRetries; attempt++){
-      try{
-        const { res, data, rawText } = await apiRaw(path, opts);
-
-        if(res.status === 429 && data && data.error === "cooldown"){
-          renderCooldownScreen(data.cooldownUntil);
-          throw new Error("COOLDOWN_MODE");
-        }
-
-        if(res.status === 429){
-          dlog('err', `✗ 429 Too Many Requests (tentative ${attempt+1}/${maxRetries+1})`);
-          if(attempt < maxRetries){
-            await new Promise(r => setTimeout(r, 500 * Math.pow(2, attempt))); // backoff : 0.5s, 1s, 2s
-            continue;
-          }
-          throw new Error("Backend not available at the moment, please try again.");
-        }
-
-        if(res.status === 503 && data && data.maintenance){
-          renderMaintenanceScreen(data.error);
-          throw new Error("MAINTENANCE_MODE");
-        }
-
-        if(!res.ok){
-          const rawMsg = (data && data.error) || rawText || ("HTTP " + res.status);
-          dlog('err', `✗ ${rawMsg}`);
-          throw new Error("Backend not available at the moment, please try again.");
-        }
-
-        dlog('ok', `✓ Requête réussie`);
-        return data;
-
-      } catch(e){
-        lastErr = e;
-        if(e.message === "MAINTENANCE_MODE" || e.message === "COOLDOWN_MODE") throw e;
-        if(e.message && e.message.includes("Backend not available")) throw e;
-        // Erreur réseau (fetch a échoué) : on retente aussi, sauf à la dernière tentative
-        dlog('err', `✗ Échec réseau : ${e.message}`);
-        if(attempt < maxRetries){
-          await new Promise(r => setTimeout(r, 500 * Math.pow(2, attempt)));
-          continue;
-        }
-        throw new Error("Backend not available at the moment, please try again.");
-      }
-    }
-    throw lastErr || new Error("Backend not available at the moment, please try again.");
-  } finally{
-    _apiInFlight--;
-  }
-}
-
-function escapeHtml(s){
-  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-}
-
-/* =========================================================
-   COOLDOWN (remplace l'ancien système anti-spam/captcha)
-   ========================================================= */
-function renderCooldownScreen(untilTimestamp){
-  const app = document.getElementById('app');
-  const minutes = Math.max(1, Math.ceil((untilTimestamp - Date.now()) / 60000));
-  app.innerHTML = `
-    <div class="login-wrap">
-      <div class="login-card" style="text-align:center;">
-        <div class="login-mark" style="margin-left:auto; margin-right:auto;">${APP_INITIAL}</div>
-        <h1>Trop de requêtes</h1>
-        <p class="sub">Vous pourrez réutiliser le site dans environ ${minutes} minute${minutes > 1 ? 's' : ''}.</p>
-        <button class="btn-primary" id="cooldown-retry">Réessayer</button>
-      </div>
-    </div>
-  `;
-  document.getElementById('cooldown-retry').onclick = ()=> location.reload();
-}
-
-/* =========================================================
-   MODE MAINTENANCE (écran plein page)
-   ========================================================= */
-function renderMaintenanceScreen(message){
-  const app = document.getElementById('app');
-  app.innerHTML = `
-    <div class="login-wrap">
-      <div class="login-card" style="text-align:center;">
-        <div class="login-mark" style="margin-left:auto; margin-right:auto;">${APP_INITIAL}</div>
-        <h1>Maintenance en cours</h1>
-        <p class="sub">${escapeHtml(message || "Le site est actuellement en maintenance. Reviens un peu plus tard.")}</p>
-        <button class="btn-primary" id="maintenance-retry">Réessayer</button>
-      </div>
-    </div>
-  `;
-  document.getElementById('maintenance-retry').onclick = ()=> location.reload();
-}
-const TOS_TEXT = `En créant un compte, vous acceptez que vos informations (pseudo, mot de passe sous forme chiffrée, préférences) soient stockées de façon sécurisée dans notre base de données. Nous ne partageons aucune donnée avec des tiers. Vous pouvez demander la suppression de votre compte et de vos données à tout moment depuis les Paramètres.`;
-
-function renderLogin(mode){
-  mode = mode || 'login';
-  const app = document.getElementById('app');
-  app.innerHTML = `
-    <div class="login-wrap">
-      <div class="login-card">
-        <div class="login-mark">${APP_INITIAL}</div>
-        <h1>${mode==='login' ? 'Connexion' : 'Créer un compte'}</h1>
-        <p class="sub">${mode==='login' ? `Accède à ${APP_NAME}.` : 'Choisis un pseudo et un mot de passe.'}</p>
-
-        <div class="social-row">
-          <button class="social-btn" id="google-btn">
-            <span class="social-icon">G</span> Continuer avec Google
-          </button>
-        </div>
-        <div class="divider"><span>ou</span></div>
-
-        <div class="field">
-          <label>Pseudo</label>
-          <input id="in-user" type="text" placeholder="ex : spyuhq" autocomplete="username">
-        </div>
-        <div class="field">
-          <label>Mot de passe</label>
-          <input id="in-pass" type="password" placeholder="••••••••" autocomplete="current-password">
-        </div>
-
-        ${mode === 'register' ? `
-        <div class="tos-row">
-          <input type="checkbox" id="tos-check">
-          <label for="tos-check">J'accepte les <span id="tos-link">conditions d'utilisation</span></label>
-        </div>` : ''}
-
-        <button class="btn-primary" id="submit-btn">${mode==='login' ? 'Se connecter' : "S'inscrire"}</button>
-        <div class="login-error" id="login-err"></div>
-        <div class="login-toggle">
-          ${mode==='login' ? `Pas de compte ? <span id="toggle-mode">Créer un compte</span>` : `Déjà un compte ? <span id="toggle-mode">Se connecter</span>`}
-        </div>
-      </div>
-    </div>
-
-    <div class="tos-modal-overlay" id="tos-modal-overlay">
-      <div class="tos-modal">
-        <h3>Conditions d'utilisation et confidentialité</h3>
-        <div class="tos-body">${TOS_TEXT}</div>
-        <button class="btn-primary" id="tos-close">J'ai compris</button>
-      </div>
-    </div>
-
-    <div class="toast" id="toast"></div>
-  `;
-
-  document.getElementById('toggle-mode').onclick = ()=> renderLogin(mode==='login' ? 'register' : 'login');
-  document.getElementById('google-btn').onclick = ()=> toast('Connexion Google — bientôt disponible');
-
-  if(mode === 'register'){
-    document.getElementById('tos-link').onclick = ()=> document.getElementById('tos-modal-overlay').classList.add('show');
-    document.getElementById('tos-close').onclick = ()=> document.getElementById('tos-modal-overlay').classList.remove('show');
-  }
-
-  document.getElementById('submit-btn').onclick = async ()=>{
-    const u = document.getElementById('in-user').value.trim();
-    const p = document.getElementById('in-pass').value;
-    const err = document.getElementById('login-err');
-    const btn = document.getElementById('submit-btn');
-    err.style.display = 'none';
-    if(!u || !p){ err.textContent = 'Remplis le pseudo et le mot de passe.'; err.style.display='block'; return; }
-    if(mode === 'register' && !document.getElementById('tos-check').checked){
-      err.textContent = "Merci d'accepter les conditions d'utilisation."; err.style.display='block'; return;
-    }
-
-    btn.disabled = true;
-    btn.innerHTML = '<span class="spinner"></span>';
-    showLoader();
-    try{
-      const data = await api(mode === 'register' ? '/auth/register' : '/auth/login', {
-        method:'POST', body:{ username:u, password:p }
-      });
-      state.user = { username:data.username, role:data.role, token:data.token };
-      saveSession();
-      if(mode === 'register'){
-        renderAccountSetup();
-      } else {
-        renderWelcomeScreen();
-      }
-    } catch(e){
-      err.textContent = e.message;
-      err.style.display = 'block';
-    } finally{
-      btn.disabled = false;
-      btn.textContent = mode==='login' ? 'Se connecter' : "S'inscrire";
-      hideLoader();
-    }
-  };
-}
-
-/* =========================================================
-   SESSION PERSISTANTE
-   ========================================================= */
-function saveSession(){
-  localStorage.setItem('shgt_session', JSON.stringify(state.user));
-}
-function clearSession(){
-  localStorage.removeItem('shgt_session');
-}
-function loadSession(){
-  try{ return JSON.parse(localStorage.getItem('shgt_session')); }
-  catch(e){ return null; }
-}
-
-/* =========================================================
-   LOADER (petit écran de chargement entre les pages)
-   ========================================================= */
-function showLoader(){
-  let l = document.getElementById('global-loader');
-  if(!l){
-    l = document.createElement('div');
-    l.id = 'global-loader';
-    l.className = 'global-loader';
-    l.innerHTML = `<div class="loader-spin"></div>`;
-    document.body.appendChild(l);
-  }
-  l.classList.add('show');
-}
-function hideLoader(){
-  const l = document.getElementById('global-loader');
-  if(l) l.classList.remove('show');
-}
-
-/* =========================================================
-   ÉCRAN DE CONFIGURATION DE COMPTE (après inscription)
-   ========================================================= */
-const LANGUAGES = [
-  { code:'fr', label:'Français' },
-  { code:'en', label:'English' },
-  { code:'es', label:'Español' },
-  { code:'ru', label:'Русский' },
-  { code:'zh', label:'中文' },
-  { code:'ar', label:'العربية' },
-  { code:'pt', label:'Português' },
-];
-
-function renderAccountSetup(){
-  const app = document.getElementById('app');
-  app.innerHTML = `
-    <div class="login-wrap">
-      <div class="login-card" style="max-width:420px;">
-        <div class="login-mark">${APP_INITIAL}</div>
-        <h1>Configure ton compte</h1>
-        <p class="sub">Personnalise ton profil avant de commencer.</p>
-
-        <div class="field">
-          <label>Surnom affiché</label>
-          <input id="setup-nick" type="text" placeholder="${escapeHtml(state.user.username)}">
-        </div>
-        <div class="field">
-          <label>Email (optionnel)</label>
-          <input id="setup-email" type="email" placeholder="ton@email.com">
-        </div>
-        <div class="field">
-          <label>Photo de profil (URL, optionnel)</label>
-          <input id="setup-avatar" type="text" placeholder="https://...">
-        </div>
-        <div class="field">
-          <label>Langue</label>
-          <select id="setup-lang" class="lang-select">
-            ${LANGUAGES.map(l => `<option value="${l.code}" ${l.code==='fr'?'selected':''}>${l.label}</option>`).join('')}
-          </select>
-        </div>
-        <button class="btn-primary" id="setup-save-btn">Continuer</button>
-      </div>
-    </div>
-    <div class="toast" id="toast"></div>
-  `;
-
-  document.getElementById('setup-save-btn').onclick = ()=>{
-    const nick = document.getElementById('setup-nick').value.trim() || state.user.username;
-    const email = document.getElementById('setup-email').value.trim();
-    const avatar = document.getElementById('setup-avatar').value.trim();
-    const lang = document.getElementById('setup-lang').value;
-
-    state.user.nickname = nick;
-    state.user.email = email;
-    state.user.avatar = avatar;
-    state.lang = lang;
-    localStorage.setItem('shgt_lang', lang);
-    saveSession();
-    renderWelcomeScreen();
-  };
-}
-
-/* =========================================================
-   ÉCRAN DE BIENVENUE ANIMÉ
-   ========================================================= */
-function renderWelcomeScreen(){
-  const app = document.getElementById('app');
-  const name = state.user.nickname || state.user.username;
-  app.innerHTML = `
-    <div class="welcome-wrap">
-      <div class="cloud-anim-container">
-        <div class="cloud front"><span class="left-front"></span><span class="right-front"></span></div>
-        <span class="sun sunshine"></span>
-        <span class="sun"></span>
-        <div class="cloud back"><span class="left-back"></span><span class="right-back"></span></div>
-      </div>
-      <h1 class="welcome-title">Bienvenue dans ton espace de travail, ${escapeHtml(name)}</h1>
-      <p class="welcome-sub">Tout est prêt.</p>
-    </div>
-  `;
-  setTimeout(()=> renderMain(), 1800);
-}
-
-
-/* =========================================================
-   MAIN LAYOUT
-   ========================================================= */
-function navItemsFor(role){
-  const base = [
-    { group:'News', items:[ { id:'news', label:'Actualités' } ] },
-    { group:'Général', items:[ { id:'overview', label:'Accueil' } ] },
-    { group:'Code', items:[ { id:'devtools', label:'Dev Tools' } ] },
-    { group:'Hébergement', items:[ { id:'hosting', label:'Sites hébergés' }, { id:'botHosting', label:'Bot Discord hébergé' } ] },
-    { group:'Outils', items:[ { id:'discord', label:'Annonce Discord' } ] },
-    { group:'Boutique', items:[ { id:'shop', label:'Ma boutique' }, { id:'shopBrowse', label:'Boutiques' } ] },
-    { group:'IA', items:[ { id:'chatgpt', label:'Chat GPT' } ] },
-    { group:'Sécurité', items:[ { id:'toolsv1', label:'Tools V1' } ] },
-    { group:'Compte', items:[ { id:'settings', label:'Paramètres' } ] },
-  ];
-  if(role === 'owner'){
-    base.splice(2, 0, { group:'Administration', items:[ { id:'admin', label:'Dashboard Owner' } ] });
-  }
-  return base;
-}
-
-function renderMain(){
-  const app = document.getElementById('app');
-  const NAV = navItemsFor(state.user.role);
-  const displayName = state.user.nickname || state.user.username;
-  app.innerHTML = `
-    <div class="main-layout">
-      <div class="topbar">
-        <div class="hamburger" id="hamburger-btn"><span></span><span></span><span></span></div>
-        <div class="mark">${APP_INITIAL}</div>
-        <div class="topbar-title">${APP_NAME}</div>
-        <div class="avatar-sm">${displayName.slice(0,2).toUpperCase()}</div>
-      </div>
-      <div class="body-row">
-        <div class="sidebar-overlay" id="sidebar-overlay"></div>
-        <div class="sidebar" id="sidebar">
-          <div class="sidebar-close"><div class="hamburger" id="sidebar-close-btn"><span></span><span></span><span></span></div></div>
-          <div id="nav-container"></div>
-          <div class="sidebar-footer">
-            <div class="avatar">${displayName.slice(0,2).toUpperCase()}</div>
-            <div class="user-meta">
-              <div class="uname">${escapeHtml(displayName)}</div>
-              <div class="urole">${state.user.role === 'owner' ? 'Owner' : 'Membre'}</div>
-            </div>
-            <div class="logout-btn" id="logout-btn">Quitter</div>
-          </div>
-        </div>
-        <div class="content" id="content"></div>
-      </div>
-    </div>
-    <div class="toast" id="toast"></div>
-  `;
-  renderNav(NAV);
-  renderSection(state.section);
-
-  document.getElementById('logout-btn').onclick = ()=>{
-    state.user = null;
-    clearSession();
-    renderLogin('login');
-  };
-
-  const sidebar = document.getElementById('sidebar');
-  const overlay = document.getElementById('sidebar-overlay');
-  function openSidebar(){ sidebar.classList.add('open'); overlay.classList.add('show'); }
-  function closeSidebar(){ sidebar.classList.remove('open'); overlay.classList.remove('show'); }
-  document.getElementById('hamburger-btn').onclick = openSidebar;
-  document.getElementById('sidebar-close-btn').onclick = closeSidebar;
-  overlay.onclick = closeSidebar;
-  window._closeSidebar = closeSidebar;
-}
-
-function renderNav(NAV){
-  const c = document.getElementById('nav-container');
-  c.innerHTML = NAV.map(g => `
-    <div class="nav-group">
-      <div class="nav-label">${g.group}</div>
-      ${g.items.map(it => `
-        <div class="nav-item ${state.section===it.id?'active':''}" data-id="${it.id}">
-          <span class="dot"></span><span>${it.label}</span>
-        </div>
-      `).join('')}
-    </div>
-  `).join('');
-  c.querySelectorAll('.nav-item').forEach(el=>{
-    el.onclick = ()=>{
-      state.section = el.dataset.id;
-      renderNav(NAV);
-      renderSection(state.section);
-      if(window._closeSidebar) window._closeSidebar();
-    };
-  });
-}
-
-function renderSection(id){
-  const c = document.getElementById('content');
-  if(id !== 'chat' && chatPollTimer){ clearInterval(chatPollTimer); chatPollTimer = null; }
-  showLoader();
-  setTimeout(()=>{
-    if(id === 'overview') renderOverview(c);
-    else if(id === 'devtools') renderDevTools(c);
-    else if(id === 'hosting') renderHosting(c);
-    else if(id === 'botHosting') renderBotHosting(c);
-    else if(id === 'discord') renderDiscord(c);
-    else if(id === 'shop') renderShop(c);
-    else if(id === 'shopBrowse') renderShopBrowse(c);
-    else if(id === 'news') renderNews(c);
-    else if(id === 'chatgpt') renderChatGPT(c);
-    else if(id === 'toolsv1') renderToolsV1(c);
-    else if(id === 'settings') renderSettings(c);
-    else if(id === 'admin') renderAdmin(c);
-    hideLoader();
-  }, 280);
-}
-
-/* ---------- Bot Discord hébergé (bientôt disponible) ---------- */
-function renderBotHosting(c){
-  c.innerHTML = `
-    <div class="content-header">
-      <h2>Bot Discord hébergé</h2>
-      <p>Héberge ton propre bot Discord directement depuis la plateforme.</p>
-    </div>
-    <div class="panel" style="text-align:center; padding:50px 20px;">
-      <div style="font-size:15px; font-weight:600; margin-bottom:8px;">Bientôt disponible</div>
-      <div style="font-size:13.5px; color:var(--text-dim); max-width:420px; margin:0 auto 20px auto;">
-        Cette fonctionnalité est en cours de construction.
-      </div>
-      <div class="panel" style="max-width:380px; margin:0 auto; background:rgba(255,255,255,0.03);">
-        <div style="display:flex; justify-content:space-between; font-size:12.5px; color:var(--text-dim); margin-bottom:6px;">
-          <span>Progression</span><span>35%</span>
-        </div>
-        <div style="height:6px; background:rgba(255,255,255,0.08); border-radius:6px; overflow:hidden;">
-          <div style="height:100%; width:35%; background:linear-gradient(120deg, var(--accent), var(--accent-2));"></div>
-        </div>
-      </div>
-    </div>
-  `;
-}
-
-/* ---------- Notes ---------- */
-function loadNotes(){
-  try{ return JSON.parse(localStorage.getItem('shgt_notes')) || []; }
-  catch(e){ return []; }
-}
-function saveNotes(notes){
-  localStorage.setItem('shgt_notes', JSON.stringify(notes));
-}
-
-function renderNotes(c){
-  let notes = loadNotes();
-  c.innerHTML = `
-    <div class="content-header">
-      <h2>Notes</h2>
-      <p>Note rapidement une idée, un bout de code ou un rappel.</p>
-    </div>
-    <div class="panel" style="margin-bottom:16px;">
-      <div class="field" style="margin-bottom:10px;">
-        <input id="note-title" type="text" placeholder="Titre de la note">
-      </div>
-      <div class="field" style="margin-bottom:14px;">
-        <textarea id="note-content" placeholder="Contenu..." style="min-height:100px;"></textarea>
-      </div>
-      <button class="pill-btn run" id="add-note-btn">Ajouter la note</button>
-    </div>
-    <div id="notes-list"></div>
-  `;
-
-  function renderList(){
-    const list = document.getElementById('notes-list');
-    if(!notes.length){
-      list.innerHTML = `<div class="empty-state"><div class="big">Aucune note</div>Ajoute ta première idée ci-dessus.</div>`;
-      return;
-    }
-    list.innerHTML = notes.slice().reverse().map((n, revIdx) => {
-      const i = notes.length - 1 - revIdx;
-      return `
-        <div class="panel" style="margin-bottom:10px;">
-          <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:10px; margin-bottom:6px;">
-            <div style="font-weight:600; font-size:14px;">${escapeHtml(n.title || 'Sans titre')}</div>
-            <button class="pill-btn danger" data-del="${i}">Supprimer</button>
-          </div>
-          <div style="font-size:13px; color:var(--text-dim); white-space:pre-wrap;">${escapeHtml(n.content)}</div>
-        </div>
-      `;
-    }).join('');
-    list.querySelectorAll('[data-del]').forEach(btn=>{
-      btn.onclick = ()=>{
-        notes.splice(btn.dataset.del, 1);
-        saveNotes(notes);
-        renderList();
-      };
-    });
-  }
-  renderList();
-
-  document.getElementById('add-note-btn').onclick = ()=>{
-    const title = document.getElementById('note-title').value.trim();
-    const content = document.getElementById('note-content').value.trim();
-    if(!content){ toast('La note est vide'); return; }
-    notes.push({ title, content });
-    saveNotes(notes);
-    document.getElementById('note-title').value = '';
-    document.getElementById('note-content').value = '';
-    renderList();
-    toast('Note ajoutée');
-  };
-}
-
-/* ---------- Accueil enrichi ---------- */
-async function renderOverview(c){
-  const displayName = state.user.nickname || state.user.username;
-
-  c.innerHTML = `
-    <div class="landing-topbar">
-      <div class="landing-logo">
-        <div class="mark">${APP_INITIAL}</div>
-        <span>${APP_NAME}</span>
-      </div>
-      <div class="landing-status-pill">
-        <span class="dot-live"></span> Hosting — En ligne
-      </div>
-      <a href="https://discord.gg/eaRmCczJmE" target="_blank" class="landing-discord-btn">Rejoindre le Discord</a>
-    </div>
-
-    <div class="landing-hero">
-      <div class="landing-hero-glow"></div>
-      <h1>Bienvenue, ${escapeHtml(displayName)}</h1>
-      <p>Ta plateforme tout-en-un pour coder, héberger et créer.</p>
-    </div>
-
-    <div class="landing-info-grid" id="landing-info">
-      <div class="landing-info-card">
-        <div class="li-label">Sites hébergés</div>
-        <div class="li-value" id="li-sites">…</div>
-      </div>
-      <div class="landing-info-card">
-        <div class="li-label">Membres</div>
-        <div class="li-value" id="li-members">…</div>
-      </div>
-      <div class="landing-info-card">
-        <div class="li-label">Messages échangés</div>
-        <div class="li-value" id="li-messages">…</div>
-      </div>
-      <div class="landing-info-card">
-        <div class="li-label">Boutiques créées</div>
-        <div class="li-value" id="li-shops">…</div>
-      </div>
-    </div>
-
-    <div class="landing-quicklinks">
-      <div class="landing-qlink" data-go="devtools"><span>Dev Tools</span></div>
-      <div class="landing-qlink" data-go="hosting"><span>Sites hébergés</span></div>
-      <div class="landing-qlink" data-go="discord"><span>Annonce Discord</span></div>
-      <div class="landing-qlink" data-go="chatgpt"><span>Chat GPT</span></div>
-    </div>
-  `;
-
-  c.querySelectorAll('.landing-qlink').forEach(el=>{
-    el.onclick = ()=>{
-      state.section = el.dataset.go;
-      renderNav(navItemsFor(state.user.role));
-      renderSection(state.section);
-    };
-  });
-
-  try{
-    const data = await api('/sites/mine');
-    document.getElementById('li-sites').textContent = (data.sites || []).length;
-  } catch(e){ document.getElementById('li-sites').textContent = '—'; }
-
-  if(state.user.role === 'owner'){
-    try{
-      const data = await api('/admin/overview');
-      document.getElementById('li-members').textContent = data.accounts.length;
-      document.getElementById('li-messages').textContent = data.totalMessages;
-      document.getElementById('li-shops').textContent = data.totalShops;
-    } catch(e){
-      document.getElementById('li-members').textContent = '—';
-      document.getElementById('li-messages').textContent = '—';
-      document.getElementById('li-shops').textContent = '—';
-    }
-  } else {
-    document.getElementById('li-members').textContent = '—';
-    document.getElementById('li-messages').textContent = '—';
-    document.getElementById('li-shops').textContent = '—';
-  }
-}
-
-/* ---------- News : actualités publiées par l'Owner ---------- */
-const NEWS_CATEGORIES = { info:{label:'Info', color:'#5E9EFF'}, update:{label:'Mise à jour', color:'#5FD98A'}, alert:{label:'Alerte', color:'#FF6B6B'}, event:{label:'Événement', color:'#C9A8FF'} };
-
-async function renderNews(c){
-  const isOwner = state.user.role === 'owner';
-  c.innerHTML = `
-    <div class="content-header">
-      <h2>Actualités</h2>
-      <p>Les dernières informations publiées par l'équipe.</p>
-    </div>
-    ${isOwner ? `
-    <div class="panel" style="margin-bottom:20px;">
-      <div class="field" style="margin-bottom:10px;">
-        <label>Titre</label>
-        <input id="news-title" type="text" placeholder="Titre de l'actualité">
-      </div>
-      <div class="field" style="margin-bottom:10px;">
-        <label>Catégorie</label>
-        <select id="news-category" class="lang-select">
-          ${Object.entries(NEWS_CATEGORIES).map(([k,v]) => `<option value="${k}">${v.label}</option>`).join('')}
-        </select>
-      </div>
-      <div class="field" style="margin-bottom:14px;">
-        <label>Contenu</label>
-        <textarea id="news-content" placeholder="Contenu de l'annonce..." style="min-height:100px;"></textarea>
-      </div>
-      <button class="tool-btn primary" id="news-publish-btn">Publier</button>
-    </div>
-    ` : ''}
-    <div id="news-list"><div class="empty-state">Chargement…</div></div>
-  `;
-
-  async function loadNews(){
-    const list = document.getElementById('news-list');
-    try{
-      const data = await api('/news');
-      const items = data.news || [];
-      if(!items.length){
-        list.innerHTML = `<div class="empty-state"><div class="big">Aucune actualité pour le moment</div></div>`;
-        return;
-      }
-      list.innerHTML = items.map(n => {
-        const cat = NEWS_CATEGORIES[n.category] || NEWS_CATEGORIES.info;
-        const d = new Date(n.createdAt);
-        return `
-        <div class="news-card" style="border-left-color:${cat.color};">
-          <div class="news-card-top">
-            <span class="news-badge" style="background:${cat.color}22; color:${cat.color};">${cat.label}</span>
-            <span class="news-time">${d.toLocaleDateString('fr-FR', {day:'2-digit', month:'short'})} à ${d.toLocaleTimeString('fr-FR', {hour:'2-digit', minute:'2-digit'})}</span>
-            ${isOwner ? `<button class="tool-btn" data-del-news="${n.id}" style="margin-left:auto; color:var(--red);">Supprimer</button>` : ''}
-          </div>
-          <div class="news-card-title">${escapeHtml(n.title)}</div>
-          <div class="news-card-body">${escapeHtml(n.content)}</div>
-          <div class="news-card-author">Publié par ${escapeHtml(n.author)}</div>
-        </div>
-      `}).join('');
-      list.querySelectorAll('[data-del-news]').forEach(btn=>{
-        btn.onclick = async ()=>{
-          if(!confirm('Supprimer cette actualité ?')) return;
-          try{ await api('/news/' + btn.dataset.delNews, { method:'DELETE' }); toast('Supprimée'); loadNews(); }
-          catch(e){ toast(e.message); }
-        };
-      });
-    } catch(e){
-      list.innerHTML = `<div class="empty-state"><div class="big" style="color:var(--red)">Impossible de charger</div>${escapeHtml(e.message)}</div>`;
-    }
-  }
-  loadNews();
-
-  if(isOwner){
-    document.getElementById('news-publish-btn').onclick = async ()=>{
-      const title = document.getElementById('news-title').value.trim();
-      const content = document.getElementById('news-content').value.trim();
-      const category = document.getElementById('news-category').value;
-      const btn = document.getElementById('news-publish-btn');
-      if(!title || !content){ toast('Titre et contenu requis'); return; }
-      btn.disabled = true;
-      btn.innerHTML = '<span class="spinner"></span>';
-      try{
-        await api('/news', { method:'POST', body:{ title, content, category } });
-        document.getElementById('news-title').value = '';
-        document.getElementById('news-content').value = '';
-        toast('Actualité publiée');
-        loadNews();
-      } catch(e){ toast(e.message); }
-      finally{ btn.disabled = false; btn.textContent = 'Publier'; }
-    };
-  }
-}
-
-/* ---------- Chat GPT : conversation avec l'IA (via Groq, proxy Worker) ---------- */
-let chatHistory = [];
-let chatAttachments = [];
-
-function renderMarkdownLite(text){
-  let html = escapeHtml(text);
-  html = html.replace(/```([\s\S]*?)```/g, (m, code) => `<pre style="background:rgba(0,0,0,0.35); border:1px solid var(--border-soft); border-radius:8px; padding:10px 12px; overflow-x:auto; margin:8px 0; font-family:'SF Mono',Menlo,monospace; font-size:12.5px;">${code.trim()}</pre>`);
-  html = html.replace(/`([^`]+)`/g, '<code style="background:rgba(255,255,255,0.08); padding:1px 6px; border-radius:5px; font-family:\'SF Mono\',Menlo,monospace; font-size:0.9em;">$1</code>');
-  html = html.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
-  html = html.replace(/\n/g, '<br>');
-  return html;
-}
-
-function renderChatGPT(c){
-  c.innerHTML = `
-    <div class="content-header">
-      <h2>Chat GPT</h2>
-      <p>Discute avec l'assistant IA. Tu peux joindre des fichiers texte (le contenu sera lu par l'IA).</p>
-    </div>
-    <div class="chat-panel">
-      <div class="chat-panel-bar">
-        <span>Conversation</span>
-        <button class="tool-btn" id="chat-clear-btn">Effacer</button>
-      </div>
-      <div class="chat-messages-area" id="chat-messages">
-        <div class="chat-empty-hint">Écris un message pour commencer la conversation.</div>
-      </div>
-      <div class="chat-input-bar">
-        <div id="chat-attachments-preview" class="chat-attach-row"></div>
-        <div class="chat-input-row">
-          <input id="chat-file-input" type="file" accept=".txt,.js,.py,.lua,.json,.md,.html,.css,image/*" multiple class="hidden">
-          <button class="tool-btn" id="chat-attach-btn" title="Joindre un fichier">Joindre</button>
-          <textarea id="chat-input" placeholder="Écris ton message..." class="chat-textarea"></textarea>
-          <button class="tool-btn primary" id="chat-send-btn">Envoyer</button>
-        </div>
-      </div>
-    </div>
-  `;
-
-  const messagesBox = document.getElementById('chat-messages');
-  const input = document.getElementById('chat-input');
-  const fileInput = document.getElementById('chat-file-input');
-  const attachPreview = document.getElementById('chat-attachments-preview');
-
-  function renderMessages(){
-    if(!chatHistory.length){
-      messagesBox.innerHTML = `<div class="chat-empty-hint">Écris un message pour commencer la conversation.</div>`;
-      return;
-    }
-    messagesBox.innerHTML = chatHistory.map(m => `
-      <div class="chat-bubble-row ${m.role === 'user' ? 'user' : 'assistant'}">
-        <div class="chat-bubble-label">${m.role === 'user' ? 'Toi' : 'Assistant'}</div>
-        <div class="chat-bubble ${m.role === 'user' ? 'user' : 'assistant'}">
-          ${m.thinking ? `<span class="thinking-dots"><span></span><span></span><span></span></span>` : renderMarkdownLite(m.displayContent || m.content)}
-        </div>
-      </div>
-    `).join('');
-    messagesBox.scrollTop = messagesBox.scrollHeight;
-  }
-  renderMessages();
-
-  function renderAttachPreview(){
-    attachPreview.innerHTML = chatAttachments.map((a, i) => `
-      <div class="chat-attach-chip">${escapeHtml(a.name)} <span data-remove-att="${i}">×</span></div>
-    `).join('');
-    attachPreview.querySelectorAll('[data-remove-att]').forEach(el=>{
-      el.onclick = ()=>{ chatAttachments.splice(el.dataset.removeAtt, 1); renderAttachPreview(); };
-    });
-  }
-
-  document.getElementById('chat-attach-btn').onclick = ()=> fileInput.click();
-  fileInput.onchange = async ()=>{
-    for(const file of fileInput.files){
-      if(file.type.startsWith('image/')){
-        toast(`"${file.name}" est une image — ce modèle ne peut pas encore l'analyser, seul son nom sera mentionné.`);
-        chatAttachments.push({ name: file.name, content: `[Image jointe : ${file.name} — non analysable par ce modèle]`, isImage: true });
-      } else {
-        const text = await file.text();
-        chatAttachments.push({ name: file.name, content: text });
-      }
-    }
-    fileInput.value = '';
-    renderAttachPreview();
-  };
-
-  document.getElementById('chat-clear-btn').onclick = ()=>{
-    chatHistory = [];
-    chatAttachments = [];
-    renderMessages();
-    renderAttachPreview();
-  };
-
-  async function sendMessage(){
-    const text = input.value.trim();
-    if(!text && !chatAttachments.length){ toast('Écris un message ou joins un fichier'); return; }
-
-    let fullContent = text;
-    let displayContent = text;
-    if(chatAttachments.length){
-      const attachedText = chatAttachments.map(a => `\n\n--- Fichier joint : ${a.name} ---\n${a.content}`).join('');
-      fullContent = (text || "Voici les fichiers joints :") + attachedText;
-      displayContent = (text ? text + '\n' : '') + chatAttachments.map(a => `[Fichier : ${a.name}]`).join(' ');
-    }
-
-    chatHistory.push({ role:'user', content: fullContent, displayContent });
-    input.value = '';
-    chatAttachments = [];
-    renderAttachPreview();
-    renderMessages();
-
-    const sendBtn = document.getElementById('chat-send-btn');
-    sendBtn.disabled = true;
-    sendBtn.innerHTML = '<span class="spinner"></span>';
-
-    chatHistory.push({ role:'assistant', content:'', displayContent:'', thinking:true });
-    renderMessages();
-
-    try{
-      const apiMessages = chatHistory
-        .slice(0, -1)
-        .map(m => ({ role: m.role, content: m.content }));
-
-      const data = await api('/ai/chat', { method:'POST', body:{ messages: apiMessages } });
-      chatHistory[chatHistory.length - 1] = { role:'assistant', content: data.reply, displayContent: data.reply };
-    } catch(e){
-      chatHistory[chatHistory.length - 1] = { role:'assistant', content: e.message, displayContent: e.message };
-    } finally{
-      renderMessages();
-      sendBtn.disabled = false;
-      sendBtn.textContent = 'Envoyer';
-    }
-  }
-
-  document.getElementById('chat-send-btn').onclick = sendMessage;
-  input.addEventListener('keydown', (e)=>{
-    if(e.key === 'Enter' && !e.shiftKey){ e.preventDefault(); sendMessage(); }
-  });
-}
-
-/* ---------- Tools V1 : cybersécurité légale ---------- */
-function renderToolsV1(c){
-  c.innerHTML = `
-    <div class="content-header">
-      <h2>Tools V1</h2>
-      <p>Outils de cybersécurité légaux et informatifs.</p>
-    </div>
-    <div class="panel" style="text-align:center; padding:50px 20px;">
-      <div style="font-size:15px; font-weight:600; margin-bottom:8px;">En développement</div>
-      <div style="font-size:13.5px; color:var(--text-dim); max-width:420px; margin:0 auto;">
-        Cette catégorie est en cours de construction. Reviens bientôt.
-      </div>
-    </div>
-  `;
-}
-
-/* ---------- Discussion : chat live entre tous les membres ---------- */
-let chatPollTimer = null;
-
-function renderChat(c){
-  c.innerHTML = `
-    <div class="content-header">
-      <h2>Discussion</h2>
-      <p>Discute en direct avec tous les membres de la plateforme.</p>
-    </div>
-    <div class="editor-wrap chat-height" style="height:calc(100vh - 210px); min-height:420px;">
-      <div class="console-pane" style="flex:1;">
-        <div class="pane-bar">
-          <span>Discussion générale</span>
-        </div>
-        <div class="console-body" id="live-chat-messages" style="display:flex; flex-direction:column; gap:10px;">
-          <div class="sys">// Chargement des messages…</div>
-        </div>
-        <div style="border-top:1px solid var(--border-soft); padding:12px; display:flex; gap:8px; align-items:flex-end;">
-          <textarea id="live-chat-input" placeholder="Écris un message..." maxlength="500" style="flex:1; min-height:44px; max-height:100px; background:rgba(255,255,255,0.04); border:1px solid var(--border-soft); border-radius:11px; padding:10px 14px; color:var(--text); font-size:14px; outline:none; resize:none; font-family:inherit;"></textarea>
-          <button class="pill-btn run" id="live-chat-send-btn">Envoyer</button>
-        </div>
-      </div>
-    </div>
-  `;
-
-  const box = document.getElementById('live-chat-messages');
-  const input = document.getElementById('live-chat-input');
-
-  function renderList(messages){
-    if(!messages.length){
-      box.innerHTML = `<div class="sys">// Aucun message. Sois le premier à écrire.</div>`;
-      return;
-    }
-    const wasNearBottom = (box.scrollHeight - box.scrollTop - box.clientHeight) < 80;
-    box.innerHTML = messages.map(m => `
-      <div style="align-self:${m.author === state.user.username ? 'flex-end' : 'flex-start'}; max-width:80%;">
-        <div style="font-size:11px; color:var(--text-faint); margin-bottom:3px;">${escapeHtml(m.author)} · ${new Date(m.createdAt).toLocaleTimeString('fr-FR', {hour:'2-digit', minute:'2-digit'})}</div>
-        <div style="background:${m.author === state.user.username ? 'rgba(255,255,255,0.08)' : 'rgba(255,255,255,0.03)'}; border:1px solid var(--border-soft); border-radius:12px; padding:9px 13px; font-size:13.5px; color:var(--text); white-space:pre-wrap; position:relative;">
-          ${escapeHtml(m.content)}
-          ${(m.author === state.user.username || state.user.role === 'owner') ? `<span data-del-msg="${m.id}" style="cursor:pointer; color:var(--red); font-size:11px; margin-left:8px;">supprimer</span>` : ''}
-        </div>
-      </div>
-    `).join('');
-    if(wasNearBottom) box.scrollTop = box.scrollHeight;
-    box.querySelectorAll('[data-del-msg]').forEach(el=>{
-      el.onclick = async ()=>{
-        try{ await api('/chat/messages/' + el.dataset.delMsg, { method:'DELETE' }); loadMessages(); }
-        catch(e){ toast(e.message); }
-      };
-    });
-  }
-
-  async function loadMessages(){
-    try{
-      const data = await api('/chat/messages');
-      renderList(data.messages || []);
-    } catch(e){
-      box.innerHTML = `<div class="err">${escapeHtml(e.message)}</div>`;
-    }
-  }
-  loadMessages();
-
-  if(chatPollTimer) clearInterval(chatPollTimer);
-  chatPollTimer = setInterval(loadMessages, 5000);
-
-  async function send(){
-    const text = input.value.trim();
-    if(!text) return;
-    const btn = document.getElementById('live-chat-send-btn');
-    btn.disabled = true;
-    try{
-      await api('/chat/messages', { method:'POST', body:{ content: text } });
-      input.value = '';
-      loadMessages();
-    } catch(e){ toast(e.message); }
-    finally{ btn.disabled = false; }
-  }
-  document.getElementById('live-chat-send-btn').onclick = send;
-  input.addEventListener('keydown', (e)=>{
-    if(e.key === 'Enter' && !e.shiftKey){ e.preventDefault(); send(); }
-  });
-}
-
-/* ---------- Shop : créer sa boutique ---------- */
-const PAYMENT_METHODS = ['PayPal', 'CashApp', 'Venmo', 'Zelle', 'LTC (Litecoin)', 'BTC (Bitcoin)', 'ETH (Ethereum)', 'Virement bancaire', 'Carte cadeau', 'Autre'];
-
-const SHOP_STEPS = ['Informations', 'Paiement', 'Objets', 'Style'];
-
-async function renderShop(c){
-  c.innerHTML = `
-    <div class="content-header">
-      <h2>Ma boutique</h2>
-      <p>Configure ta boutique et génère un site dédié avec son propre lien.</p>
-    </div>
-    <div id="shop-wizard"></div>
-    <div class="settings-section">
-      <h3>Mes boutiques publiées</h3>
-      <div id="my-shops-list"><div class="empty-state">Chargement…</div></div>
-    </div>
-  `;
-
-  let step = 0;
-  const shopData = { shopName:'', description:'', paymentMethod:'', paymentLink:'', contact:'', items:[], bannerImage:'', accentColor:'#c9a8ff' };
-
-  function renderWizard(){
-    const wizard = document.getElementById('shop-wizard');
-    wizard.innerHTML = `
-      <div class="panel" style="max-width:600px;">
-        <div class="mode-switch" style="margin-bottom:20px;">
-          ${SHOP_STEPS.map((s,i) => `<div class="mode-btn ${i===step?'active':''}">${s}</div>`).join('')}
-        </div>
-        <div id="shop-step-body"></div>
-        <div style="display:flex; gap:8px; margin-top:18px;">
-          ${step > 0 ? `<button class="tool-btn" id="shop-prev-btn">Précédent</button>` : ''}
-          ${step < SHOP_STEPS.length - 1 ? `<button class="tool-btn primary" id="shop-next-btn">Suivant</button>` : `<button class="tool-btn primary" id="shop-publish-btn">Générer ma boutique</button>`}
-        </div>
-      </div>
-    `;
-
-    const body = document.getElementById('shop-step-body');
-    if(step === 0){
-      body.innerHTML = `
-        <div class="field" style="margin-bottom:12px;"><label>Nom de la boutique</label>
-          <input id="s-name" type="text" value="${escapeHtml(shopData.shopName)}" placeholder="Ma boutique"></div>
-        <div class="field"><label>Description</label>
-          <textarea id="s-desc" placeholder="Présente ta boutique en quelques mots" style="min-height:80px;">${escapeHtml(shopData.description)}</textarea></div>
-      `;
-    } else if(step === 1){
-      body.innerHTML = `
-        <div class="field" style="margin-bottom:12px;"><label>Moyen de paiement</label>
-          <select id="s-payment" class="lang-select">
-            <option value="">— Choisis —</option>
-            ${PAYMENT_METHODS.map(m => `<option value="${m}" ${shopData.paymentMethod===m?'selected':''}>${m}</option>`).join('')}
-          </select></div>
-        <div class="field" style="margin-bottom:12px;"><label>Lien de paiement</label>
-          <input id="s-link" type="text" value="${escapeHtml(shopData.paymentLink)}" placeholder="ex : paypal.me/tonpseudo"></div>
-        <div class="field"><label>Comment te contacter ?</label>
-          <input id="s-contact" type="text" value="${escapeHtml(shopData.contact)}" placeholder="ex : Discord pseudo#0000"></div>
-      `;
-    } else if(step === 2){
-      body.innerHTML = `
-        <div id="shop-items-editor"></div>
-        <button class="tool-btn" id="add-item-btn" style="margin-top:10px;">+ Ajouter un objet</button>
-      `;
-      renderItemsEditor();
-    } else if(step === 3){
-      body.innerHTML = `
-        <div class="field" style="margin-bottom:12px;"><label>Image de bannière (URL, optionnelle)</label>
-          <input id="s-banner" type="text" value="${escapeHtml(shopData.bannerImage)}" placeholder="https://..."></div>
-        <div class="field"><label>Couleur d'accent de la boutique</label>
-          <input id="s-color" type="color" value="${shopData.accentColor}" style="height:42px; padding:4px; cursor:pointer;"></div>
-      `;
-    }
-
-    if(step === 0){
-      document.getElementById('s-name').oninput = e => shopData.shopName = e.target.value;
-      document.getElementById('s-desc').oninput = e => shopData.description = e.target.value;
-    } else if(step === 1){
-      document.getElementById('s-payment').onchange = e => shopData.paymentMethod = e.target.value;
-      document.getElementById('s-link').oninput = e => shopData.paymentLink = e.target.value;
-      document.getElementById('s-contact').oninput = e => shopData.contact = e.target.value;
-    } else if(step === 3){
-      document.getElementById('s-banner').oninput = e => shopData.bannerImage = e.target.value;
-      document.getElementById('s-color').oninput = e => shopData.accentColor = e.target.value;
-    }
-
-    if(step > 0) document.getElementById('shop-prev-btn').onclick = ()=>{ step--; renderWizard(); };
-    if(step < SHOP_STEPS.length - 1){
-      document.getElementById('shop-next-btn').onclick = ()=>{
-        if(step === 0 && !shopData.shopName){ toast('Donne un nom à ta boutique'); return; }
-        if(step === 1 && (!shopData.paymentMethod || !shopData.paymentLink || !shopData.contact)){ toast('Complète les infos de paiement'); return; }
-        step++; renderWizard();
-      };
-    } else {
-      document.getElementById('shop-publish-btn').onclick = publishShop;
-    }
-  }
-
-  function renderItemsEditor(){
-    const box = document.getElementById('shop-items-editor');
-    box.innerHTML = shopData.items.map((item, i) => `
-      <div class="shop-item-row">
-        <input type="text" data-item-name="${i}" placeholder="Nom de l'objet" value="${escapeHtml(item.name)}">
-        <input type="text" data-item-price="${i}" placeholder="Prix" value="${escapeHtml(item.price)}">
-        <input type="text" data-item-desc="${i}" placeholder="Description" value="${escapeHtml(item.description||'')}">
-        <input type="text" data-item-image="${i}" placeholder="URL image (optionnel)" value="${escapeHtml(item.image||'')}">
-        <button class="tool-btn" data-remove-item="${i}" style="color:var(--red);">Retirer</button>
-      </div>
-    `).join('') || `<div class="empty-state">Aucun objet ajouté.</div>`;
-
-    box.querySelectorAll('[data-item-name]').forEach(el => el.oninput = e => shopData.items[el.dataset.itemName].name = e.target.value);
-    box.querySelectorAll('[data-item-price]').forEach(el => el.oninput = e => shopData.items[el.dataset.itemPrice].price = e.target.value);
-    box.querySelectorAll('[data-item-desc]').forEach(el => el.oninput = e => shopData.items[el.dataset.itemDesc].description = e.target.value);
-    box.querySelectorAll('[data-item-image]').forEach(el => el.oninput = e => shopData.items[el.dataset.itemImage].image = e.target.value);
-    box.querySelectorAll('[data-remove-item]').forEach(el => el.onclick = ()=>{ shopData.items.splice(el.dataset.removeItem, 1); renderItemsEditor(); });
-  }
-
-  async function publishShop(){
-    const btn = document.getElementById('shop-publish-btn');
-    btn.disabled = true;
-    btn.innerHTML = '<span class="spinner"></span>';
-    try{
-      const data = await api('/shop', { method:'POST', body: shopData });
-      toast('Boutique générée !');
-      const link = `${API_BASE}/shopsite/${data.id}`;
-      navigator.clipboard.writeText(link);
-      toast('Lien copié : ' + link);
-      loadMyShops();
-    } catch(e){ toast(e.message); }
-    finally{ btn.disabled = false; btn.textContent = 'Générer ma boutique'; }
-  }
-
-  async function loadMyShops(){
-    const box = document.getElementById('my-shops-list');
-    try{
-      const data = await api('/shop/mine');
-      const shops = data.shops || [];
-      if(!shops.length){
-        box.innerHTML = `<div class="empty-state">Aucune boutique publiée pour l'instant.</div>`;
-        return;
-      }
-      box.innerHTML = shops.map(s => `
-        <div class="site-card">
-          <div class="site-card-info">
-            <div class="name">${escapeHtml(s.shopName)}</div>
-            <div class="link">${API_BASE}/shopsite/${s.id}</div>
-          </div>
-          <div class="actions">
-            <button class="tool-btn" data-copy-shop="${s.id}">Copier le lien</button>
-            <button class="tool-btn" data-del-shop="${s.id}" style="color:var(--red);">Supprimer</button>
-          </div>
-        </div>
-      `).join('');
-      box.querySelectorAll('[data-copy-shop]').forEach(btn=>{
-        btn.onclick = ()=>{ navigator.clipboard.writeText(`${API_BASE}/shopsite/${btn.dataset.copyShop}`); toast('Lien copié'); };
-      });
-      box.querySelectorAll('[data-del-shop]').forEach(btn=>{
-        btn.onclick = async ()=>{
-          try{ await api('/shop/' + btn.dataset.delShop, { method:'DELETE' }); toast('Boutique supprimée'); loadMyShops(); }
-          catch(e){ toast(e.message); }
-        };
-      });
-    } catch(e){
-      box.innerHTML = `<div class="empty-state" style="color:var(--red)">${escapeHtml(e.message)}</div>`;
-    }
-  }
-
-  renderWizard();
-  loadMyShops();
-}
-
-/* ---------- Boutiques : parcourir celles des autres membres ---------- */
-async function renderShopBrowse(c){
-  c.innerHTML = `
-    <div class="content-header">
-      <h2>Boutiques</h2>
-      <p>Découvre les boutiques créées par les membres.</p>
-    </div>
-    <div id="shops-list"><div class="empty-state">Chargement…</div></div>
-  `;
-
-  try{
-    const data = await api('/shop/all');
-    const shops = data.shops || [];
-    const list = document.getElementById('shops-list');
-    if(!shops.length){
-      list.innerHTML = `<div class="empty-state"><div class="big">Aucune boutique pour le moment</div></div>`;
-      return;
-    }
-    list.innerHTML = shops.map(s => `
-      <div class="site-card">
-        <div class="site-card-info">
-          <div class="name">${escapeHtml(s.shopName)}</div>
-          <div class="site-card-desc">par ${escapeHtml(s.owner)}</div>
-          <div class="link">${API_BASE}/shopsite/${s.id}</div>
-        </div>
-        <div class="actions">
-          <button class="tool-btn" data-visit-shop="${s.id}">Visiter</button>
-        </div>
-      </div>
-    `).join('');
-    list.querySelectorAll('[data-visit-shop]').forEach(btn=>{
-      btn.onclick = ()=> window.open(`${API_BASE}/shopsite/${btn.dataset.visitShop}`, '_blank');
-    });
-  } catch(e){
-    document.getElementById('shops-list').innerHTML = `<div class="empty-state" style="color:var(--red)">${escapeHtml(e.message)}</div>`;
-  }
-}
-const JS_KEYWORDS = ["const","let","var","function","return","if","else","for","while","class","import","export","async","await","true","false","null","undefined","console.log","document","window"];
-const CSS_KEYWORDS = ["display","flex","grid","color","background","margin","padding","border","width","height","position","absolute","relative","font-size","font-weight","border-radius","transition","transform"];
-const HTML_KEYWORDS = ["div","span","button","input","textarea","section","header","footer","nav","h1","h2","h3","p","a","img","ul","li","form","class","id"];
-
-const devFiles = {
-  html: { name:'index.html', content: `<h1>Hello world</h1>\n<p>Modifie ce fichier pour commencer.</p>\n<button onclick="sayHi()">Clique-moi</button>` },
-  css:  { name:'style.css', content: `body {\n  font-family: sans-serif;\n  background: #111;\n  color: #eee;\n  padding: 40px;\n}` },
-  js:   { name:'script.js', content: `function sayHi(){\n  console.log("Bonjour !");\n  alert("Bonjour !");\n}` }
-};
-let devActiveTab = 'html';
-let devMode = 'web'; // 'web' = éditeur multi-fichiers, 'lua' = éditeur Lua, 'run' = exécution Python/JS
-let luaCode = '';
-
-function devKeywordsFor(tab){
-  if(tab === 'html') return HTML_KEYWORDS;
-  if(tab === 'css') return CSS_KEYWORDS;
-  return JS_KEYWORDS;
-}
-
-function buildPreviewDoc(){
-  return `<!DOCTYPE html><html><head><style>${devFiles.css.content}</style></head><body>${devFiles.html.content}<script>${devFiles.js.content}<\/script></body></html>`;
-}
-
-function renderDevTools(c){
-  c.innerHTML = `
-    <div class="content-header">
-      <h2>Dev Tools</h2>
-      <p>Construis un mini-site multi-fichiers, code en Lua, ou exécute du Python/JavaScript.</p>
-    </div>
-    <div class="mode-switch" id="mode-tabs">
-      <div class="mode-btn ${devMode==='web'?'active':''}" data-mode="web">Éditeur web</div>
-      <div class="mode-btn ${devMode==='lua'?'active':''}" data-mode="lua">Lua</div>
-      <div class="mode-btn ${devMode==='run'?'active':''}" data-mode="run">Python / JS</div>
-    </div>
-    <div id="dev-body"></div>
-  `;
-
-  c.querySelectorAll('#mode-tabs .mode-btn').forEach(el=>{
-    el.onclick = ()=>{ devMode = el.dataset.mode; renderDevTools(c); };
-  });
-
-  if(devMode === 'web') renderDevWebEditor(document.getElementById('dev-body'));
-  else if(devMode === 'lua') renderDevLuaEditor(document.getElementById('dev-body'));
-  else renderDevRunEditor(document.getElementById('dev-body'));
-}
-
-function renderDevWebEditor(host){
-  host.innerHTML = `
-    <div class="file-tabs-bar">
-      <div class="file-tabs">
-        <div class="file-tab ${devActiveTab==='html'?'active':''}" data-tab="html">index.html</div>
-        <div class="file-tab ${devActiveTab==='css'?'active':''}" data-tab="css">style.css</div>
-        <div class="file-tab ${devActiveTab==='js'?'active':''}" data-tab="js">script.js</div>
-        <div class="file-tab ${devActiveTab==='preview'?'active':''}" data-tab="preview">Browser</div>
-      </div>
-      <button class="tool-btn" id="dev-dl-btn">Télécharger tout</button>
-    </div>
-    <div class="dev-editor-area">
-      <div class="editor-pane" style="border-radius:0 0 var(--radius) var(--radius); ${devActiveTab==='preview' ? 'display:none;' : ''}">
-        <textarea class="code-input" id="dev-code-input" spellcheck="false"></textarea>
-        <div class="autocomplete-box" id="dev-autocomplete"></div>
-      </div>
-      <div class="preview-frame-wrap" style="${devActiveTab==='preview' ? 'display:flex;' : 'display:none;'}">
-        <iframe id="dev-preview"></iframe>
-      </div>
-    </div>
-  `;
-
-  host.querySelectorAll('[data-tab]').forEach(el=>{
-    el.onclick = ()=>{
-      if(devActiveTab !== 'preview'){
-        devFiles[devActiveTab].content = document.getElementById('dev-code-input').value;
-      }
-      devActiveTab = el.dataset.tab;
-      renderDevWebEditor(host);
-    };
-  });
-
-  if(devActiveTab === 'preview'){
-    document.getElementById('dev-preview').srcdoc = buildPreviewDoc();
-  } else {
-    const input = document.getElementById('dev-code-input');
-    input.value = devFiles[devActiveTab].content;
-
-    const autoBox = document.getElementById('dev-autocomplete');
-    input.addEventListener('keyup', ()=>{
-      devFiles[devActiveTab].content = input.value;
-      const val = input.value;
-      const pos = input.selectionStart;
-      const before = val.slice(0, pos);
-      const match = before.match(/[a-zA-Z.-]+$/);
-      if(match && match[0].length >= 2){
-        const word = match[0];
-        const keywords = devKeywordsFor(devActiveTab);
-        const sugg = keywords.filter(k => k.startsWith(word) && k !== word);
-        if(sugg.length){
-          autoBox.style.display = 'block';
-          autoBox.style.left = '20px';
-          autoBox.style.top = '44px';
-          autoBox.innerHTML = sugg.slice(0,6).map(s => `<div class="autocomplete-item" data-word="${s}">${s}</div>`).join('');
-          autoBox.querySelectorAll('.autocomplete-item').forEach(item=>{
-            item.onclick = ()=>{
-              const w = item.dataset.word;
-              input.value = before.slice(0, before.length - word.length) + w + val.slice(pos);
-              devFiles[devActiveTab].content = input.value;
-              autoBox.style.display = 'none';
-              input.focus();
-            };
-          });
-          return;
-        }
-      }
-      autoBox.style.display = 'none';
-    });
-    input.addEventListener('blur', ()=>{
-      devFiles[devActiveTab].content = input.value;
-      setTimeout(()=> autoBox.style.display='none', 150);
-    });
-  }
-
-  document.getElementById('dev-dl-btn').onclick = ()=>{
-    if(devActiveTab !== 'preview'){
-      devFiles[devActiveTab].content = document.getElementById('dev-code-input').value;
-    }
-    Object.values(devFiles).forEach(f=>{
-      const blob = new Blob([f.content], {type:'text/plain'});
-      const a = document.createElement('a');
-      a.href = URL.createObjectURL(blob);
-      a.download = f.name;
-      a.click();
-    });
-    toast('Fichiers téléchargés');
-  };
-}
-
-function renderDevLuaEditor(host){
-  host.innerHTML = `
-    <div class="editor-wrap">
-      <div class="editor-pane">
-        <div class="pane-bar">
-          <span>Script Lua</span>
-          <div class="tools">
-            <button class="tool-btn" id="dl-btn">Télécharger</button>
-            <button class="tool-btn primary" id="run-btn">Exécuter</button>
-          </div>
-        </div>
-        <textarea class="code-input" id="code-input" spellcheck="false" placeholder="-- écris ton script Lua ici">${escapeHtml(luaCode)}</textarea>
-        <div class="autocomplete-box" id="autocomplete"></div>
-      </div>
-      <div class="console-pane">
-        <div class="pane-bar">
-          <span>Console</span>
-          <div class="tools">
-            <button class="tool-btn" id="copy-console">Copier</button>
-            <button class="tool-btn" id="clear-console">Vider</button>
-          </div>
-        </div>
-        <div class="console-body" id="console-body"><div class="sys">// La console s'affichera ici après exécution.</div></div>
-      </div>
-    </div>
-  `;
-
-  const input = document.getElementById('code-input');
-  const autoBox = document.getElementById('autocomplete');
-  input.addEventListener('input', ()=>{ luaCode = input.value; });
-
-  input.addEventListener('keyup', ()=>{
-    const val = input.value;
-    const pos = input.selectionStart;
-    const before = val.slice(0, pos);
-    const match = before.match(/[a-zA-Z_]+$/);
-    if(match && match[0].length >= 2){
-      const word = match[0];
-      const sugg = LUA_KEYWORDS.filter(k => k.startsWith(word) && k !== word);
-      if(sugg.length){
-        autoBox.style.display = 'block';
-        autoBox.style.left = '20px';
-        autoBox.style.top = '44px';
-        autoBox.innerHTML = sugg.slice(0,6).map(s => `<div class="autocomplete-item" data-word="${s}">${s}</div>`).join('');
-        autoBox.querySelectorAll('.autocomplete-item').forEach(item=>{
-          item.onclick = ()=>{
-            const w = item.dataset.word;
-            input.value = before.slice(0, before.length - word.length) + w + val.slice(pos);
-            luaCode = input.value;
-            autoBox.style.display = 'none';
-            input.focus();
-          };
-        });
-        return;
-      }
-    }
-    autoBox.style.display = 'none';
-  });
-  input.addEventListener('blur', ()=> setTimeout(()=> autoBox.style.display='none', 150));
-
-  document.getElementById('run-btn').onclick = async ()=>{
-    const body = document.getElementById('console-body');
-    const code = input.value;
-    const runBtn = document.getElementById('run-btn');
-    if(!code.trim()){
-      body.innerHTML = `<div class="err">Erreur : aucun code à exécuter.</div>`;
-      return;
-    }
-    runBtn.disabled = true;
-    runBtn.innerHTML = '<span class="spinner"></span>';
-    body.innerHTML = `<div class="sys">// Exécution en cours…</div>`;
-
-    try{
-      const res = await fetch('https://emkc.org/api/v2/piston/execute', {
-        method:'POST',
-        headers:{'Content-Type':'application/json'},
-        body: JSON.stringify({ language: 'lua', version: '*', files: [{ content: code }] })
-      });
-      const data = await res.json();
-      const out = (data.run && data.run.stdout) || '';
-      const errOut = (data.run && data.run.stderr) || '';
-      const compileErr = (data.compile && data.compile.stderr) || '';
-      let html = '';
-      if(out) html += `<div class="ok">${escapeHtml(out)}</div>`;
-      if(compileErr) html += `<div class="err">${escapeHtml(compileErr)}</div>`;
-      if(errOut) html += `<div class="err">${escapeHtml(errOut)}</div>`;
-      if(!out && !errOut && !compileErr) html = `<div class="sys">// Aucune sortie.</div>`;
-      body.innerHTML = html;
-    } catch(e){
-      body.innerHTML = `<div class="err">Erreur d'exécution : impossible de contacter l'API d'exécution. ${escapeHtml(e.message)}</div>`;
-    } finally{
-      runBtn.disabled = false;
-      runBtn.textContent = 'Exécuter';
-    }
-  };
-
-  document.getElementById('dl-btn').onclick = ()=>{
-    const blob = new Blob([input.value], {type:'text/plain'});
-    const a = document.createElement('a');
-    a.href = URL.createObjectURL(blob);
-    a.download = `script.lua`;
-    a.click();
-  };
-
-  document.getElementById('copy-console').onclick = ()=>{
-    navigator.clipboard.writeText(document.getElementById('console-body').innerText);
-    toast('Console copiée');
-  };
-  document.getElementById('clear-console').onclick = ()=>{
-    document.getElementById('console-body').innerHTML = `<div class="sys">// Console vidée.</div>`;
-  };
-}
-
-function renderDevRunEditor(host){
-  host.innerHTML = `
-    <div class="mode-switch" id="lang-tabs" style="margin-bottom:14px;">
-      <div class="mode-btn active" data-lang="python">Python</div>
-      <div class="mode-btn" data-lang="javascript">JavaScript</div>
-    </div>
-    <div class="editor-wrap">
-      <div class="editor-pane">
-        <div class="pane-bar">
-          <span>Script</span>
-          <div class="tools">
-            <button class="tool-btn" id="dl-btn">Télécharger</button>
-            <button class="tool-btn primary" id="run-btn">Exécuter</button>
-          </div>
-        </div>
-        <textarea class="code-input" id="code-input" spellcheck="false" placeholder="# écris ton script ici"></textarea>
-      </div>
-      <div class="console-pane">
-        <div class="pane-bar">
-          <span>Console</span>
-          <div class="tools">
-            <button class="tool-btn" id="copy-console">Copier</button>
-            <button class="tool-btn" id="clear-console">Vider</button>
-          </div>
-        </div>
-        <div class="console-body" id="console-body"><div class="sys">// La console s'affichera ici après exécution.</div></div>
-      </div>
-    </div>
-  `;
-
-  let currentLang = 'python';
-  host.querySelectorAll('#lang-tabs .mode-btn').forEach(el=>{
-    el.onclick = ()=>{
-      host.querySelectorAll('#lang-tabs .mode-btn').forEach(x=>x.classList.remove('active'));
-      el.classList.add('active');
-      currentLang = el.dataset.lang;
-    };
-  });
-
-  const input = document.getElementById('code-input');
-
-  document.getElementById('run-btn').onclick = async ()=>{
-    const body = document.getElementById('console-body');
-    const code = input.value;
-    const runBtn = document.getElementById('run-btn');
-    if(!code.trim()){
-      body.innerHTML = `<div class="err">Erreur : aucun code à exécuter.</div>`;
-      return;
-    }
-    runBtn.disabled = true;
-    runBtn.innerHTML = '<span class="spinner"></span>';
-    body.innerHTML = `<div class="sys">// Exécution en cours…</div>`;
-    try{
-      const res = await fetch('https://emkc.org/api/v2/piston/execute', {
-        method:'POST',
-        headers:{'Content-Type':'application/json'},
-        body: JSON.stringify({ language: currentLang, version: '*', files: [{ content: code }] })
-      });
-      const data = await res.json();
-      const out = (data.run && data.run.stdout) || '';
-      const errOut = (data.run && data.run.stderr) || '';
-      const compileErr = (data.compile && data.compile.stderr) || '';
-      let html = '';
-      if(out) html += `<div class="ok">${escapeHtml(out)}</div>`;
-      if(compileErr) html += `<div class="err">${escapeHtml(compileErr)}</div>`;
-      if(errOut) html += `<div class="err">${escapeHtml(errOut)}</div>`;
-      if(!out && !errOut && !compileErr) html = `<div class="sys">// Aucune sortie.</div>`;
-      body.innerHTML = html;
-    } catch(e){
-      body.innerHTML = `<div class="err">Erreur d'exécution : ${escapeHtml(e.message)}</div>`;
-    } finally{
-      runBtn.disabled = false;
-      runBtn.textContent = 'Exécuter';
-    }
-  };
-
-  document.getElementById('dl-btn').onclick = ()=>{
-    const ext = currentLang === 'python' ? 'py' : 'js';
-    const blob = new Blob([input.value], {type:'text/plain'});
-    const a = document.createElement('a');
-    a.href = URL.createObjectURL(blob);
-    a.download = `script.${ext}`;
-    a.click();
-  };
-  document.getElementById('copy-console').onclick = ()=>{
-    navigator.clipboard.writeText(document.getElementById('console-body').innerText);
-    toast('Console copiée');
-  };
-  document.getElementById('clear-console').onclick = ()=>{
-    document.getElementById('console-body').innerHTML = `<div class="sys">// Console vidée.</div>`;
-  };
-}
-
-/* ---------- Hosting ---------- */
-async function renderHosting(c){
-  c.innerHTML = `
-    <div class="content-header">
-      <h2>Sites hébergés</h2>
-      <p>Crée un mini-site HTML et reçois un lien réel, accessible depuis n'importe quel appareil.</p>
-    </div>
-    <div class="panel" style="margin-bottom:16px;">
-      <div class="field" style="margin-bottom:10px;">
-        <label>Nom du site</label>
-        <input id="site-name" type="text" placeholder="mon-super-site">
-      </div>
-      <div class="field" style="margin-bottom:10px;">
-        <label>Description (optionnelle)</label>
-        <input id="site-desc" type="text" placeholder="Un petit résumé de ce que fait ce site">
-      </div>
-      <div class="field" style="margin-bottom:10px;">
-        <label>Code HTML</label>
-        <textarea id="site-html" placeholder="<h1>Hello world</h1>" style="min-height:140px; font-family:'SF Mono',Menlo,monospace; font-size:13px;"></textarea>
-      </div>
-      <div style="display:flex; gap:8px; margin-bottom:14px;">
-        <button class="tool-btn" id="site-preview-btn">Aperçu</button>
-      </div>
-      <div id="site-preview-box" class="preview-frame-wrap hidden" style="margin-bottom:14px; min-height:280px;">
-        <iframe id="site-preview-frame"></iframe>
-      </div>
-      <button class="tool-btn primary" id="publish-btn">Publier</button>
-    </div>
-    <div id="sites-list"><div class="empty-state">Chargement…</div></div>
-  `;
-
-  document.getElementById('site-preview-btn').onclick = ()=>{
-    const box = document.getElementById('site-preview-box');
-    box.classList.toggle('hidden');
-    if(!box.classList.contains('hidden')){
-      document.getElementById('site-preview-frame').srcdoc = document.getElementById('site-html').value;
-    }
-  };
-
-  async function loadList(){
-    const list = document.getElementById('sites-list');
-    try{
-      const data = await api('/sites/mine');
-      const sites = data.sites || [];
-      if(!sites.length){
-        list.innerHTML = `<div class="empty-state"><div class="big">Aucun site publié</div>Crée ton premier site ci-dessus.</div>`;
-        return;
-      }
-      list.innerHTML = sites.map(s => `
-        <div class="site-card">
-          <div class="site-card-info">
-            <div class="name">${escapeHtml(s.name)}</div>
-            ${s.description ? `<div class="site-card-desc">${escapeHtml(s.description)}</div>` : ''}
-            <div class="link">${API_BASE}/site/${s.id}</div>
-            ${s.createdAt ? `<div class="site-card-date">Publié le ${new Date(s.createdAt).toLocaleDateString('fr-FR')}</div>` : ''}
-          </div>
-          <div class="actions">
-            <button class="tool-btn" data-copy="${s.id}">Copier le lien</button>
-            <button class="tool-btn" data-visit="${s.id}">Ouvrir</button>
-            <button class="tool-btn" data-del="${s.id}" style="color:var(--red);">Supprimer</button>
-          </div>
-        </div>
-      `).join('');
-      list.querySelectorAll('[data-copy]').forEach(btn=>{
-        btn.onclick = ()=>{
-          navigator.clipboard.writeText(`${API_BASE}/site/${btn.dataset.copy}`);
-          toast('Lien copié');
-        };
-      });
-      list.querySelectorAll('[data-visit]').forEach(btn=>{
-        btn.onclick = ()=> window.open(`${API_BASE}/site/${btn.dataset.visit}`, '_blank');
-      });
-      list.querySelectorAll('[data-del]').forEach(btn=>{
-        btn.onclick = async ()=>{
-          try{ await api('/sites/' + btn.dataset.del, { method:'DELETE' }); toast('Site supprimé'); loadList(); }
-          catch(e){ toast(e.message); }
-        };
-      });
-    } catch(e){
-      list.innerHTML = `<div class="empty-state"><div class="big" style="color:var(--red)">Impossible de charger tes sites</div>${escapeHtml(e.message)}</div>`;
-    }
-  }
-  loadList();
-
-  document.getElementById('publish-btn').onclick = async ()=>{
-    const name = document.getElementById('site-name').value.trim();
-    const description = document.getElementById('site-desc').value.trim();
-    const html = document.getElementById('site-html').value;
-    const btn = document.getElementById('publish-btn');
-    if(!name){ toast('Donne un nom au site'); return; }
-    if(!html.trim()){ toast('Le code HTML est vide'); return; }
-    btn.disabled = true;
-    btn.innerHTML = '<span class="spinner"></span>';
-    try{
-      await api('/sites', { method:'POST', body:{ name, html, description } });
-      document.getElementById('site-name').value = '';
-      document.getElementById('site-desc').value = '';
-      document.getElementById('site-html').value = '';
-      document.getElementById('site-preview-box').classList.add('hidden');
-      toast('Site publié');
-      loadList();
-    } catch(e){ toast(e.message); }
-    finally{ btn.disabled = false; btn.textContent = 'Publier'; }
-  };
-}
-
-/* ---------- Discord ---------- */
-function renderDiscord(c){
-  c.innerHTML = `
-    <div class="content-header">
-      <h2>Annonce Discord</h2>
-      <p>Envoie un embed complet via un webhook Discord. Le webhook est sauvegardé pour la prochaine fois.</p>
-    </div>
-    <div class="panel" style="max-width:600px;">
-      <div class="field">
-        <label>Webhook Discord</label>
-        <input id="wh-url" type="text" placeholder="https://discord.com/api/webhooks/..." value="${escapeHtml(state.savedWebhook)}">
-      </div>
-      <div class="field">
-        <label>Nom d'affichage du bot (optionnel)</label>
-        <input id="wh-username" type="text" placeholder="ex : SpyHub Bot">
-      </div>
-      <div class="field">
-        <label>Titre de l'embed</label>
-        <input id="embed-title" type="text" placeholder="Titre de l'annonce">
-      </div>
-      <div class="field">
-        <label>Description</label>
-        <textarea id="embed-desc" placeholder="Contenu de l'annonce..."></textarea>
-      </div>
-      <div class="field">
-        <label>Couleur de l'embed</label>
-        <input id="embed-color" type="color" value="#c9a8ff" style="height:42px; padding:4px; cursor:pointer;">
-      </div>
-      <div class="field">
-        <label>Image (URL, grande image en bas de l'embed)</label>
-        <input id="embed-image" type="text" placeholder="https://...">
-      </div>
-      <div class="field">
-        <label>Miniature (URL, petite image en haut à droite)</label>
-        <input id="embed-thumb" type="text" placeholder="https://...">
-      </div>
-      <div class="field">
-        <label>Nom de l'auteur (optionnel)</label>
-        <input id="embed-author" type="text" placeholder="ex : Équipe SpyHub">
-      </div>
-      <div class="field">
-        <label>Texte en pied de page (optionnel)</label>
-        <input id="embed-footer" type="text" placeholder="ex : Merci de nous suivre !">
-      </div>
-      <button class="tool-btn primary" id="send-btn">Envoyer l'annonce</button>
-      <div class="discord-preview" id="preview" style="display:none;">
-        <div class="dp-author" id="pv-author"></div>
-        <div class="dp-title" id="pv-title"></div>
-        <div class="dp-desc" id="pv-desc"></div>
-        <img id="pv-image" class="dp-image hidden">
-        <div class="dp-footer" id="pv-footer"></div>
-      </div>
-    </div>
-  `;
-
-  const fields = ['embed-title','embed-desc','embed-color','embed-image','embed-thumb','embed-author','embed-footer'].map(id => document.getElementById(id));
-
-  function updatePreview(){
-    const title = document.getElementById('embed-title').value;
-    const desc = document.getElementById('embed-desc').value;
-    const author = document.getElementById('embed-author').value;
-    const footer = document.getElementById('embed-footer').value;
-    const image = document.getElementById('embed-image').value;
-    const color = document.getElementById('embed-color').value;
-
-    if(!title && !desc){ document.getElementById('preview').style.display='none'; return; }
-    const preview = document.getElementById('preview');
-    preview.style.display='block';
-    preview.style.borderLeftColor = color;
-    document.getElementById('pv-author').textContent = author;
-    document.getElementById('pv-author').style.display = author ? 'block' : 'none';
-    document.getElementById('pv-title').textContent = title;
-    document.getElementById('pv-desc').textContent = desc;
-    document.getElementById('pv-footer').textContent = footer;
-    document.getElementById('pv-footer').style.display = footer ? 'block' : 'none';
-    const img = document.getElementById('pv-image');
-    if(image){ img.src = image; img.classList.remove('hidden'); } else { img.classList.add('hidden'); }
-  }
-  fields.forEach(f => f.oninput = updatePreview);
-
-  document.getElementById('send-btn').onclick = async ()=>{
-    const url = document.getElementById('wh-url').value.trim();
-    const username = document.getElementById('wh-username').value.trim();
-    const title = document.getElementById('embed-title').value.trim();
-    const desc = document.getElementById('embed-desc').value.trim();
-    const colorHex = document.getElementById('embed-color').value;
-    const image = document.getElementById('embed-image').value.trim();
-    const thumb = document.getElementById('embed-thumb').value.trim();
-    const author = document.getElementById('embed-author').value.trim();
-    const footer = document.getElementById('embed-footer').value.trim();
-    const btn = document.getElementById('send-btn');
-    if(!url){ toast('Colle un lien de webhook'); return; }
-    if(!title && !desc){ toast("Ajoute un titre ou une description"); return; }
-
-    const colorInt = parseInt(colorHex.replace('#',''), 16);
-    const embed = { title, description: desc, color: colorInt };
-    if(image) embed.image = { url: image };
-    if(thumb) embed.thumbnail = { url: thumb };
-    if(author) embed.author = { name: author };
-    if(footer) embed.footer = { text: footer };
-
-    btn.disabled = true;
-    btn.innerHTML = '<span class="spinner"></span>';
-    try{
-      const payload = { embeds:[embed] };
-      if(username) payload.username = username;
-      const res = await fetch(url, {
-        method:'POST', headers:{'Content-Type':'application/json'},
-        body: JSON.stringify(payload)
-      });
-      if(!res.ok) throw new Error('Discord a refusé la requête (lien invalide ?)');
-      localStorage.setItem('shgt_webhook', url);
-      state.savedWebhook = url;
-      toast('Annonce envoyée');
-    } catch(e){ toast(e.message); }
-    finally{ btn.disabled = false; btn.textContent = "Envoyer l'annonce"; }
-  };
-}
-
-/* ---------- Paramètres (avec sélecteur de couleur custom) ---------- */
-const PRESET_THEMES = [
-  { accent:"#B8B8BE", accent2:"#7A7A80" }, // gris neutre (défaut)
-  { accent:"#5E9EFF", accent2:"#2f5fb8" }, // bleu
-  { accent:"#5FD98A", accent2:"#2f9e5c" }, // vert
-  { accent:"#FF6B6B", accent2:"#b83c3c" }, // rouge
-  { accent:"#C77DFF", accent2:"#7b2fbf" }, // violet
-  { accent:"#FFB84D", accent2:"#c67c1e" }, // orange
-];
-
-function hslToHex(h, s, l){
-  s/=100; l/=100;
-  const k = n => (n + h/30) % 12;
-  const a = s * Math.min(l, 1-l);
-  const f = n => l - a * Math.max(-1, Math.min(k(n)-3, Math.min(9-k(n), 1)));
-  const toHex = x => Math.round(255*x).toString(16).padStart(2,'0');
-  return `#${toHex(f(0))}${toHex(f(8))}${toHex(f(4))}`;
-}
-
-function renderSettings(c){
-  c.innerHTML = `
-    <div class="content-header">
-      <h2>Paramètres</h2>
-      <p>Gère ton compte et personnalise l'interface.</p>
-    </div>
-
-    <div class="settings-section">
-      <h3>Couleur d'accent</h3>
-      <div class="panel">
-        <div class="swatch-row" id="swatch-row"></div>
-        <div class="picker-row">
-          <div class="picker-strip-wrap">
-            <div class="picker-strip" id="picker-strip"><div class="picker-handle" id="picker-handle"></div></div>
-            <div class="picker-label">Glisse pour choisir</div>
-          </div>
-          <div class="gradient-preview" id="gradient-preview"></div>
-        </div>
-      </div>
-    </div>
-
-    <div class="settings-section">
-      <h3>Changer le mot de passe</h3>
-      <div class="panel" style="max-width:420px;">
-        <div class="field">
-          <label>Mot de passe actuel</label>
-          <input id="cur-pass" type="password">
-        </div>
-        <div class="field">
-          <label>Nouveau mot de passe</label>
-          <input id="new-pass" type="password">
-        </div>
-        <button class="pill-btn run" id="change-pass-btn">Mettre à jour</button>
-      </div>
-    </div>
-
-    <div class="settings-section">
-      <h3>Webhook Discord enregistré</h3>
-      <div class="panel" style="max-width:420px;">
-        <div class="field" style="margin-bottom:12px;">
-          <input id="wh-set" type="text" value="${escapeHtml(state.savedWebhook)}" placeholder="Aucun webhook enregistré" readonly>
-        </div>
-        <button class="pill-btn danger" id="clear-wh-btn">Oublier ce webhook</button>
-      </div>
-    </div>
-
-    <div class="settings-section">
-      <h3>Densité d'affichage</h3>
-      <div class="panel" style="max-width:420px;">
-        <div class="mode-switch">
-          <div class="mode-btn ${state.density !== 'compact' ? 'active' : ''}" id="density-comfortable">Confortable</div>
-          <div class="mode-btn ${state.density === 'compact' ? 'active' : ''}" id="density-compact">Compact</div>
-        </div>
-      </div>
-    </div>
-
-    <div class="settings-section">
-      <h3>Format de l'heure</h3>
-      <div class="panel" style="max-width:420px;">
-        <div class="mode-switch">
-          <div class="mode-btn ${state.timeFormat !== '12h' ? 'active' : ''}" id="time-24h">24h</div>
-          <div class="mode-btn ${state.timeFormat === '12h' ? 'active' : ''}" id="time-12h">12h (AM/PM)</div>
-        </div>
-      </div>
-    </div>
-
-    <div class="settings-section">
-      <h3>Notifications de bienvenue</h3>
-      <div class="panel" style="max-width:420px; display:flex; align-items:center; justify-content:space-between;">
-        <span style="font-size:13.5px; color:var(--text-dim);">Afficher l'animation à chaque connexion</span>
-        <input type="checkbox" id="toggle-welcome-anim" ${state.skipWelcomeAnim ? '' : 'checked'}>
-      </div>
-    </div>
-
-    <div class="settings-section">
-      <h3>Exporter mes données</h3>
-      <div class="panel" style="max-width:420px;">
-        <div style="font-size:13px; color:var(--text-dim); margin-bottom:12px;">Télécharge une copie de ton profil enregistré localement (thème, notes, webhook).</div>
-        <button class="pill-btn" id="export-data-btn">Exporter en .json</button>
-      </div>
-    </div>
-
-    <div class="settings-section">
-      <h3>Vider le cache local</h3>
-      <div class="panel" style="max-width:420px;">
-        <div style="font-size:13px; color:var(--text-dim); margin-bottom:12px;">Efface les préférences stockées sur cet appareil (thème, webhook). Ne supprime pas ton compte.</div>
-        <button class="pill-btn danger" id="clear-cache-btn">Vider le cache local</button>
-      </div>
-    </div>
-
-    <div class="settings-section">
-      <h3>Zone dangereuse</h3>
-      <div class="panel" style="max-width:420px; border-color:rgba(255,107,107,0.3);">
-        <div style="font-size:13px; color:var(--text-dim); margin-bottom:12px;">La suppression de compte est définitive et ne peut pas être annulée.</div>
-        <button class="pill-btn danger" id="delete-account-btn">Supprimer mon compte</button>
-      </div>
-    </div>
-  `;
-
-  document.getElementById('density-comfortable').onclick = ()=>{ state.density = 'comfortable'; localStorage.setItem('shgt_density','comfortable'); renderSettings(c); };
-  document.getElementById('density-compact').onclick = ()=>{ state.density = 'compact'; localStorage.setItem('shgt_density','compact'); renderSettings(c); };
-  document.getElementById('time-24h').onclick = ()=>{ state.timeFormat = '24h'; localStorage.setItem('shgt_timeformat','24h'); renderSettings(c); };
-  document.getElementById('time-12h').onclick = ()=>{ state.timeFormat = '12h'; localStorage.setItem('shgt_timeformat','12h'); renderSettings(c); };
-  document.getElementById('toggle-welcome-anim').onchange = (e)=>{
-    state.skipWelcomeAnim = !e.target.checked;
-    localStorage.setItem('shgt_skip_welcome', state.skipWelcomeAnim ? '1' : '');
-  };
-  document.getElementById('export-data-btn').onclick = ()=>{
-    const exportData = {
-      username: state.user.username,
-      nickname: state.user.nickname || '',
-      theme: currentTheme,
-      webhook: state.savedWebhook,
-      notes: loadNotes ? loadNotes() : []
-    };
-    const blob = new Blob([JSON.stringify(exportData, null, 2)], {type:'application/json'});
-    const a = document.createElement('a');
-    a.href = URL.createObjectURL(blob);
-    a.download = 'spyhub-export.json';
-    a.click();
-    toast('Export téléchargé');
-  };
-  document.getElementById('clear-cache-btn').onclick = ()=>{
-    if(!confirm('Vider le cache local ? Ton compte ne sera pas supprimé.')) return;
-    const keep = ['shgt_session'];
-    Object.keys(localStorage).forEach(k => { if(k.startsWith('shgt_') && !keep.includes(k)) localStorage.removeItem(k); });
-    toast('Cache local vidé');
-  };
-  document.getElementById('delete-account-btn').onclick = async ()=>{
-    if(!confirm('Supprimer définitivement ton compte ? Cette action est irréversible.')) return;
-    if(!confirm('Es-tu vraiment sûr ? Toutes tes données seront perdues.')) return;
-    try{
-      await api('/admin/accounts/' + state.user.username, { method:'DELETE' });
-      clearSession();
-      toast('Compte supprimé');
-      renderLogin('login');
-    } catch(e){ toast('Impossible de supprimer le compte : ' + e.message); }
-  };
-
-  // Swatches (presets rapides)
-  const swatchRow = document.getElementById('swatch-row');
-  swatchRow.innerHTML = PRESET_THEMES.map((t,i) => `
-    <div class="swatch ${t.accent===currentTheme.accent ? 'sel':''}" data-i="${i}"
-         style="background:linear-gradient(120deg, ${t.accent}, ${t.accent2});"></div>
-  `).join('');
-  swatchRow.querySelectorAll('.swatch').forEach(el=>{
-    el.onclick = ()=>{
-      const t = PRESET_THEMES[el.dataset.i];
-      setTheme(t.accent, t.accent2);
-      swatchRow.querySelectorAll('.swatch').forEach(x=>x.classList.remove('sel'));
-      el.classList.add('sel');
-    };
-  });
-
-  // Picker strip (glisser pour choisir une teinte, façon sidenard iOS)
-  const strip = document.getElementById('picker-strip');
-  const handle = document.getElementById('picker-handle');
-
-  function setHandleFromEvent(clientY){
-    const rect = strip.getBoundingClientRect();
-    let pct = (clientY - rect.top) / rect.height;
-    pct = Math.max(0, Math.min(1, pct));
-    handle.style.top = (pct * 100) + '%';
-    const hue = pct * 360;
-    const accent = hslToHex(hue, 70, 65);
-    const accent2 = hslToHex(hue, 65, 40);
-    setTheme(accent, accent2, false);
-  }
-
-  let dragging = false;
-  strip.addEventListener('pointerdown', (e)=>{ dragging = true; setHandleFromEvent(e.clientY); strip.setPointerCapture(e.pointerId); });
-  strip.addEventListener('pointermove', (e)=>{ if(dragging) setHandleFromEvent(e.clientY); });
-  strip.addEventListener('pointerup', ()=>{ dragging = false; });
-  strip.addEventListener('pointercancel', ()=>{ dragging = false; });
-
-  function setTheme(accent, accent2, clearSwatchSel){
-    currentTheme = { accent, accent2 };
-    applyTheme(currentTheme);
-    localStorage.setItem('shgt_theme', JSON.stringify(currentTheme));
-    document.getElementById('gradient-preview').style.background = `linear-gradient(120deg, ${accent}, ${accent2})`;
-    if(clearSwatchSel !== false){
-      // rien de plus, presets gérés séparément
-    }
-  }
-
-  document.getElementById('change-pass-btn').onclick = async ()=>{
-    const cur = document.getElementById('cur-pass').value;
-    const neu = document.getElementById('new-pass').value;
-    if(!cur || !neu){ toast('Remplis les deux champs'); return; }
-    try{
-      await api('/auth/change-password', { method:'POST', body:{ current:cur, next:neu } });
-      toast('Mot de passe mis à jour');
-      document.getElementById('cur-pass').value = '';
-      document.getElementById('new-pass').value = '';
-    } catch(e){ toast(e.message); }
-  };
-
-  document.getElementById('clear-wh-btn').onclick = ()=>{
-    localStorage.removeItem('shgt_webhook');
-    state.savedWebhook = '';
-    document.getElementById('wh-set').value = '';
-    toast('Webhook oublié');
-  };
-}
-
-/* ---------- Dashboard Owner ---------- */
-async function renderAdmin(c){
-  c.innerHTML = `
-    <div class="content-header">
-      <h2>Dashboard Owner</h2>
-      <p>Vue globale sur les comptes, les sites hébergés et la modération de la plateforme.</p>
-    </div>
-    <div class="grid-cards" id="admin-cards" style="margin-bottom:20px;">
-      <div class="stat-card"><div class="label">Comptes</div><div class="value accent">…</div></div>
-      <div class="stat-card"><div class="label">Sites publiés</div><div class="value">…</div></div>
-    </div>
-
-    <div class="settings-section">
-      <h3>Mode maintenance</h3>
-      <div class="panel" style="max-width:480px;">
-        <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:14px;">
-          <span style="font-size:13.5px; color:var(--text-dim);">Statut</span>
-          <span id="maintenance-status" style="font-size:12px;">Chargement…</span>
-        </div>
-        <div class="field" style="margin-bottom:12px;">
-          <label>Message affiché aux utilisateurs</label>
-          <input id="maintenance-msg" type="text" placeholder="Le site est en maintenance, reviens plus tard.">
-        </div>
-        <div style="display:flex; gap:8px;">
-          <button class="pill-btn run" id="maintenance-on-btn">Activer</button>
-          <button class="pill-btn danger" id="maintenance-off-btn">Désactiver</button>
-        </div>
-      </div>
-    </div>
-
-    <div class="settings-section">
-      <h3>Bannir une IP</h3>
-      <div class="panel" style="max-width:480px;">
-        <div class="field" style="margin-bottom:10px;">
-          <label>Adresse IP</label>
-          <input id="ban-ip-input" type="text" placeholder="ex : 203.0.113.42">
-        </div>
-        <div class="field" style="margin-bottom:12px;">
-          <label>Durée</label>
-          <select id="ban-ip-duration" class="lang-select">
-            <option value="3">Temporaire — 3 heures</option>
-            <option value="24">Temporaire — 24 heures</option>
-            <option value="permanent">Permanent</option>
-          </select>
-        </div>
-        <button class="pill-btn danger" id="ban-ip-btn">Bannir cette IP</button>
-      </div>
-    </div>
-
-    <div class="settings-section">
-      <h3>IPs actuellement bannies</h3>
-      <div class="panel" id="banned-ips-list"><div class="empty-state">Chargement…</div></div>
-    </div>
-
-    <div class="settings-section">
-      <h3>Comptes</h3>
-      <div class="panel">
-        <div style="overflow-x:auto;">
-          <table class="table" id="accounts-table">
-            <thead><tr><th>Pseudo</th><th>Rôle</th><th>Sites</th><th>Dernière connexion</th><th></th></tr></thead>
-            <tbody><tr><td colspan="5">Chargement…</td></tr></tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-
-    <div class="settings-section">
-      <h3>Outils avancés</h3>
-      <div class="panel" style="max-width:520px;">
-        <div class="field" style="margin-bottom:10px;">
-          <label>Pseudo cible</label>
-          <input id="target-username" type="text" placeholder="pseudo du membre">
-        </div>
-        <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:14px;">
-          <button class="tool-btn" id="promote-btn">Promouvoir Owner</button>
-          <button class="tool-btn" id="demote-btn">Rétrograder Membre</button>
-          <button class="tool-btn" id="wipe-session-btn">Déconnecter</button>
-          <button class="tool-btn" id="skip-cooldown-btn">Skip son cooldown</button>
-        </div>
-        <div class="field" style="margin-bottom:10px;">
-          <label>Nouveau mot de passe (réinitialisation)</label>
-          <input id="reset-pass-input" type="text" placeholder="nouveau mot de passe">
-        </div>
-        <button class="tool-btn" id="reset-pass-btn" style="margin-bottom:16px;">Réinitialiser son mot de passe</button>
-        <div style="border-top:1px solid var(--border-soft); padding-top:14px; display:flex; gap:8px; flex-wrap:wrap;">
-          <button class="tool-btn" id="clear-chat-btn" style="color:var(--red);">Vider tout le chat</button>
-        </div>
-      </div>
-    </div>
-  `;
-
-  // ---- Vue d'ensemble + comptes ----
-  try{
-    const data = await api('/admin/overview');
-    document.querySelector('#admin-cards .stat-card .value.accent').textContent = data.accounts.length;
-    document.querySelectorAll('#admin-cards .stat-card .value')[1].textContent = data.totalSites;
-
-    const tbody = document.querySelector('#accounts-table tbody');
-    tbody.innerHTML = data.accounts.map(a => `
-      <tr>
-        <td>${escapeHtml(a.username)}</td>
-        <td><span class="badge ${a.role}">${a.role === 'owner' ? 'Owner' : 'Membre'}</span></td>
-        <td>${a.siteCount}</td>
-        <td style="font-size:12px; color:var(--text-faint);">${a.lastLoginAt ? new Date(a.lastLoginAt).toLocaleString('fr-FR') : '—'}${a.cooldownUntil && a.cooldownUntil > Date.now() ? '<br><span style="color:var(--red);">En cooldown</span>' : ''}</td>
-        <td>${a.role !== 'owner' ? `
-          <button class="tool-btn" data-ban-user="${a.username}">Bannir</button>
-          <button class="tool-btn" data-ban-ip="${a.username}" style="color:var(--red);">Ban IP</button>
-          <button class="tool-btn" data-del="${a.username}" style="color:var(--red);">Supprimer</button>
-        ` : ''}</td>
-      </tr>
-    `).join('');
-
-    tbody.querySelectorAll('[data-ban-ip]').forEach(btn=>{
-      btn.onclick = async ()=>{
-        if(!confirm(`Bannir toutes les IPs connues de ${btn.dataset.banIp} ?`)) return;
-        try{ await api('/admin/ban-user-ip', { method:'POST', body:{ username: btn.dataset.banIp } }); toast('IP(s) bannie(s)'); renderAdmin(c); }
-        catch(e){ toast(e.message); }
-      };
-    });
-
-    tbody.querySelectorAll('[data-del]').forEach(btn=>{
-      btn.onclick = async ()=>{
-        if(!confirm(`Supprimer le compte ${btn.dataset.del} ?`)) return;
-        try{ await api('/admin/accounts/' + btn.dataset.del, { method:'DELETE' }); toast('Compte supprimé'); renderAdmin(c); }
-        catch(e){ toast(e.message); }
-      };
-    });
-    tbody.querySelectorAll('[data-ban-user]').forEach(btn=>{
-      btn.onclick = async ()=>{
-        if(!confirm(`Bannir le compte ${btn.dataset.banUser} ?`)) return;
-        try{ await api('/admin/ban-user', { method:'POST', body:{ username: btn.dataset.banUser } }); toast('Compte banni'); renderAdmin(c); }
-        catch(e){ toast(e.message); }
-      };
-    });
-  } catch(e){
-    document.querySelector('#accounts-table tbody').innerHTML = `<tr><td colspan="5" style="color:var(--red)">${escapeHtml(e.message)}</td></tr>`;
-  }
-
-  // ---- Mode maintenance ----
-  try{
-    const m = await api('/settings/maintenance');
-    document.getElementById('maintenance-status').innerHTML = m.maintenance
-      ? `<span style="color:var(--red)">Activé</span>`
-      : `<span style="color:var(--green)">Désactivé</span>`;
-    document.getElementById('maintenance-msg').value = m.message || '';
-  } catch(e){
-    document.getElementById('maintenance-status').textContent = '—';
-  }
-
-  document.getElementById('maintenance-on-btn').onclick = async ()=>{
-    const message = document.getElementById('maintenance-msg').value.trim();
-    try{
-      await api('/settings/maintenance', { method:'POST', body:{ enabled:true, message } });
-      toast('Maintenance activée');
-      renderAdmin(c);
-    } catch(e){ toast(e.message); }
-  };
-  document.getElementById('maintenance-off-btn').onclick = async ()=>{
-    try{
-      await api('/settings/maintenance', { method:'POST', body:{ enabled:false, message:'' } });
-      toast('Maintenance désactivée');
-      renderAdmin(c);
-    } catch(e){ toast(e.message); }
-  };
-
-  // ---- Ban IP ----
-  document.getElementById('ban-ip-btn').onclick = async ()=>{
-    const ip = document.getElementById('ban-ip-input').value.trim();
-    const duration = document.getElementById('ban-ip-duration').value;
-    if(!ip){ toast("Renseigne une adresse IP"); return; }
-    try{
-      await api('/admin/ban-ip', {
-        method:'POST',
-        body: duration === 'permanent' ? { ip, permanent:true } : { ip, permanent:false, hours: Number(duration) }
-      });
-      toast('IP bannie');
-      document.getElementById('ban-ip-input').value = '';
-      loadBannedIps();
-    } catch(e){ toast(e.message); }
-  };
-
-  async function loadBannedIps(){
-    const box = document.getElementById('banned-ips-list');
-    try{
-      const data = await api('/admin/bans');
-      const ips = data.bannedIps || [];
-      if(!ips.length){
-        box.innerHTML = `<div class="empty-state">Aucune IP bannie actuellement.</div>`;
-        return;
-      }
-      box.innerHTML = ips.map(b => `
-        <div class="site-row">
-          <div>
-            <div class="name">${escapeHtml(b.ip)}</div>
-            <div class="link">${b.permanent ? 'Bannissement permanent' : ("Jusqu'au " + new Date(b.expires).toLocaleString('fr-FR'))}</div>
-          </div>
-          <button class="pill-btn" data-unban-ip="${b.ip}">Débannir</button>
-        </div>
-      `).join('');
-      box.querySelectorAll('[data-unban-ip]').forEach(btn=>{
-        btn.onclick = async ()=>{
-          try{ await api('/admin/unban-ip', { method:'POST', body:{ ip: btn.dataset.unbanIp } }); toast('IP débannie'); loadBannedIps(); }
-          catch(e){ toast(e.message); }
-        };
-      });
-    } catch(e){
-      box.innerHTML = `<div class="empty-state" style="color:var(--red)">Impossible de charger.</div>`;
-    }
-  }
-  loadBannedIps();
-
-  // ---- Outils avancés (7 nouvelles fonctions) ----
-  function getTarget(){
-    const u = document.getElementById('target-username').value.trim();
-    if(!u) toast('Renseigne un pseudo cible');
-    return u;
-  }
-
-  document.getElementById('promote-btn').onclick = async ()=>{
-    const u = getTarget(); if(!u) return;
-    try{ await api('/admin/promote', { method:'POST', body:{ username:u } }); toast(u + ' est maintenant Owner'); renderAdmin(c); }
-    catch(e){ toast(e.message); }
-  };
-  document.getElementById('demote-btn').onclick = async ()=>{
-    const u = getTarget(); if(!u) return;
-    try{ await api('/admin/demote', { method:'POST', body:{ username:u } }); toast(u + ' est maintenant Membre'); renderAdmin(c); }
-    catch(e){ toast(e.message); }
-  };
-  document.getElementById('wipe-session-btn').onclick = async ()=>{
-    const u = getTarget(); if(!u) return;
-    try{ await api('/admin/wipe-sessions', { method:'POST', body:{ username:u } }); toast(u + ' a été déconnecté'); }
-    catch(e){ toast(e.message); }
-  };
-  document.getElementById('skip-cooldown-btn').onclick = async ()=>{
-    const u = getTarget(); if(!u) return;
-    try{ await api('/admin/skip-cooldown', { method:'POST', body:{ username:u } }); toast('Cooldown levé pour ' + u); renderAdmin(c); }
-    catch(e){ toast(e.message); }
-  };
-  document.getElementById('reset-pass-btn').onclick = async ()=>{
-    const u = getTarget(); if(!u) return;
-    const newPassword = document.getElementById('reset-pass-input').value.trim();
-    if(!newPassword){ toast('Renseigne un nouveau mot de passe'); return; }
-    try{
-      await api('/admin/reset-password', { method:'POST', body:{ username:u, newPassword } });
-      toast('Mot de passe réinitialisé pour ' + u);
-      document.getElementById('reset-pass-input').value = '';
-    } catch(e){ toast(e.message); }
-  };
-  document.getElementById('clear-chat-btn').onclick = async ()=>{
-    if(!confirm('Vider tout le chat de la plateforme ?')) return;
-    try{ await api('/admin/clear-chat', { method:'POST' }); toast('Chat vidé'); }
-    catch(e){ toast(e.message); }
-  };
-}
-
-/* =========================================================
-   BOOT — restaure la session si elle existe déjà
-   ========================================================= */
-try{
-  const savedSession = loadSession();
-  if(savedSession && savedSession.token && savedSession.username && savedSession.role){
-    state.user = savedSession;
-    renderMain();
-  } else {
-    renderLogin('login');
-  }
-} catch(bootErr){
-  document.getElementById('app').innerHTML = '<div style="color:#FF6B6B; background:#000; padding:40px; font-family:monospace; font-size:14px; white-space:pre-wrap;">ERREUR AU DÉMARRAGE :\n\n' + bootErr.message + '\n\n' + (bootErr.stack || '') + '</div>';
-}
 </script>
 </body>
 </html>
