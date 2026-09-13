@@ -12,329 +12,256 @@
   --b:rgba(255,255,255,0.07);--b2:rgba(120,70,255,0.22);
   --p1:#a78bfa;--p2:#7c3aed;--p3:#c4b5fd;--p4:#ddd6fe;
   --tx:#ede9fe;--mt:rgba(237,233,254,0.38);
-  --red:#f87171;--grn:#34d399;--amb:#fbbf24;
+  --red:#f87171;--grn:#34d399;--amb:#fbbf24;--blu:#60a5fa;
   --mono:'JetBrains Mono',monospace;
 }
 body{font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--tx);min-height:100vh;overflow-x:hidden}
 #app{position:relative;z-index:1}
 
-/* ══════════════════════════════════════════
-   AUTH — Redesign complet
-══════════════════════════════════════════ */
-#auth{
-  min-height:100vh;
-  display:flex;
-  align-items:stretch;
-  position:relative;
-  overflow:hidden;
-}
-
-/* Fond global animé */
-#auth::before{
-  content:'';position:absolute;inset:0;
-  background:
-    radial-gradient(ellipse 60% 70% at 0% 50%, rgba(90,30,180,0.35) 0%, transparent 55%),
-    radial-gradient(ellipse 50% 60% at 100% 20%, rgba(150,80,255,0.2) 0%, transparent 50%),
-    radial-gradient(ellipse 40% 40% at 60% 80%, rgba(60,10,120,0.25) 0%, transparent 55%);
-  pointer-events:none;z-index:0;
-}
-
-/* Grille de points */
-#auth::after{
-  content:'';position:absolute;inset:0;
-  background-image:radial-gradient(circle, rgba(130,80,255,0.14) 1px, transparent 1px);
-  background-size:24px 24px;
-  pointer-events:none;z-index:0;
-}
-
-/* ── Panneau gauche (terminal/info) ── */
-.auth-left{
-  flex:1;
-  display:flex;
-  flex-direction:column;
-  justify-content:center;
-  padding:64px 56px;
-  position:relative;
-  z-index:1;
-}
-
-.auth-brand{
-  display:flex;align-items:center;gap:10px;
-  margin-bottom:60px;
-}
-.auth-brand .logo{
-  width:34px;height:34px;
-  background:linear-gradient(135deg,var(--p2),#4c1d95);
-  border-radius:9px;
-  display:flex;align-items:center;justify-content:center;
-  box-shadow:0 4px 20px rgba(100,40,200,0.4);
-}
+/* ── AUTH ── */
+#auth{min-height:100vh;display:flex;align-items:stretch;position:relative;overflow:hidden;}
+#auth::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 60% 70% at 0% 50%,rgba(90,30,180,0.35) 0%,transparent 55%),radial-gradient(ellipse 50% 60% at 100% 20%,rgba(150,80,255,0.2) 0%,transparent 50%),radial-gradient(ellipse 40% 40% at 60% 80%,rgba(60,10,120,0.25) 0%,transparent 55%);pointer-events:none;z-index:0;}
+#auth::after{content:'';position:absolute;inset:0;background-image:radial-gradient(circle,rgba(130,80,255,0.14) 1px,transparent 1px);background-size:24px 24px;pointer-events:none;z-index:0;}
+.auth-topnav{position:absolute;top:0;left:0;right:0;z-index:10;display:flex;align-items:center;justify-content:space-between;padding:18px 32px}
+.auth-topnav .ver{font-family:var(--mono);font-size:11px;color:var(--mt);letter-spacing:.5px}
+.auth-topnav .links{display:flex;align-items:center;gap:20px}
+.auth-topnav .links a{font-size:12px;color:var(--mt);text-decoration:none;transition:color .15s}
+.auth-topnav .links a:hover{color:var(--p3)}
+.auth-left{flex:1;display:flex;flex-direction:column;justify-content:center;padding:64px 56px;padding-top:96px;position:relative;z-index:1;}
+.auth-brand{display:flex;align-items:center;gap:10px;margin-bottom:48px;}
+.auth-brand .logo{width:34px;height:34px;background:linear-gradient(135deg,var(--p2),#4c1d95);border-radius:9px;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 20px rgba(100,40,200,0.4);}
 .auth-brand .logo svg{width:18px;height:18px;fill:none;stroke:#fff;stroke-width:2}
 .auth-brand span{font-size:16px;font-weight:600;color:var(--tx);letter-spacing:-.1px}
-
-.auth-tagline{
-  margin-bottom:48px;
-}
-.auth-tagline h2{
-  font-size:32px;font-weight:600;letter-spacing:-.5px;
-  line-height:1.2;color:var(--tx);
-  margin-bottom:12px;
-}
-.auth-tagline h2 em{
-  font-style:normal;
-  background:linear-gradient(135deg,var(--p1),var(--p4));
-  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
-}
-.auth-tagline p{font-size:14px;color:var(--mt);line-height:1.6;max-width:340px}
-
-/* Terminal */
-.terminal{
-  background:rgba(0,0,0,0.45);
-  border:1px solid rgba(255,255,255,0.07);
-  border-radius:14px;
-  overflow:hidden;
-  max-width:420px;
-  backdrop-filter:blur(12px);
-  box-shadow:0 20px 60px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.05);
-}
-.term-bar{
-  display:flex;align-items:center;gap:6px;
-  padding:10px 14px;
-  background:rgba(255,255,255,0.03);
-  border-bottom:1px solid rgba(255,255,255,0.06);
-}
+.auth-tagline{margin-bottom:36px;}
+.auth-tagline h2{font-size:30px;font-weight:600;letter-spacing:-.5px;line-height:1.2;color:var(--tx);margin-bottom:10px;}
+.auth-tagline h2 em{font-style:normal;background:linear-gradient(135deg,var(--p1),var(--p4));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.auth-tagline p{font-size:13px;color:var(--mt);line-height:1.6;max-width:340px}
+.terminal{background:rgba(0,0,0,0.45);border:1px solid rgba(255,255,255,0.07);border-radius:14px;overflow:hidden;max-width:400px;backdrop-filter:blur(12px);box-shadow:0 20px 60px rgba(0,0,0,0.4),inset 0 1px 0 rgba(255,255,255,0.05);}
+.term-bar{display:flex;align-items:center;gap:6px;padding:10px 14px;background:rgba(255,255,255,0.03);border-bottom:1px solid rgba(255,255,255,0.06);}
 .term-dot{width:10px;height:10px;border-radius:50%}
-.term-dot:nth-child(1){background:#ff5f57}
-.term-dot:nth-child(2){background:#febc2e}
-.term-dot:nth-child(3){background:#28c840}
-.term-title{
-  font-family:var(--mono);font-size:11px;color:var(--mt);
-  margin-left:auto;margin-right:auto;
-}
-.term-body{padding:18px;font-family:var(--mono);font-size:12px;line-height:1.8}
+.term-dot:nth-child(1){background:#ff5f57}.term-dot:nth-child(2){background:#febc2e}.term-dot:nth-child(3){background:#28c840}
+.term-title{font-family:var(--mono);font-size:11px;color:var(--mt);margin-left:auto;margin-right:auto;}
+.term-body{padding:16px;font-family:var(--mono);font-size:12px;line-height:1.8}
 .term-line{display:flex;gap:8px;margin-bottom:2px}
-.term-prompt{color:var(--p1);user-select:none}
-.term-cmd{color:rgba(237,233,254,0.75)}
-.term-out{color:var(--mt);padding-left:16px}
-.term-out.ok{color:var(--grn)}
-.term-out.err{color:var(--red)}
-.term-out.dim{color:rgba(237,233,254,0.28)}
-.term-cursor{
-  display:inline-block;width:7px;height:13px;
-  background:var(--p1);border-radius:1px;
-  animation:blink 1.1s steps(1) infinite;
-  vertical-align:middle;margin-left:2px;
-}
+.term-prompt{color:var(--p1);user-select:none}.term-cmd{color:rgba(237,233,254,0.75)}
+.term-out{color:var(--mt);padding-left:16px}.term-out.ok{color:var(--grn)}.term-out.dim{color:rgba(237,233,254,0.28)}
+.term-cursor{display:inline-block;width:7px;height:13px;background:var(--p1);border-radius:1px;animation:blink 1.1s steps(1) infinite;vertical-align:middle;margin-left:2px;}
 @keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
-
-/* Stats row */
-.auth-stats{
-  display:flex;gap:32px;
-  margin-top:40px;
-}
-.auth-stat .val{font-size:20px;font-weight:600;color:var(--tx)}
-.auth-stat .lbl{font-size:11px;color:var(--mt);margin-top:2px}
-
-/* ── Panneau droit (form) ── */
-.auth-right{
-  width:420px;flex-shrink:0;
-  display:flex;align-items:center;justify-content:center;
-  padding:40px 40px;
-  position:relative;z-index:1;
-  border-left:1px solid rgba(255,255,255,0.05);
-  background:rgba(5,5,14,0.6);
-  backdrop-filter:blur(32px);
-}
-
+.auth-right{width:420px;flex-shrink:0;display:flex;align-items:center;justify-content:center;padding:40px;position:relative;z-index:1;border-left:1px solid rgba(255,255,255,0.05);background:rgba(5,5,14,0.6);backdrop-filter:blur(32px);}
 .auth-form-wrap{width:100%;max-width:340px}
-
-.form-header{margin-bottom:32px}
-.form-header .eyebrow{
-  font-family:var(--mono);
-  font-size:10px;color:var(--p1);
-  letter-spacing:1.5px;text-transform:uppercase;
-  margin-bottom:8px;
-}
-.form-header h3{font-size:22px;font-weight:600;color:var(--tx);letter-spacing:-.2px}
-.form-header p{font-size:13px;color:var(--mt);margin-top:5px;line-height:1.5}
-
-/* Tab toggle */
-.tsw{
-  display:flex;
-  background:rgba(255,255,255,0.03);
-  border:1px solid rgba(255,255,255,0.07);
-  border-radius:10px;padding:3px;
-  margin-bottom:28px;
-}
-.tbtn{
-  flex:1;padding:9px;background:none;border:none;
-  color:var(--mt);font-size:12px;font-weight:500;
-  cursor:pointer;border-radius:8px;transition:all .18s;
-  font-family:inherit;
-}
-.tbtn.on{
-  background:rgba(100,40,200,0.28);
-  color:var(--p3);
-  box-shadow:inset 0 1px 0 rgba(255,255,255,0.06);
-}
-
-/* Fields */
-.fld{margin-bottom:16px}
-.fld label{
-  display:flex;align-items:center;justify-content:space-between;
-  font-size:11px;font-weight:500;color:var(--mt);
-  margin-bottom:7px;letter-spacing:.3px;
-}
-.fld label span{font-size:10px;color:var(--p1);cursor:pointer}
+.form-header{margin-bottom:28px}
+.form-header .eyebrow{font-family:var(--mono);font-size:10px;color:var(--p1);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:8px;}
+.form-header h3{font-size:20px;font-weight:600;color:var(--tx);letter-spacing:-.2px}
+.form-header p{font-size:12px;color:var(--mt);margin-top:4px;line-height:1.5}
+.tsw{display:flex;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:10px;padding:3px;margin-bottom:24px;}
+.tbtn{flex:1;padding:9px;background:none;border:none;color:var(--mt);font-size:12px;font-weight:500;cursor:pointer;border-radius:8px;transition:all .18s;font-family:inherit;}
+.tbtn.on{background:rgba(100,40,200,0.28);color:var(--p3);box-shadow:inset 0 1px 0 rgba(255,255,255,0.06);}
+.fld{margin-bottom:14px}
+.fld label{display:flex;align-items:center;justify-content:space-between;font-size:11px;font-weight:500;color:var(--mt);margin-bottom:6px;letter-spacing:.3px;}
 .inp-wrap{position:relative}
-.inp-wrap .ico{
-  position:absolute;left:13px;top:50%;transform:translateY(-50%);
-  width:15px;height:15px;opacity:.35;pointer-events:none;
-}
-.fld input{
-  width:100%;padding:11px 13px 11px 38px;
-  background:rgba(255,255,255,0.04);
-  border:1px solid rgba(255,255,255,0.08);
-  border-radius:10px;color:var(--tx);
-  font-size:13px;font-family:inherit;
-  outline:none;transition:border-color .18s,box-shadow .18s,background .18s;
-}
-.fld input:focus{
-  border-color:rgba(120,70,255,0.55);
-  box-shadow:0 0 0 3px rgba(100,40,200,0.12);
-  background:rgba(255,255,255,0.055);
-}
+.inp-wrap .ico{position:absolute;left:12px;top:50%;transform:translateY(-50%);width:14px;height:14px;opacity:.3;pointer-events:none;}
+.fld input{width:100%;padding:11px 12px 11px 36px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:10px;color:var(--tx);font-size:13px;font-family:inherit;outline:none;transition:border-color .18s,box-shadow .18s,background .18s;}
+.fld input:focus{border-color:rgba(120,70,255,0.55);box-shadow:0 0 0 3px rgba(100,40,200,0.12);background:rgba(255,255,255,0.055);}
 .fld input::placeholder{color:rgba(237,233,254,0.18)}
-
-/* Security notice */
-.sec-notice{
-  display:flex;align-items:center;gap:8px;
-  padding:10px 12px;
-  background:rgba(52,211,153,0.07);
-  border:1px solid rgba(52,211,153,0.15);
-  border-radius:9px;
-  margin-bottom:20px;
-  font-size:11px;color:rgba(52,211,153,0.8);
-}
-.sec-notice svg{width:13px;height:13px;flex-shrink:0;stroke:currentColor;fill:none;stroke-width:2}
-
-/* Bouton principal */
-.btn-main{
-  width:100%;
-  padding:13px;
-  background:linear-gradient(135deg,#6d28d9,#7c3aed,#8b5cf6);
-  border:none;border-radius:11px;
-  color:#fff;font-size:13px;font-weight:600;font-family:inherit;
-  cursor:pointer;position:relative;overflow:hidden;
-  box-shadow:0 4px 20px rgba(100,40,200,0.35),0 1px 0 rgba(255,255,255,0.1) inset;
-  transition:all .2s;
-  letter-spacing:.1px;
-}
-.btn-main::before{
-  content:'';position:absolute;inset:0;
-  background:linear-gradient(135deg,rgba(255,255,255,0.1),transparent);
-  pointer-events:none;
-}
-.btn-main:hover{
-  transform:translateY(-1px);
-  box-shadow:0 8px 28px rgba(100,40,200,0.45),0 1px 0 rgba(255,255,255,0.1) inset;
-}
-.btn-main:active{transform:none;box-shadow:0 2px 10px rgba(100,40,200,0.3)}
-
-/* Divider */
-.divider{
-  display:flex;align-items:center;gap:12px;
-  margin:20px 0;
-  font-size:11px;color:var(--mt);
-}
-.divider::before,.divider::after{content:'';flex:1;height:1px;background:rgba(255,255,255,0.06)}
-
-/* Terms */
-.terms{
-  font-size:11px;color:var(--mt);text-align:center;
-  margin-top:20px;line-height:1.6;
-}
-.terms a{color:var(--p1);text-decoration:none}
-.terms a:hover{text-decoration:underline}
-
-/* msg */
-.msg{margin-top:14px;padding:10px 13px;border-radius:9px;font-size:12px;font-weight:500;display:none}
+.sec-notice{display:flex;align-items:center;gap:8px;padding:9px 12px;background:rgba(52,211,153,0.07);border:1px solid rgba(52,211,153,0.15);border-radius:9px;margin-bottom:16px;font-size:11px;color:rgba(52,211,153,0.8);}
+.sec-notice svg{width:12px;height:12px;flex-shrink:0;stroke:currentColor;fill:none;stroke-width:2}
+.btn-main{width:100%;padding:12px;background:linear-gradient(135deg,#6d28d9,#7c3aed,#8b5cf6);border:none;border-radius:11px;color:#fff;font-size:13px;font-weight:600;font-family:inherit;cursor:pointer;position:relative;overflow:hidden;box-shadow:0 4px 20px rgba(100,40,200,0.35),0 1px 0 rgba(255,255,255,0.1) inset;transition:all .2s;}
+.btn-main::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,0.1),transparent);pointer-events:none;}
+.btn-main:hover{transform:translateY(-1px);box-shadow:0 8px 28px rgba(100,40,200,0.45)}
+.btn-main:active{transform:none}
+.terms{font-size:11px;color:var(--mt);text-align:center;margin-top:16px;line-height:1.6;}
+.terms a{color:var(--p1);text-decoration:none}.terms a:hover{text-decoration:underline}
+.msg{margin-top:12px;padding:10px 13px;border-radius:9px;font-size:12px;font-weight:500;display:none}
 .msg.err{background:rgba(248,113,113,0.09);border:1px solid rgba(248,113,113,0.2);color:var(--red)}
 .msg.suc{background:rgba(52,211,153,0.09);border:1px solid rgba(52,211,153,0.2);color:var(--grn)}
 .msg.show{display:block}
 
-/* ── Responsive mobile ── */
-@media(max-width:860px){
-  #auth{flex-direction:column}
-  .auth-left{padding:40px 24px 24px;border-bottom:1px solid rgba(255,255,255,0.05)}
-  .terminal{display:none}
-  .auth-right{width:100%;border-left:none;padding:28px 24px 40px}
-  .auth-stats{display:none}
-  .auth-tagline h2{font-size:24px}
-}
+/* ToS Modal */
+.modal-bg{display:none;position:fixed;inset:0;z-index:200;align-items:center;justify-content:center;padding:24px}
+.modal-bg.show{display:flex}
+.modal-overlay{position:absolute;inset:0;background:rgba(0,0,0,0.6);backdrop-filter:blur(8px)}
+.modal-box{position:relative;z-index:1;width:100%;max-width:520px;background:rgba(10,7,22,0.96);border:1px solid rgba(120,70,255,0.25);border-radius:18px;padding:32px;backdrop-filter:blur(40px);box-shadow:0 32px 80px rgba(0,0,0,0.6)}
+.modal-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px}
+.modal-close{background:rgba(255,255,255,0.05);border:1px solid var(--b);border-radius:8px;color:var(--mt);width:30px;height:30px;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center}
+.modal-body{font-size:12px;color:var(--mt);line-height:1.8;max-height:340px;overflow-y:auto;padding-right:6px}
+.modal-body h4{color:var(--tx);font-weight:500;margin-bottom:6px;margin-top:14px}
+.modal-body h4:first-child{margin-top:0}
+.modal-ft{margin-top:20px;padding-top:14px;border-top:1px solid var(--b);font-size:11px;color:var(--mt)}
 
-/* ══════════════════════════════════════════
-   DASHBOARD (inchangé, styles minifiés)
-══════════════════════════════════════════ */
+/* ── DASHBOARD GLOBAL ── */
 #dash{display:none;min-height:100vh}
-body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(circle,rgba(130,80,255,0.13) 1px,transparent 1px);background-size:26px 26px;pointer-events:none;z-index:0;opacity:.45}
-.topbar{position:sticky;top:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:0 24px;height:54px;background:rgba(5,5,14,0.88);border-bottom:1px solid var(--b);backdrop-filter:blur(20px)}
+body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(circle,rgba(130,80,255,0.1) 1px,transparent 1px);background-size:26px 26px;pointer-events:none;z-index:0;opacity:.4}
+.topbar{position:sticky;top:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:0 24px;height:54px;background:rgba(5,5,14,0.9);border-bottom:1px solid var(--b);backdrop-filter:blur(20px)}
 .tbrand{display:flex;align-items:center;gap:9px;font-size:14px;font-weight:600;color:var(--tx)}
 .pip{width:6px;height:6px;background:var(--grn);border-radius:50%;box-shadow:0 0 6px var(--grn)}
-.tright{display:flex;align-items:center;gap:9px}
+.tright{display:flex;align-items:center;gap:8px}
 .badge{padding:3px 10px;border-radius:20px;font-size:10px;font-weight:500}
-.bo{background:rgba(167,139,250,0.12);border:1px solid rgba(167,139,250,0.28);color:var(--p3)}
-.ba{background:rgba(100,40,200,0.1);border:1px solid rgba(100,40,200,0.25);color:var(--p1)}
-.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:10px 16px;border:none;border-radius:9px;font-size:12px;font-weight:500;font-family:inherit;cursor:pointer;transition:all .15s;white-space:nowrap}
+.b-owner{background:rgba(167,139,250,0.12);border:1px solid rgba(167,139,250,0.28);color:var(--p3)}
+.b-admin{background:rgba(100,40,200,0.1);border:1px solid rgba(100,40,200,0.25);color:var(--p1)}
+.b-premium{background:rgba(251,191,36,0.12);border:1px solid rgba(251,191,36,0.28);color:var(--amb)}
+.b-free{background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);color:var(--mt)}
+.b-user{background:rgba(96,165,250,0.1);border:1px solid rgba(96,165,250,0.25);color:var(--blu)}
+
+/* Boutons */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:9px 15px;border:none;border-radius:9px;font-size:12px;font-weight:500;font-family:inherit;cursor:pointer;transition:all .15s;white-space:nowrap}
 .bgh{background:var(--s1);border:1px solid var(--b);color:var(--tx)}.bgh:hover{background:var(--s2);border-color:var(--b2)}
 .bred{background:rgba(248,113,113,0.09);border:1px solid rgba(248,113,113,0.22);color:var(--red)}.bred:hover{background:rgba(248,113,113,0.16)}
 .bgrn{background:rgba(52,211,153,0.09);border:1px solid rgba(52,211,153,0.22);color:var(--grn)}.bgrn:hover{background:rgba(52,211,153,0.16)}
 .bamb{background:rgba(251,191,36,0.09);border:1px solid rgba(251,191,36,0.22);color:var(--amb)}.bamb:hover{background:rgba(251,191,36,0.16)}
-.bsm{padding:5px 12px;font-size:11px;border-radius:7px}
-.main{padding:24px;max-width:1080px;margin:0 auto}
-.ntabs{display:flex;gap:2px;margin-bottom:24px;background:var(--s1);border:1px solid var(--b);border-radius:11px;padding:3px;width:fit-content;overflow-x:auto}
+.bblu{background:rgba(96,165,250,0.09);border:1px solid rgba(96,165,250,0.22);color:var(--blu)}.bblu:hover{background:rgba(96,165,250,0.16)}
+.bsm{padding:5px 11px;font-size:11px;border-radius:7px}
+.bpri{background:linear-gradient(135deg,var(--p2),#8b5cf6);color:#fff;border:none;box-shadow:0 3px 12px rgba(100,40,200,0.3)}.bpri:hover{box-shadow:0 5px 18px rgba(100,40,200,0.4);transform:translateY(-1px)}
+
+/* Layout sidebar + content */
+.dash-layout{display:flex;min-height:calc(100vh - 54px)}
+.sidebar{width:200px;flex-shrink:0;border-right:1px solid var(--b);padding:16px 12px;display:flex;flex-direction:column;gap:2px;background:rgba(5,5,14,0.5)}
+.slink{display:flex;align-items:center;gap:9px;padding:9px 12px;border-radius:9px;font-size:13px;font-weight:500;color:var(--mt);cursor:pointer;transition:all .15s;border:none;background:none;font-family:inherit;width:100%;text-align:left}
+.slink svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:2;flex-shrink:0;opacity:.6}
+.slink:hover{background:var(--s2);color:var(--tx)}
+.slink.on{background:rgba(100,40,200,0.2);color:var(--p3)}
+.slink.on svg{opacity:1}
+.sidebar-sep{height:1px;background:var(--b);margin:8px 0}
+.sidebar-lbl{font-size:10px;font-weight:500;color:var(--mt);letter-spacing:.8px;text-transform:uppercase;padding:0 12px;margin-bottom:4px;margin-top:8px}
+.content{flex:1;padding:24px;overflow-x:hidden}
+
+/* Tabs classiques pour sous-sections */
+.ntabs{display:flex;gap:2px;margin-bottom:20px;background:var(--s1);border:1px solid var(--b);border-radius:11px;padding:3px;width:fit-content}
 .ntab{padding:7px 16px;background:none;border:none;color:var(--mt);font-size:12px;font-weight:500;cursor:pointer;border-radius:8px;transition:all .15s;font-family:inherit;white-space:nowrap}
 .ntab.on{background:rgba(100,40,200,0.28);color:var(--p3)}
-.tc{display:none}.tc.on{display:block}
-.sgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;margin-bottom:24px}
-.sc{background:rgba(12,8,26,0.5);border:1px solid var(--b);border-radius:13px;padding:20px;backdrop-filter:blur(14px);position:relative;overflow:hidden;transition:border-color .2s,transform .2s}
+.pane{display:none}.pane.on{display:block}
+
+/* Cards stats */
+.sgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-bottom:24px}
+.sc{background:rgba(12,8,26,0.5);border:1px solid var(--b);border-radius:13px;padding:20px;position:relative;overflow:hidden;transition:border-color .2s,transform .2s;cursor:default}
 .sc::after{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(150,100,255,0.3),transparent)}
 .sc:hover{border-color:var(--b2);transform:translateY(-1px)}
 .slbl{font-size:10px;font-weight:500;color:var(--mt);text-transform:uppercase;letter-spacing:.8px;margin-bottom:8px}
-.sval{font-size:28px;font-weight:600;letter-spacing:-1px;color:var(--p3);line-height:1}
+.sval{font-size:26px;font-weight:600;letter-spacing:-1px;color:var(--p3);line-height:1}
+.sval.grn{color:var(--grn)}.sval.amb{color:var(--amb)}.sval.red{color:var(--red)}
+
+/* Legacy score card */
+.score-card{background:linear-gradient(135deg,rgba(100,40,200,0.15),rgba(150,80,255,0.08));border:1px solid rgba(120,70,255,0.25);border-radius:13px;padding:20px;margin-bottom:24px;display:flex;align-items:center;gap:20px}
+.score-ring{width:64px;height:64px;flex-shrink:0;position:relative}
+.score-ring svg{transform:rotate(-90deg)}
+.score-ring .score-num{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;color:var(--p3)}
+.score-info h3{font-size:18px;font-weight:600;color:var(--tx);margin-bottom:4px}
+.score-info p{font-size:12px;color:var(--mt);line-height:1.5}
+
+/* Chart */
+.chart-box{background:rgba(12,8,26,0.5);border:1px solid var(--b);border-radius:13px;padding:20px;margin-bottom:22px}
+.chart-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+.chart-hd h4{font-size:13px;font-weight:500;color:var(--tx)}
+.chart-wrap{height:120px;display:flex;align-items:flex-end;gap:6px}
+.chart-bar-col{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;height:100%}
+.chart-bar{width:100%;border-radius:4px 4px 0 0;background:linear-gradient(180deg,var(--p2),rgba(100,40,200,0.3));transition:height .4s cubic-bezier(.34,1.56,.64,1);min-height:3px;position:relative}
+.chart-bar:hover::after{content:attr(data-val);position:absolute;top:-20px;left:50%;transform:translateX(-50%);font-size:10px;color:var(--p3);font-family:var(--mono);white-space:nowrap}
+.chart-lbl{font-size:9px;color:var(--mt);font-family:var(--mono)}
+
+/* Heatmap */
+.heatmap-wrap{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:8px}
+.hm-cell{width:28px;height:28px;border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:9px;color:var(--mt);font-family:var(--mono);transition:transform .1s}
+.hm-cell:hover{transform:scale(1.15)}
+
+/* Tables */
 .shd{font-size:12px;font-weight:500;color:var(--tx);margin-bottom:12px;display:flex;align-items:center;gap:7px}
 .cnt{font-size:10px;padding:2px 8px;background:var(--s2);border-radius:20px;color:var(--mt)}
-.gt{width:100%;background:rgba(12,8,26,0.45);border:1px solid var(--b);border-radius:13px;overflow:hidden;backdrop-filter:blur(14px);margin-bottom:22px}
-.gt table{width:100%;border-collapse:collapse}
-.gt thead th{padding:10px 16px;text-align:left;font-size:9px;font-weight:500;color:var(--mt);text-transform:uppercase;letter-spacing:.7px;border-bottom:1px solid var(--b);background:rgba(255,255,255,0.015)}
-.gt tbody td{padding:10px 16px;font-size:12px;color:var(--tx);border-bottom:1px solid rgba(255,255,255,0.03)}
+.gt{width:100%;background:rgba(12,8,26,0.45);border:1px solid var(--b);border-radius:13px;overflow:hidden;margin-bottom:20px;overflow-x:auto}
+.gt table{width:100%;border-collapse:collapse;min-width:500px}
+.gt thead th{padding:10px 14px;text-align:left;font-size:9px;font-weight:500;color:var(--mt);text-transform:uppercase;letter-spacing:.7px;border-bottom:1px solid var(--b);background:rgba(255,255,255,0.015)}
+.gt tbody td{padding:10px 14px;font-size:12px;color:var(--tx);border-bottom:1px solid rgba(255,255,255,0.03)}
 .gt tbody tr:last-child td{border-bottom:none}
 .gt tbody tr:hover td{background:rgba(150,100,255,0.04)}
 .uid{font-family:var(--mono);font-size:10px;color:var(--p1);background:rgba(100,40,200,0.09);padding:2px 6px;border-radius:5px}
-.mt-c{color:var(--mt);font-size:11px}
-.acts{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
-.odot{width:7px;height:7px;background:var(--grn);border-radius:50%;display:inline-block;box-shadow:0 0 5px var(--grn);margin-right:5px}
-.ann-banner{background:rgba(251,191,36,0.08);border:1px solid rgba(251,191,36,0.2);border-radius:10px;padding:10px 14px;margin-bottom:16px;font-size:12px;color:var(--amb);display:none}
-.ann-banner.show{display:flex;align-items:center;justify-content:space-between;gap:10px}
-.maint-bar{background:rgba(248,113,113,0.08);border:1px solid rgba(248,113,113,0.2);border-radius:10px;padding:10px 14px;margin-bottom:16px;font-size:12px;color:var(--red);display:none;align-items:center;justify-content:space-between;gap:10px}
-.maint-bar.show{display:flex}
-.box{background:rgba(12,8,26,0.45);border:1px solid var(--b);border-radius:13px;padding:22px;backdrop-filter:blur(14px);margin-bottom:22px}
-.frow{display:flex;gap:9px;align-items:flex-end;flex-wrap:wrap}
-.frow .fld2{flex:1;min-width:120px;margin-bottom:0}
-.fld2 label{display:block;font-size:10px;font-weight:500;color:var(--mt);margin-bottom:6px;letter-spacing:.4px;text-transform:uppercase}
-.fld2 input{width:100%;padding:10px 13px;background:rgba(255,255,255,0.04);border:1px solid var(--b);border-radius:9px;color:var(--tx);font-size:13px;font-family:inherit;outline:none;transition:border-color .15s,box-shadow .15s}
-.fld2 input:focus{border-color:rgba(100,40,200,0.5);box-shadow:0 0 0 3px rgba(100,40,200,0.1)}
-.fld2 input::placeholder{color:rgba(237,233,254,0.18)}
-.rbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:22px}
-.rbar-l{font-size:12px;color:var(--mt)}
-.empty-s{text-align:center;padding:36px 20px;color:var(--mt);font-size:12px}
+.mc{color:var(--mt);font-size:11px}
+.acts{display:flex;gap:5px;align-items:center;flex-wrap:wrap}
+.odot{width:6px;height:6px;background:var(--grn);border-radius:50%;display:inline-block;box-shadow:0 0 5px var(--grn);margin-right:5px}
+
+/* Box / forms */
+.box{background:rgba(12,8,26,0.45);border:1px solid var(--b);border-radius:13px;padding:20px;margin-bottom:20px}
+.frow{display:flex;gap:8px;align-items:flex-end;flex-wrap:wrap}
+.fd{flex:1;min-width:120px}
+.fd label{display:block;font-size:10px;font-weight:500;color:var(--mt);margin-bottom:6px;letter-spacing:.4px;text-transform:uppercase}
+.fd input,.fd select,.fd textarea{width:100%;padding:9px 12px;background:rgba(255,255,255,0.04);border:1px solid var(--b);border-radius:9px;color:var(--tx);font-size:12px;font-family:inherit;outline:none;transition:border-color .15s,box-shadow .15s;resize:vertical}
+.fd input:focus,.fd select:focus,.fd textarea:focus{border-color:rgba(100,40,200,0.5);box-shadow:0 0 0 3px rgba(100,40,200,0.1)}
+.fd input::placeholder,.fd textarea::placeholder{color:rgba(237,233,254,0.18)}
+.fd select option{background:#10081e}
+
+/* Status bars */
+.ann-bar{background:rgba(251,191,36,0.08);border:1px solid rgba(251,191,36,0.2);border-radius:10px;padding:10px 14px;margin-bottom:14px;font-size:12px;color:var(--amb);display:none;align-items:center;justify-content:space-between;gap:10px}
+.ann-bar.show{display:flex}
+.mnt-bar{background:rgba(248,113,113,0.08);border:1px solid rgba(248,113,113,0.2);border-radius:10px;padding:10px 14px;margin-bottom:14px;font-size:12px;color:var(--red);display:none;align-items:center;justify-content:space-between;gap:10px}
+.mnt-bar.show{display:flex}
+
+/* Leaderboard */
+.lb-item{display:flex;align-items:center;gap:12px;padding:10px 14px;border-radius:10px;transition:background .15s}
+.lb-item:hover{background:rgba(255,255,255,0.03)}
+.lb-rank{font-family:var(--mono);font-size:13px;font-weight:600;width:28px;text-align:center;color:var(--mt)}
+.lb-rank.gold{color:#fbbf24}.lb-rank.silver{color:#94a3b8}.lb-rank.bronze{color:#b45309}
+.lb-avatar{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--p2),#4c1d95);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:600;color:#fff;flex-shrink:0}
+.lb-info{flex:1}.lb-name{font-size:13px;font-weight:500;color:var(--tx)}.lb-sub{font-size:11px;color:var(--mt)}
+.lb-count{font-family:var(--mono);font-size:14px;font-weight:600;color:var(--p3)}
+
+/* Audit log */
+.audit-line{display:flex;align-items:flex-start;gap:10px;padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.04)}
+.audit-line:last-child{border-bottom:none}
+.audit-dot{width:6px;height:6px;border-radius:50%;margin-top:5px;flex-shrink:0}
+.audit-dot.ban{background:var(--red)}.audit-dot.unban{background:var(--grn)}.audit-dot.kick{background:var(--amb)}.audit-dot.announce{background:var(--p1)}.audit-dot.other{background:var(--mt)}
+.audit-txt{flex:1;font-size:12px;color:var(--tx)}.audit-who{color:var(--p1)}.audit-ts{font-size:10px;color:var(--mt);flex-shrink:0;font-family:var(--mono)}
+
+/* USER PANEL */
+.user-hero{background:linear-gradient(135deg,rgba(100,40,200,0.12),rgba(150,80,255,0.06));border:1px solid rgba(120,70,255,0.18);border-radius:16px;padding:24px;margin-bottom:20px;display:flex;align-items:center;gap:20px}
+.user-avatar-big{width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,var(--p2),#4c1d95);display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:700;color:#fff;flex-shrink:0;box-shadow:0 4px 16px rgba(100,40,200,0.3)}
+.user-info h2{font-size:18px;font-weight:600;color:var(--tx);margin-bottom:4px}
+.user-info p{font-size:12px;color:var(--mt)}
+.user-info .badges{display:flex;gap:6px;margin-top:8px}
+.plan-cards{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:20px}
+.plan-card{border-radius:14px;padding:22px;border:1px solid var(--b);position:relative;overflow:hidden;transition:border-color .2s,transform .2s;cursor:pointer}
+.plan-card:hover{transform:translateY(-2px)}
+.plan-card.free{background:rgba(12,8,26,0.5)}
+.plan-card.premium{background:linear-gradient(135deg,rgba(251,191,36,0.06),rgba(245,158,11,0.03));border-color:rgba(251,191,36,0.2)}
+.plan-card.premium:hover{border-color:rgba(251,191,36,0.4)}
+.plan-card .plan-name{font-size:15px;font-weight:600;color:var(--tx);margin-bottom:6px}
+.plan-card.premium .plan-name{color:var(--amb)}
+.plan-card .plan-price{font-size:24px;font-weight:700;color:var(--tx);margin-bottom:12px}
+.plan-card .plan-price span{font-size:13px;font-weight:400;color:var(--mt)}
+.plan-feat{list-style:none;font-size:12px;color:var(--mt);display:flex;flex-direction:column;gap:6px}
+.plan-feat li{display:flex;align-items:center;gap:6px}
+.plan-feat li::before{content:'';width:14px;height:14px;background:var(--s2);border-radius:50%;flex-shrink:0}
+.plan-feat.ok li::before{background:rgba(52,211,153,0.15);border:1px solid rgba(52,211,153,0.3)}
+.plan-feat.ok li{color:var(--tx)}
+.plan-current{position:absolute;top:12px;right:12px;font-size:10px;padding:3px 9px;border-radius:20px;font-weight:500}
+.plan-current.free{background:rgba(255,255,255,0.06);color:var(--mt)}
+.plan-current.premium{background:rgba(251,191,36,0.15);color:var(--amb)}
+
+/* Tickets */
+.ticket-item{background:rgba(12,8,26,0.45);border:1px solid var(--b);border-radius:11px;padding:14px;margin-bottom:10px;cursor:pointer;transition:border-color .15s}
+.ticket-item:hover{border-color:var(--b2)}
+.ticket-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}
+.ticket-subj{font-size:13px;font-weight:500;color:var(--tx)}
+.ticket-status{font-size:10px;padding:2px 9px;border-radius:20px;font-weight:500}
+.ticket-status.open{background:rgba(52,211,153,0.1);border:1px solid rgba(52,211,153,0.25);color:var(--grn)}
+.ticket-status.closed{background:rgba(255,255,255,0.05);border:1px solid var(--b);color:var(--mt)}
+.ticket-meta{font-size:11px;color:var(--mt)}
+.ticket-replies{margin-top:12px;padding-top:12px;border-top:1px solid var(--b);display:none;flex-direction:column;gap:8px}
+.ticket-replies.show{display:flex}
+.reply{padding:10px 12px;border-radius:8px;font-size:12px;line-height:1.5}
+.reply.admin{background:rgba(120,70,255,0.1);border:1px solid rgba(120,70,255,0.15);color:var(--p3)}
+.reply.user{background:rgba(255,255,255,0.04);border:1px solid var(--b);color:var(--tx)}
+.reply .reply-who{font-size:10px;color:var(--mt);margin-bottom:4px}
+
+/* Notif badge */
+.notif-badge{background:var(--red);color:#fff;border-radius:50%;width:16px;height:16px;font-size:9px;display:inline-flex;align-items:center;justify-content:center;margin-left:4px;font-weight:700}
+
+/* Toast */
 #toast{position:fixed;bottom:24px;right:24px;padding:12px 16px;border-radius:11px;font-size:12px;font-weight:500;backdrop-filter:blur(20px);z-index:9999;transform:translateY(60px);opacity:0;transition:all .25s cubic-bezier(.34,1.56,.64,1);max-width:280px;pointer-events:none}
 #toast.show{transform:translateY(0);opacity:1}
 #toast.suc{background:rgba(52,211,153,0.12);border:1px solid rgba(52,211,153,0.28);color:var(--grn)}
 #toast.err{background:rgba(248,113,113,0.12);border:1px solid rgba(248,113,113,0.28);color:var(--red)}
 .spin{display:inline-block;width:14px;height:14px;border:2px solid rgba(255,255,255,0.12);border-top-color:rgba(255,255,255,0.5);border-radius:50%;animation:sp .6s linear infinite}
 @keyframes sp{to{transform:rotate(360deg)}}
-@media(max-width:600px){.topbar{padding:0 14px}.main{padding:14px}.frow{flex-direction:column}.frow .btn{width:100%}.ntabs{width:100%}#toast{bottom:12px;right:12px;left:12px;max-width:none}}
+.empty-s{text-align:center;padding:32px;color:var(--mt);font-size:12px}
+
+@media(max-width:860px){#auth{flex-direction:column}.auth-left{padding:80px 20px 20px}.terminal{display:none}.auth-right{width:100%;border-left:none;padding:20px}.sidebar{display:none}.content{padding:16px}}
 </style>
 </head>
 <body>
@@ -342,112 +269,125 @@ body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(
 
 <!-- ══ AUTH ══ -->
 <div id="auth">
-
-  <!-- Panneau gauche -->
+  <div class="auth-topnav">
+    <div class="ver">legacy v1.0</div>
+    <div class="links">
+      <a href="#" onclick="showModal('tos')">Terms of Service</a>
+      <a href="#" onclick="showModal('privacy')">Privacy Policy</a>
+      <a href="#" onclick="showModal('support')">Support</a>
+    </div>
+  </div>
   <div class="auth-left">
     <div class="auth-brand">
-      <div class="logo">
-        <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
-      </div>
+      <div class="logo"><svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg></div>
       <span>Legacy</span>
     </div>
-
     <div class="auth-tagline">
       <h2>Control panel<br><em>built different.</em></h2>
       <p>Monitor executions, manage bans, broadcast announcements and control your script from one place.</p>
     </div>
-
     <div class="terminal">
       <div class="term-bar">
-        <div class="term-dot"></div>
-        <div class="term-dot"></div>
-        <div class="term-dot"></div>
+        <div class="term-dot"></div><div class="term-dot"></div><div class="term-dot"></div>
         <div class="term-title">legacy — system status</div>
       </div>
       <div class="term-body">
         <div class="term-line"><span class="term-prompt">$</span><span class="term-cmd">legacy status --check</span></div>
-        <div class="term-out ok">✓ Worker online — legacy.spyuhq.workers.dev</div>
-        <div class="term-out ok">✓ JSONBin storage — connected</div>
-        <div class="term-out ok">✓ Auth system — operational</div>
-        <div class="term-line" style="margin-top:8px"><span class="term-prompt">$</span><span class="term-cmd">legacy --version</span></div>
-        <div class="term-out">Legacy Control Panel v2.0.0</div>
-        <div class="term-out dim">Build: 2024-12 · Cloudflare Workers</div>
+        <div class="term-out ok">✓  Backend online</div>
+        <div class="term-out ok">✓  Host + VPS storage — connected</div>
+        <div class="term-out ok">✓  Auth system — operational</div>
+        <div class="term-line" style="margin-top:8px"><span class="term-prompt">$</span><span class="term-cmd">legacy -- version 1.0</span></div>
+        <div class="term-out">Legacy Control Panel v1.0.0</div>
+        <div class="term-out dim">· Cloud WRK + KV</div>
         <div class="term-line" style="margin-top:8px"><span class="term-prompt">$</span><span class="term-cursor"></span></div>
       </div>
     </div>
-
-    <div class="auth-stats">
-      <div class="auth-stat"><div class="val" id="stat-exec">—</div><div class="lbl">Executions</div></div>
-      <div class="auth-stat"><div class="val" id="stat-online">—</div><div class="lbl">Online now</div></div>
-      <div class="auth-stat"><div class="val" id="stat-bans">—</div><div class="lbl">Banned</div></div>
-    </div>
   </div>
-
-  <!-- Panneau droit -->
   <div class="auth-right">
     <div class="auth-form-wrap">
-
       <div class="form-header">
         <div class="eyebrow">// secure access</div>
         <h3 id="fh-title">Sign in to Legacy</h3>
         <p id="fh-sub">Enter your credentials to access the control panel.</p>
       </div>
-
       <div class="tsw">
         <button class="tbtn on" onclick="atab('login')">Sign in</button>
         <button class="tbtn" onclick="atab('reg')">Create account</button>
       </div>
-
-      <!-- LOGIN -->
       <div id="fl">
-        <div class="fld">
-          <label>Username</label>
-          <div class="inp-wrap">
-            <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-            <input id="lu" placeholder="Enter username" autocomplete="username">
-          </div>
-        </div>
-        <div class="fld">
-          <label>Password</label>
-          <div class="inp-wrap">
-            <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-            <input id="lp" type="password" placeholder="Enter password" autocomplete="current-password">
-          </div>
-        </div>
-        <div class="sec-notice">
-          <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-          Connection encrypted — credentials never stored locally
-        </div>
+        <div class="fld"><label>Username</label><div class="inp-wrap"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg><input id="lu" placeholder="Enter username" autocomplete="username"></div></div>
+        <div class="fld"><label>Password</label><div class="inp-wrap"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg><input id="lp" type="password" placeholder="Enter password" autocomplete="current-password"></div></div>
+        <div class="sec-notice"><svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>Connection encrypted — credentials never stored locally</div>
         <button class="btn-main" onclick="doLogin()">Sign in to Legacy</button>
         <div class="msg" id="lm"></div>
-        <div class="terms">By signing in, you agree to the <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a>.</div>
+        <div class="terms">By signing in you agree to the <a href="#" onclick="showModal('tos')">Terms of Service</a> and <a href="#" onclick="showModal('privacy')">Privacy Policy</a>.</div>
       </div>
-
-      <!-- REGISTER -->
       <div id="fr" style="display:none">
-        <div class="fld">
-          <label>Username</label>
-          <div class="inp-wrap">
-            <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-            <input id="ru" placeholder="Choose a username" autocomplete="username">
-          </div>
-        </div>
-        <div class="fld">
-          <label>Password</label>
-          <div class="inp-wrap">
-            <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-            <input id="rp" type="password" placeholder="Min. 6 characters" autocomplete="new-password">
-          </div>
-        </div>
-        <div class="sec-notice">
-          <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-          First account created automatically becomes Owner
-        </div>
+        <div class="fld"><label>Username</label><div class="inp-wrap"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg><input id="ru" placeholder="Choose a username" autocomplete="username"></div></div>
+        <div class="fld"><label>Password</label><div class="inp-wrap"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg><input id="rp" type="password" placeholder="Min. 6 characters" autocomplete="new-password"></div></div>
+        <div class="sec-notice"><svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>First account created becomes Owner automatically</div>
         <button class="btn-main" onclick="doReg()">Create account</button>
         <div class="msg" id="rm"></div>
-        <div class="terms">By creating an account, you agree to the <a href="#">Terms of Service</a>.</div>
+        <div class="terms">By creating an account you agree to the <a href="#" onclick="showModal('tos')">Terms of Service</a>.</div>
       </div>
+    </div>
+  </div>
+</div>
 
+<!-- Modals -->
+<div class="modal-bg" id="modal-tos">
+  <div class="modal-overlay" onclick="hideModal('tos')"></div>
+  <div class="modal-box">
+    <div class="modal-hd"><div><div style="font-family:var(--mono);font-size:10px;color:var(--p1);letter-spacing:1px;margin-bottom:5px">// legal</div><h3 style="font-size:16px;font-weight:600;color:var(--tx)">Terms of Service</h3></div><button class="modal-close" onclick="hideModal('tos')">×</button></div>
+    <div class="modal-body">
+      <h4>1. Acceptance</h4><p>By accessing Legacy Control Panel, you agree to be bound by these terms. If you do not agree, do not use the service.</p>
+      <h4>2. Use of Service</h4><p>Legacy is a private control panel. Access is restricted to authorized users only. Sharing credentials or unauthorized access is strictly prohibited.</p>
+      <h4>3. Data & Privacy</h4><p>Legacy collects Roblox user IDs, usernames, and place IDs for moderation purposes. No personal data beyond this is stored. Data is kept on secure infrastructure.</p>
+      <h4>4. Moderation</h4><p>Administrators reserve the right to ban or remove any user from the platform at any time without notice. All moderation decisions are final.</p>
+      <h4>5. Availability</h4><p>Legacy is provided as-is with no uptime guarantee. Maintenance periods may occur without prior notice.</p>
+      <h4>6. Changes</h4><p>These terms may be updated at any time. Continued use of the platform constitutes acceptance of the updated terms.</p>
+    </div>
+    <div class="modal-ft">Last updated: December 2024 · Legacy Control Panel v1.0.0</div>
+  </div>
+</div>
+<div class="modal-bg" id="modal-privacy">
+  <div class="modal-overlay" onclick="hideModal('privacy')"></div>
+  <div class="modal-box">
+    <div class="modal-hd"><div><div style="font-family:var(--mono);font-size:10px;color:var(--p1);letter-spacing:1px;margin-bottom:5px">// legal</div><h3 style="font-size:16px;font-weight:600;color:var(--tx)">Privacy Policy</h3></div><button class="modal-close" onclick="hideModal('privacy')">×</button></div>
+    <div class="modal-body">
+      <h4>Data Collected</h4><p>We collect Roblox User IDs, usernames, place IDs, game names, and execution timestamps. No real-name or contact information is collected.</p>
+      <h4>Data Usage</h4><p>Collected data is used exclusively for moderation, statistics, and service improvement. Data is never sold or shared with third parties.</p>
+      <h4>Data Storage</h4><p>Data is stored on JSONBin.io with encrypted API keys. Access is restricted to authorized administrators only.</p>
+      <h4>Data Retention</h4><p>Execution logs are kept for a maximum of 500 entries. Older entries are automatically removed.</p>
+      <h4>Your Rights</h4><p>You may request deletion of your data by contacting an administrator through the support system.</p>
+    </div>
+    <div class="modal-ft">Last updated: December 2024</div>
+  </div>
+</div>
+<div class="modal-bg" id="modal-support">
+  <div class="modal-overlay" onclick="hideModal('support')"></div>
+  <div class="modal-box">
+    <div class="modal-hd"><div><div style="font-family:var(--mono);font-size:10px;color:var(--p1);letter-spacing:1px;margin-bottom:5px">// help</div><h3 style="font-size:16px;font-weight:600;color:var(--tx)">Support</h3></div><button class="modal-close" onclick="hideModal('support')">×</button></div>
+    <div class="modal-body">
+      <h4>Getting Started</h4><p>Create an account — the first account is automatically Owner. Deploy the worker.js to Cloudflare, then open the script in your executor.</p>
+      <h4>FAQ</h4><p><strong style="color:var(--tx)">Script not working?</strong> Make sure JSONBIN_ID and JSONBIN_KEY are set in Cloudflare Secrets.</p>
+      <p style="margin-top:8px"><strong style="color:var(--tx)">Ban not applying?</strong> The ban applies on the next script execution, not in real-time without a ping loop.</p>
+      <p style="margin-top:8px"><strong style="color:var(--tx)">JSONBin full?</strong> The bin stores 500 executions max. Older ones are auto-removed.</p>
+      <h4>Contact</h4><p>Open a support ticket from your user panel after signing in. Premium users get priority response.</p>
+    </div>
+    <div class="modal-ft">Legacy Support · Response within 24-48h for Free users</div>
+  </div>
+</div>
+
+<!-- Confirm modal -->
+<div class="modal-bg" id="modal-confirm">
+  <div class="modal-overlay"></div>
+  <div class="modal-box" style="max-width:360px">
+    <div class="modal-hd"><h3 style="font-size:15px;font-weight:600;color:var(--tx)" id="confirm-title">Confirm action</h3><button class="modal-close" onclick="hideConfirm()">×</button></div>
+    <p style="font-size:13px;color:var(--mt);margin-bottom:20px" id="confirm-msg"></p>
+    <div style="display:flex;gap:8px;justify-content:flex-end">
+      <button class="btn bgh" onclick="hideConfirm()">Cancel</button>
+      <button class="btn bred" id="confirm-ok">Confirm</button>
     </div>
   </div>
 </div>
@@ -457,131 +397,348 @@ body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(
   <div class="topbar">
     <div class="tbrand"><div class="pip"></div>Legacy</div>
     <div class="tright">
-      <span class="badge" id="rbadge"></span>
+      <span id="rbadge" class="badge"></span>
+      <span id="planbadge" class="badge"></span>
       <button class="btn bgh bsm" onclick="doOut()">Sign out</button>
     </div>
   </div>
-  <div class="main">
-    <div id="maint-bar" class="maint-bar">
-      <span id="maint-msg">Maintenance active</span>
-      <button class="btn bred bsm" onclick="setMaint(false)">Disable</button>
-    </div>
-    <div id="ann-bar" class="ann-banner">
-      <span id="ann-msg"></span>
-      <button class="btn bamb bsm" onclick="clearAnn()">Clear</button>
-    </div>
-    <div class="ntabs">
-      <button class="ntab on" onclick="sw('overview',this)">Overview</button>
-      <button class="ntab" onclick="sw('online',this)">Online</button>
-      <button class="ntab" onclick="sw('players',this)">Players</button>
-      <button class="ntab" onclick="sw('bans',this)">Bans</button>
-      <button class="ntab" onclick="sw('logs',this)">Logs</button>
-      <button class="ntab" onclick="sw('broadcast',this)">Broadcast</button>
-      <button class="ntab owner-only" onclick="sw('accounts',this)" style="display:none">Accounts</button>
+  <div class="dash-layout">
+
+    <!-- SIDEBAR -->
+    <div class="sidebar">
+      <!-- Admin section -->
+      <div class="sidebar-lbl admin-only">Admin</div>
+      <button class="slink on admin-only" onclick="goPage('overview',this)">
+        <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>Overview
+      </button>
+      <button class="slink admin-only" onclick="goPage('online',this)">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3"/></svg>Online
+      </button>
+      <button class="slink admin-only" onclick="goPage('players',this)">
+        <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>Players
+      </button>
+      <button class="slink admin-only" onclick="goPage('bans',this)">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg>Bans
+      </button>
+      <button class="slink admin-only" onclick="goPage('leaderboard',this)">
+        <svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>Leaderboard
+      </button>
+      <button class="slink admin-only" onclick="goPage('logs',this)">
+        <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>Logs
+      </button>
+      <button class="slink admin-only" onclick="goPage('broadcast',this)">
+        <svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.42A2 2 0 0 1 3.59 1H6.6a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.1a16 16 0 0 0 6 6l.91-.91a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 21.73 15h.19z"/></svg>Broadcast
+      </button>
+      <button class="slink admin-only" onclick="goPage('audit',this)">
+        <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>Audit Log
+      </button>
+      <button class="slink owner-only admin-only" onclick="goPage('accounts',this)">
+        <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Accounts
+      </button>
+
+      <div class="sidebar-sep"></div>
+
+      <!-- User section -->
+      <div class="sidebar-lbl">My account</div>
+      <button class="slink user-home" onclick="goPage('user-home',this)">
+        <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>Home
+      </button>
+      <button class="slink" onclick="goPage('user-plan',this)">
+        <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>Plan
+      </button>
+      <button class="slink" onclick="goPage('user-tickets',this)">
+        <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>Support
+      </button>
+      <button class="slink" onclick="goPage('user-settings',this)">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>Settings
+      </button>
     </div>
 
-    <!-- OVERVIEW -->
-    <div id="tc-overview" class="tc on">
-      <div class="rbar">
-        <div class="shd" style="margin-bottom:0">Overview</div>
-        <div style="display:flex;align-items:center;gap:9px">
-          <span class="rbar-l" id="lupd"></span>
-          <button class="btn bgh bsm" onclick="load()">Refresh</button>
+    <!-- CONTENT -->
+    <div class="content">
+      <div id="mnt-bar" class="mnt-bar"><span id="mnt-msg">Maintenance active</span><button class="btn bred bsm" onclick="setMaint(false)">Disable</button></div>
+      <div id="ann-bar" class="ann-bar"><span id="ann-msg"></span><button class="btn bamb bsm" onclick="clearAnn()">Clear</button></div>
+
+      <!-- OVERVIEW -->
+      <div id="pg-overview" class="pane on">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
+          <h2 style="font-size:18px;font-weight:600">Overview</h2>
+          <div style="display:flex;gap:8px;align-items:center"><span style="font-size:11px;color:var(--mt)" id="lupd"></span><button class="btn bgh bsm" onclick="load()">Refresh</button></div>
+        </div>
+        <!-- Legacy Score -->
+        <div class="score-card">
+          <div class="score-ring">
+            <svg width="64" height="64" viewBox="0 0 64 64">
+              <circle cx="32" cy="32" r="27" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="6"/>
+              <circle id="score-circle" cx="32" cy="32" r="27" fill="none" stroke="url(#sg)" stroke-width="6" stroke-linecap="round" stroke-dasharray="170" stroke-dashoffset="170"/>
+              <defs><linearGradient id="sg" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#7c3aed"/><stop offset="100%" stop-color="#c4b5fd"/></linearGradient></defs>
+            </svg>
+            <div class="score-num" id="score-num">—</div>
+          </div>
+          <div class="score-info">
+            <h3>Legacy Score</h3>
+            <p>Health index based on recent activity,<br>unique players and ban ratio.</p>
+          </div>
+          <div style="margin-left:auto;text-align:right">
+            <button class="btn bgh bsm" onclick="doSnapshot()">Save snapshot</button>
+          </div>
+        </div>
+        <div class="sgrid">
+          <div class="sc"><div class="slbl">Total executions</div><div class="sval" id="s-tot">—</div></div>
+          <div class="sc"><div class="slbl">Unique players</div><div class="sval" id="s-uniq">—</div></div>
+          <div class="sc"><div class="slbl">Online now</div><div class="sval grn" id="s-on">—</div></div>
+          <div class="sc"><div class="slbl">Banned</div><div class="sval red" id="s-ban">—</div></div>
+        </div>
+        <!-- Chart 7 jours -->
+        <div class="chart-box">
+          <div class="chart-hd"><h4>Executions — last 7 days</h4></div>
+          <div class="chart-wrap" id="chart7"></div>
+          <div style="display:flex;gap:6px;margin-top:6px" id="chart7-lbls"></div>
+        </div>
+        <!-- Heatmap -->
+        <div class="chart-box">
+          <div class="chart-hd"><h4>Hourly heatmap</h4></div>
+          <div class="heatmap-wrap" id="heatmap"></div>
+          <div style="font-size:10px;color:var(--mt)">Hover a cell to see execution count for that hour</div>
+        </div>
+        <!-- Top games -->
+        <div class="shd">Top games</div>
+        <div class="gt"><table>
+          <thead><tr><th>#</th><th>Place ID</th><th>Game</th><th>Executions</th></tr></thead>
+          <tbody id="tb-games"><tr><td colspan="4"><div class="empty-s"><div class="spin"></div></div></td></tr></tbody>
+        </table></div>
+        <!-- Recent -->
+        <div class="shd">Recent activity</div>
+        <div class="gt"><table>
+          <thead><tr><th>Player</th><th>User ID</th><th>Game</th><th>Date</th></tr></thead>
+          <tbody id="tb-recent"><tr><td colspan="4"><div class="empty-s"><div class="spin"></div></div></td></tr></tbody>
+        </table></div>
+      </div>
+
+      <!-- ONLINE -->
+      <div id="pg-online" class="pane">
+        <h2 style="font-size:18px;font-weight:600;margin-bottom:20px">Online <span class="cnt" id="on-cnt">0</span></h2>
+        <div class="gt"><table>
+          <thead><tr><th>Player</th><th>User ID</th><th>Game</th><th>Last seen</th><th>Actions</th></tr></thead>
+          <tbody id="tb-online"><tr><td colspan="5"><div class="empty-s"><div class="spin"></div></div></td></tr></tbody>
+        </table></div>
+      </div>
+
+      <!-- PLAYERS -->
+      <div id="pg-players" class="pane">
+        <h2 style="font-size:18px;font-weight:600;margin-bottom:16px">Players <span class="cnt" id="pl-cnt">0</span></h2>
+        <div style="margin-bottom:14px"><input id="search-players" placeholder="Search by username or user ID..." style="width:100%;padding:9px 12px;background:rgba(255,255,255,0.04);border:1px solid var(--b);border-radius:9px;color:var(--tx);font-size:12px;font-family:inherit;outline:none" oninput="filterPlayers()"></div>
+        <div class="gt"><table>
+          <thead><tr><th>Player</th><th>User ID</th><th>Executions</th><th>Last game</th><th>Last seen</th><th>Actions</th></tr></thead>
+          <tbody id="tb-players"><tr><td colspan="6"><div class="empty-s"><div class="spin"></div></div></td></tr></tbody>
+        </table></div>
+      </div>
+
+      <!-- BANS -->
+      <div id="pg-bans" class="pane">
+        <h2 style="font-size:18px;font-weight:600;margin-bottom:16px">Bans</h2>
+        <div class="box">
+          <div class="shd" style="margin-bottom:14px">Ban a player</div>
+          <div class="frow">
+            <div class="fd"><label>User ID</label><input id="ban-uid" placeholder="123456789"></div>
+            <div class="fd"><label>Reason</label><input id="ban-rsn" placeholder="Exploiting..."></div>
+            <div class="fd" style="max-width:140px"><label>Duration</label><select id="ban-dur"><option value="">Permanent</option><option value="3600">1 hour</option><option value="86400">24 hours</option><option value="604800">7 days</option><option value="2592000">30 days</option></select></div>
+            <button class="btn bred" onclick="doBan()">Ban</button>
+          </div>
+          <!-- Raisons rapides -->
+          <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:12px">
+            <span style="font-size:10px;color:var(--mt);align-self:center">Quick reasons:</span>
+            <button class="btn bgh bsm" onclick="setRsn('Exploiting')">Exploiting</button>
+            <button class="btn bgh bsm" onclick="setRsn('Cheating')">Cheating</button>
+            <button class="btn bgh bsm" onclick="setRsn('Spam')">Spam</button>
+            <button class="btn bgh bsm" onclick="setRsn('Grief')">Grief</button>
+            <button class="btn bgh bsm" onclick="setRsn('Alt account')">Alt account</button>
+          </div>
+        </div>
+        <div class="shd">Active bans <span class="cnt" id="bn-cnt">0</span></div>
+        <div class="gt"><table>
+          <thead><tr><th>User ID</th><th>Reason</th><th>Banned by</th><th>Date</th><th>Expires</th><th>Action</th></tr></thead>
+          <tbody id="tb-bans"><tr><td colspan="6"><div class="empty-s"><div class="spin"></div></div></td></tr></tbody>
+        </table></div>
+      </div>
+
+      <!-- LEADERBOARD -->
+      <div id="pg-leaderboard" class="pane">
+        <h2 style="font-size:18px;font-weight:600;margin-bottom:20px">Leaderboard</h2>
+        <div class="box" id="lb-box"><div class="empty-s"><div class="spin"></div></div></div>
+      </div>
+
+      <!-- LOGS -->
+      <div id="pg-logs" class="pane">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+          <h2 style="font-size:18px;font-weight:600">Execution logs <span class="cnt" id="log-cnt">0</span></h2>
+          <div style="display:flex;gap:8px"><button class="btn bgh bsm" onclick="load()">Refresh</button><button class="btn bgrn bsm" onclick="exportLogs()">Export JSON</button></div>
+        </div>
+        <div style="margin-bottom:14px"><input id="search-logs" placeholder="Search logs..." style="width:100%;padding:9px 12px;background:rgba(255,255,255,0.04);border:1px solid var(--b);border-radius:9px;color:var(--tx);font-size:12px;font-family:inherit;outline:none" oninput="filterLogs()"></div>
+        <div class="gt"><table>
+          <thead><tr><th>Player</th><th>User ID</th><th>Game</th><th>Place ID</th><th>Date</th></tr></thead>
+          <tbody id="tb-logs"><tr><td colspan="5"><div class="empty-s"><div class="spin"></div></div></td></tr></tbody>
+        </table></div>
+      </div>
+
+      <!-- BROADCAST -->
+      <div id="pg-broadcast" class="pane">
+        <h2 style="font-size:18px;font-weight:600;margin-bottom:20px">Broadcast</h2>
+        <div class="box">
+          <div class="shd" style="margin-bottom:14px">Send announcement</div>
+          <div class="frow">
+            <div class="fd" style="flex:2"><label>Message</label><input id="ann-txt" placeholder="Server update incoming..."></div>
+            <div class="fd" style="max-width:160px"><label>Duration (seconds)</label><input id="ann-dur" type="number" value="300"></div>
+            <button class="btn bamb" onclick="sendAnn()">Send</button>
+          </div>
+          <div style="margin-top:10px;font-size:11px;color:var(--mt)">Displayed on next script execution. Auto-expires after duration.</div>
+        </div>
+        <div class="box">
+          <div class="shd" style="margin-bottom:14px">MOTD (Message of the Day)</div>
+          <div class="frow">
+            <div class="fd"><label>Message</label><input id="motd-txt" placeholder="Welcome to Legacy v1.0!"></div>
+            <button class="btn bblu" onclick="saveMOTD()">Save MOTD</button>
+            <button class="btn bgh" onclick="clearMOTD()">Clear</button>
+          </div>
+          <div style="margin-top:10px;font-size:11px;color:var(--mt)">Displayed at every execution as a small in-game notification.</div>
+        </div>
+        <div class="box">
+          <div class="shd" style="margin-bottom:14px">Maintenance mode</div>
+          <div class="frow">
+            <div class="fd"><label>Message</label><input id="mnt-txt" placeholder="Maintenance in progress..."></div>
+            <button class="btn bred" onclick="setMaint(true)">Enable</button>
+            <button class="btn bgrn" onclick="setMaint(false)">Disable</button>
+          </div>
+          <div style="margin-top:10px;font-size:11px;color:var(--mt)">Blocks all script executions when active.</div>
+        </div>
+        <div class="box">
+          <div class="shd" style="margin-bottom:14px">Ghost mode</div>
+          <div style="display:flex;align-items:center;gap:12px">
+            <p style="font-size:12px;color:var(--mt);flex:1">When active, the script runs silently — no GUI, no prints, no trace on the player's side.</p>
+            <button class="btn bgh" id="ghost-btn" onclick="toggleGhost()">—</button>
+          </div>
         </div>
       </div>
-      <div class="sgrid">
-        <div class="sc"><div class="slbl">Total executions</div><div class="sval" id="s-tot">—</div></div>
-        <div class="sc"><div class="slbl">Unique players</div><div class="sval" id="s-uniq">—</div></div>
-        <div class="sc"><div class="slbl">Online now</div><div class="sval" id="s-on">—</div></div>
-        <div class="sc"><div class="slbl">Banned</div><div class="sval" id="s-ban">—</div></div>
+
+      <!-- AUDIT LOG -->
+      <div id="pg-audit" class="pane">
+        <h2 style="font-size:18px;font-weight:600;margin-bottom:20px">Audit Log</h2>
+        <div class="box" id="audit-box"><div class="empty-s"><div class="spin"></div></div></div>
       </div>
-      <div class="shd">Recent activity</div>
-      <div class="gt"><table>
-        <thead><tr><th>Player</th><th>User ID</th><th>Game</th><th>Place ID</th><th>Date</th></tr></thead>
-        <tbody id="tb-recent"><tr><td colspan="5"><div class="empty-s"><div class="spin"></div></div></td></tr></tbody>
-      </table></div>
-    </div>
 
-    <!-- ONLINE -->
-    <div id="tc-online" class="tc">
-      <div class="shd">Online players <span class="cnt" id="on-cnt">0</span></div>
-      <div class="gt"><table>
-        <thead><tr><th>Player</th><th>User ID</th><th>Game</th><th>Last seen</th><th>Actions</th></tr></thead>
-        <tbody id="tb-online"><tr><td colspan="5"><div class="empty-s"><div class="spin"></div></div></td></tr></tbody>
-      </table></div>
-    </div>
+      <!-- ACCOUNTS -->
+      <div id="pg-accounts" class="pane">
+        <h2 style="font-size:18px;font-weight:600;margin-bottom:20px">Accounts</h2>
+        <div class="gt"><table>
+          <thead><tr><th>Username</th><th>Role</th><th>Plan</th><th>Created</th><th>Actions</th></tr></thead>
+          <tbody id="tb-acc"><tr><td colspan="5"><div class="empty-s"><div class="spin"></div></div></td></tr></tbody>
+        </table></div>
+      </div>
 
-    <!-- PLAYERS -->
-    <div id="tc-players" class="tc">
-      <div class="shd">All players <span class="cnt" id="pl-cnt">0</span></div>
-      <div class="gt"><table>
-        <thead><tr><th>Player</th><th>User ID</th><th>Executions</th><th>Last game</th><th>Last seen</th><th>Actions</th></tr></thead>
-        <tbody id="tb-players"><tr><td colspan="6"><div class="empty-s"><div class="spin"></div></div></td></tr></tbody>
-      </table></div>
-    </div>
-
-    <!-- BANS -->
-    <div id="tc-bans" class="tc">
-      <div class="box">
-        <div class="shd" style="margin-bottom:14px">Ban a player</div>
-        <div class="frow">
-          <div class="fld2"><label>User ID</label><input id="ban-uid" placeholder="123456789"></div>
-          <div class="fld2"><label>Reason</label><input id="ban-rsn" placeholder="Exploiting..."></div>
-          <button class="btn bred" onclick="doBan()">Ban</button>
+      <!-- USER HOME -->
+      <div id="pg-user-home" class="pane">
+        <div class="user-hero">
+          <div class="user-avatar-big" id="u-avatar">?</div>
+          <div class="user-info">
+            <h2 id="u-name">—</h2>
+            <p id="u-since">Member since —</p>
+            <div class="badges" id="u-badges"></div>
+          </div>
+          <div style="margin-left:auto;text-align:right">
+            <div style="font-size:11px;color:var(--mt);margin-bottom:4px">Your executions</div>
+            <div style="font-size:24px;font-weight:600;color:var(--p3)" id="u-execs">—</div>
+          </div>
+        </div>
+        <div class="sgrid">
+          <div class="sc"><div class="slbl">Role</div><div class="sval" id="u-role-stat" style="font-size:18px">—</div></div>
+          <div class="sc"><div class="slbl">Plan</div><div class="sval amb" id="u-plan-stat" style="font-size:18px">—</div></div>
+          <div class="sc"><div class="slbl">Tickets</div><div class="sval" id="u-tickets-stat" style="font-size:18px">—</div></div>
+        </div>
+        <div class="box">
+          <div class="shd" style="margin-bottom:12px">Recent login history</div>
+          <div id="u-logins" style="font-size:12px;color:var(--mt)"><div class="spin"></div></div>
         </div>
       </div>
-      <div class="shd">Active bans <span class="cnt" id="bn-cnt">0</span></div>
-      <div class="gt"><table>
-        <thead><tr><th>User ID</th><th>Reason</th><th>Banned by</th><th>Date</th><th>Action</th></tr></thead>
-        <tbody id="tb-bans"><tr><td colspan="5"><div class="empty-s"><div class="spin"></div></div></td></tr></tbody>
-      </table></div>
-    </div>
 
-    <!-- LOGS -->
-    <div id="tc-logs" class="tc">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
-        <div class="shd" style="margin-bottom:0">Execution logs <span class="cnt" id="log-cnt">0</span></div>
-        <button class="btn bgh bsm" onclick="load()">Refresh</button>
-      </div>
-      <div class="gt"><table>
-        <thead><tr><th>Player</th><th>User ID</th><th>Game</th><th>Place ID</th><th>Date</th></tr></thead>
-        <tbody id="tb-logs"><tr><td colspan="5"><div class="empty-s"><div class="spin"></div></div></td></tr></tbody>
-      </table></div>
-    </div>
-
-    <!-- BROADCAST -->
-    <div id="tc-broadcast" class="tc">
-      <div class="box">
-        <div class="shd" style="margin-bottom:14px">Send announcement</div>
-        <div class="frow">
-          <div class="fld2" style="flex:2"><label>Message</label><input id="ann-txt" placeholder="Server update incoming..."></div>
-          <div class="fld2"><label>Duration (seconds)</label><input id="ann-dur" placeholder="300" type="number" value="300"></div>
-          <button class="btn bamb" onclick="sendAnn()">Send</button>
+      <!-- USER PLAN -->
+      <div id="pg-user-plan" class="pane">
+        <h2 style="font-size:18px;font-weight:600;margin-bottom:6px">Your Plan</h2>
+        <p style="font-size:13px;color:var(--mt);margin-bottom:24px">Upgrade to Premium for priority support and advanced features.</p>
+        <div class="plan-cards">
+          <div class="plan-card free">
+            <span class="plan-current free" id="badge-free">Current</span>
+            <div class="plan-name">Free</div>
+            <div class="plan-price">$0 <span>/ forever</span></div>
+            <ul class="plan-feat ok">
+              <li>Access to Legacy panel</li>
+              <li>View personal stats</li>
+              <li>Support tickets (48h)</li>
+              <li>Announcements visible</li>
+              <li>FAQ & documentation</li>
+            </ul>
+          </div>
+          <div class="plan-card premium">
+            <span class="plan-current premium" id="badge-premium" style="display:none">Current</span>
+            <div class="plan-name">Premium</div>
+            <div class="plan-price">— <span>contact owner</span></div>
+            <ul class="plan-feat ok">
+              <li>Everything in Free</li>
+              <li>Priority support H24</li>
+              <li>Advanced statistics</li>
+              <li>Early announcements</li>
+              <li>Direct admin chat</li>
+              <li>Premium badge</li>
+              <li>Leaderboard highlight</li>
+            </ul>
+          </div>
         </div>
-        <div style="margin-top:10px;font-size:11px;color:var(--mt)">Displayed on next script execution. Auto-expires after the set duration.</div>
-      </div>
-      <div class="box">
-        <div class="shd" style="margin-bottom:14px">Maintenance mode</div>
-        <div class="frow">
-          <div class="fld2"><label>Message (optional)</label><input id="maint-txt" placeholder="Maintenance in progress, try again later."></div>
-          <button class="btn bred" onclick="setMaint(true)">Enable</button>
-          <button class="btn bgrn" onclick="setMaint(false)">Disable</button>
+        <div class="box" style="margin-top:4px">
+          <p style="font-size:12px;color:var(--mt)">To upgrade your plan, contact an administrator. Premium is manually assigned by the Owner.</p>
         </div>
-        <div style="margin-top:10px;font-size:11px;color:var(--mt)">Blocks all script executions when active.</div>
       </div>
-    </div>
 
-    <!-- ACCOUNTS -->
-    <div id="tc-accounts" class="tc">
-      <div class="shd">Accounts</div>
-      <div class="gt"><table>
-        <thead><tr><th>Username</th><th>Role</th><th>Created</th><th>Actions</th></tr></thead>
-        <tbody id="tb-acc"><tr><td colspan="4"><div class="empty-s"><div class="spin"></div></div></td></tr></tbody>
-      </table></div>
-    </div>
+      <!-- USER TICKETS -->
+      <div id="pg-user-tickets" class="pane">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
+          <h2 style="font-size:18px;font-weight:600">Support</h2>
+          <button class="btn bpri bsm" onclick="showNewTicket()">New ticket</button>
+        </div>
+        <div class="box" id="new-ticket-box" style="display:none">
+          <div class="shd" style="margin-bottom:14px">New ticket</div>
+          <div class="frow" style="margin-bottom:10px">
+            <div class="fd"><label>Category</label><select id="tkt-cat"><option>Bug</option><option>Question</option><option>Account</option><option>Other</option></select></div>
+            <div class="fd" style="flex:2"><label>Subject</label><input id="tkt-subj" placeholder="Short description..."></div>
+          </div>
+          <div class="fd" style="margin-bottom:10px"><label>Message</label><textarea id="tkt-msg" rows="3" placeholder="Describe your issue in detail..."></textarea></div>
+          <div style="display:flex;gap:8px">
+            <button class="btn bpri bsm" onclick="submitTicket()">Submit</button>
+            <button class="btn bgh bsm" onclick="hideNewTicket()">Cancel</button>
+          </div>
+        </div>
+        <div id="tickets-list"><div class="empty-s"><div class="spin"></div></div></div>
+      </div>
 
-  </div>
+      <!-- USER SETTINGS -->
+      <div id="pg-user-settings" class="pane">
+        <h2 style="font-size:18px;font-weight:600;margin-bottom:20px">Settings</h2>
+        <div class="box">
+          <div class="shd" style="margin-bottom:14px">Avatar</div>
+          <div style="display:flex;gap:10px;flex-wrap:wrap" id="avatar-select"></div>
+        </div>
+        <div class="box">
+          <div class="shd" style="margin-bottom:14px">Change password</div>
+          <div class="frow">
+            <div class="fd"><label>New password</label><input id="new-pw" type="password" placeholder="Min. 6 characters"></div>
+            <div class="fd"><label>Confirm</label><input id="new-pw2" type="password" placeholder="Repeat password"></div>
+            <button class="btn bpri" onclick="changePw()">Update</button>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /content -->
+  </div><!-- /dash-layout -->
 </div>
+
 </div>
 <div id="toast"></div>
 
@@ -590,39 +747,19 @@ const W="https://legacy.spyuhq.workers.dev";
 let token=localStorage.getItem("lt")||null;
 let me=localStorage.getItem("lu2")||null;
 let role=localStorage.getItem("lr")||null;
+let plan=localStorage.getItem("lp2")||null;
 let cache=null;
+let myData=null;
+let ghostMode=false;
+let allPlayers=[];
+let allLogs=[];
 
-// Charger les stats publiques pour le panneau gauche
-async function loadPublicStats(){
-  try{
-    const r=await fetch(`${W}/health`);
-    const d=await r.json();
-    if(d.ok){
-      document.getElementById("stat-exec").textContent="active";
-      document.getElementById("stat-online").textContent="live";
-      document.getElementById("stat-bans").textContent="on";
-    }
-  }catch{}
-}
+const AVATARS=["A","B","C","D","E","F","G","H"];
 
-if(token){showDash();load();}
-else{
-  document.getElementById("auth").style.display="flex";
-  loadPublicStats();
-  typeTerminal();
-}
+if(token){showDash();role==="user"?initUserPage():load();}
+else{document.getElementById("auth").style.display="flex";typeTerminal();}
 
-// Animation terminal
-function typeTerminal(){
-  const lines=document.querySelectorAll(".term-out");
-  lines.forEach((l,i)=>{
-    l.style.opacity="0";
-    setTimeout(()=>{
-      l.style.transition="opacity .3s";
-      l.style.opacity="1";
-    },600+i*220);
-  });
-}
+function typeTerminal(){document.querySelectorAll(".term-out").forEach((l,i)=>{l.style.opacity="0";setTimeout(()=>{l.style.transition="opacity .3s";l.style.opacity="1";},500+i*200)});}
 
 function atab(t){
   document.getElementById("fl").style.display=t==="login"?"block":"none";
@@ -639,7 +776,8 @@ async function doLogin(){
     const r=await fetch(`${W}/api/login`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({username:u,password:p})});
     const d=await r.json();
     if(!d.ok){sm(m,"err",d.error||"Authentication failed");return}
-    save(d.token,d.username,d.role);showDash();load();
+    save(d.token,d.username,d.role,d.plan);showDash();
+    if(d.role==="user"){initUserPage();}else{load();}
   }catch{sm(m,"err","Could not reach server")}
 }
 
@@ -650,29 +788,46 @@ async function doReg(){
     const r=await fetch(`${W}/api/register`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({username:u,password:p})});
     const d=await r.json();
     if(!d.ok){sm(m,"err",d.error||"Error");return}
-    if(d.token){save(d.token,d.username||u,d.role);showDash();load();}
-    else sm(m,"suc",d.pending?"Account created — waiting for approval by owner.":"Account created.");
+    save(d.token,d.username||u,d.role,d.plan);showDash();
+    if(d.role==="user"){initUserPage();}else{load();}
   }catch{sm(m,"err","Could not reach server")}
 }
 
-function save(t,u,r){token=t;me=u;role=r;localStorage.setItem("lt",t);localStorage.setItem("lu2",u);localStorage.setItem("lr",r)}
-function doOut(){token=me=role=null;["lt","lu2","lr"].forEach(k=>localStorage.removeItem(k));document.getElementById("dash").style.display="none";document.getElementById("auth").style.display="flex";loadPublicStats();typeTerminal();}
+function save(t,u,r,p){token=t;me=u;role=r;plan=p||"free";localStorage.setItem("lt",t);localStorage.setItem("lu2",u);localStorage.setItem("lr",r);localStorage.setItem("lp2",plan);}
+function doOut(){token=me=role=plan=null;["lt","lu2","lr","lp2"].forEach(k=>localStorage.removeItem(k));document.getElementById("dash").style.display="none";document.getElementById("auth").style.display="flex";typeTerminal();}
 
 function showDash(){
   document.getElementById("auth").style.display="none";
   document.getElementById("dash").style.display="block";
-  const b=document.getElementById("rbadge");
-  b.textContent=role==="owner"?"Owner":"Admin";
-  b.className="badge "+(role==="owner"?"bo":"ba");
+  // role badge
+  const rb=document.getElementById("rbadge");
+  rb.textContent=role==="owner"?"Owner":role==="admin"?"Admin":"User";
+  rb.className="badge "+(role==="owner"?"b-owner":role==="admin"?"b-admin":"b-user");
+  // plan badge
+  const pb=document.getElementById("planbadge");
+  pb.textContent=plan==="owner"?"Owner":plan==="premium"?"Premium":"Free";
+  pb.className="badge "+(plan==="premium"?"b-premium":plan==="owner"?"b-owner":"b-free");
+  // sidebar visibility
+  const isAdmin=["owner","admin"].includes(role);
+  document.querySelectorAll(".admin-only").forEach(el=>el.style.display=isAdmin?"":"none");
   document.querySelectorAll(".owner-only").forEach(el=>el.style.display=role==="owner"?"":"none");
+  // default page
+  if(!isAdmin){
+    document.querySelectorAll(".slink").forEach(s=>s.classList.remove("on"));
+    document.querySelector(".user-home").classList.add("on");
+  }
 }
 
-function sw(name,el){
-  document.querySelectorAll(".tc").forEach(x=>x.classList.remove("on"));
-  document.querySelectorAll(".ntab").forEach(x=>x.classList.remove("on"));
-  document.getElementById(`tc-${name}`).classList.add("on");
-  el.classList.add("on");
-  if(name==="accounts"&&role==="owner")loadAcc();
+function goPage(name,el){
+  document.querySelectorAll(".pane").forEach(p=>p.classList.remove("on"));
+  document.querySelectorAll(".slink").forEach(s=>s.classList.remove("on"));
+  document.getElementById(`pg-${name}`).classList.add("on");
+  if(el)el.classList.add("on");
+  if(name==="accounts")loadAccounts();
+  if(name==="user-home")loadMyData();
+  if(name==="user-tickets")loadMyTickets();
+  if(name==="user-settings")initSettings();
+  if(name==="user-plan")initPlan();
 }
 
 async function api(path,method="GET",body=null){
@@ -686,72 +841,369 @@ async function api(path,method="GET",body=null){
 async function load(){
   try{
     const d=await api("/api/stats");cache=d;
+    // status bars
+    const mb=document.getElementById("mnt-bar");
+    if(d.maintenance){mb.classList.add("show");document.getElementById("mnt-msg").textContent="Maintenance active"+(d.maintenanceMsg?": "+d.maintenanceMsg:"");}else mb.classList.remove("show");
+    const ab=document.getElementById("ann-bar");
+    if(d.announce){ab.classList.add("show");document.getElementById("ann-msg").textContent="Announcement: "+d.announce.msg;}else ab.classList.remove("show");
+    // stats
     document.getElementById("s-tot").textContent=(d.total||0).toLocaleString();
     document.getElementById("s-uniq").textContent=(d.uniquePlayers||0).toLocaleString();
     document.getElementById("s-on").textContent=(d.onlinePlayers||[]).length;
     document.getElementById("s-ban").textContent=(d.bannedCount||0).toLocaleString();
     document.getElementById("lupd").textContent="Updated "+new Date().toLocaleTimeString("fr-FR");
-    const mb=document.getElementById("maint-bar");
-    if(d.maintenance){mb.classList.add("show");document.getElementById("maint-msg").textContent="Maintenance active"+(d.maintenanceMsg?": "+d.maintenanceMsg:"");}
-    else mb.classList.remove("show");
-    const ab=document.getElementById("ann-bar");
-    if(d.announce){ab.classList.add("show");document.getElementById("ann-msg").textContent="Announcement active: "+d.announce.msg;}
-    else ab.classList.remove("show");
-    rRecent(d.recentLogs||[]);rOnline(d.onlinePlayers||[]);rPlayers(d.topPlayers||[]);rBans(d.bans||{});rLogs(d.recentLogs||[]);
+    // legacy score
+    const sc=d.legacyScore||0;
+    document.getElementById("score-num").textContent=sc;
+    const offset=170-(170*(sc/1000));
+    document.getElementById("score-circle").style.strokeDashoffset=offset;
+    // chart
+    renderChart(d.chart7days||[]);
+    renderHeatmap(d.heatmap||[]);
+    renderTopGames(d.topGames||[]);
+    renderRecent(d.recentLogs||[]);
+    renderOnline(d.onlinePlayers||[]);
+    allPlayers=d.topPlayers||[];allLogs=d.recentLogs||[];
+    renderPlayers(allPlayers);renderLogs(allLogs);
+    renderBans(d.bans||{});
+    renderLeaderboard(d.leaderboard||[]);
+    renderAudit(d.auditLog||[]);
+    // ghost btn
+    ghostMode=d.ghostMode||false;
+    const gb=document.getElementById("ghost-btn");
+    if(gb){gb.textContent=ghostMode?"Ghost ON — Disable":"Ghost OFF — Enable";gb.className=ghostMode?"btn bred":"btn bgrn";}
+    // motd
+    if(document.getElementById("motd-txt"))document.getElementById("motd-txt").value=d.motd||"";
   }catch(e){if(e.message!=="expired")toast("Load failed","err")}
 }
 
-function rRecent(ex){
-  const tb=document.getElementById("tb-recent");
-  if(!ex.length){tb.innerHTML=`<tr><td colspan="5"><div class="empty-s">No executions yet</div></td></tr>`;return}
-  tb.innerHTML=ex.slice(0,15).map(e=>`<tr><td><strong>${esc(e.uname||"unknown")}</strong></td><td><span class="uid">${esc(e.uid)}</span></td><td class="mt-c">${esc(e.gname||"—")}</td><td><span class="uid">${esc(e.pid||"—")}</span></td><td class="mt-c">${fd(e.ts)}</td></tr>`).join("");
+function renderChart(days){
+  const wrap=document.getElementById("chart7");
+  const lbls=document.getElementById("chart7-lbls");
+  if(!wrap)return;
+  const max=Math.max(...days.map(d=>d.count),1);
+  wrap.innerHTML=days.map(d=>{
+    const h=Math.round((d.count/max)*100);
+    return `<div class="chart-bar-col"><div class="chart-bar" style="height:${Math.max(h,3)}%" data-val="${d.count}"></div></div>`;
+  }).join("");
+  if(lbls)lbls.innerHTML=days.map(d=>`<div style="flex:1;text-align:center"><span class="chart-lbl">${d.label}</span></div>`).join("");
 }
 
-function rOnline(pl){
+function renderHeatmap(hm){
+  const wrap=document.getElementById("heatmap");if(!wrap)return;
+  const max=Math.max(...hm,1);
+  wrap.innerHTML=hm.map((v,i)=>{
+    const op=Math.max(0.06,v/max);
+    return `<div class="hm-cell" style="background:rgba(124,58,237,${op});color:${v>0?'var(--p3)':'var(--mt)'};" title="${i}h: ${v} exec">${String(i).padStart(2,"0")}</div>`;
+  }).join("");
+}
+
+function renderTopGames(games){
+  const tb=document.getElementById("tb-games");if(!tb)return;
+  if(!games.length){tb.innerHTML=`<tr><td colspan="4"><div class="empty-s">No data</div></td></tr>`;return}
+  tb.innerHTML=games.map((g,i)=>`<tr><td class="mc">${i+1}</td><td><span class="uid">${esc(g.pid||"—")}</span></td><td>${esc(g.gname||"Unknown")}</td><td><strong>${g.count}</strong></td></tr>`).join("");
+}
+
+function renderRecent(ex){
+  const tb=document.getElementById("tb-recent");if(!tb)return;
+  if(!ex.length){tb.innerHTML=`<tr><td colspan="4"><div class="empty-s">No executions yet</div></td></tr>`;return}
+  tb.innerHTML=ex.slice(0,15).map(e=>`<tr><td><strong>${esc(e.uname||"unknown")}</strong></td><td><span class="uid">${esc(e.uid)}</span></td><td class="mc">${esc(e.gname||"—")}</td><td class="mc">${fd(e.ts)}</td></tr>`).join("");
+}
+
+function renderOnline(pl){
   document.getElementById("on-cnt").textContent=pl.length;
-  const tb=document.getElementById("tb-online");
+  const tb=document.getElementById("tb-online");if(!tb)return;
   if(!pl.length){tb.innerHTML=`<tr><td colspan="5"><div class="empty-s">No players online</div></td></tr>`;return}
-  tb.innerHTML=pl.map(p=>`<tr><td><span class="odot"></span><strong>${esc(p.uname||"unknown")}</strong></td><td><span class="uid">${esc(p.uid)}</span></td><td class="mt-c">${esc(p.gname||"—")}</td><td class="mt-c">${fd(p.ts)}</td><td><div class="acts">${cache?.bans?.[p.uid]?`<button class="btn bgrn bsm" onclick="doUnban('${esc(p.uid)}')">Unban</button>`:`<button class="btn bred bsm" onclick="pBan('${esc(p.uid)}')">Ban</button>`}<button class="btn bamb bsm" onclick="doKick('${esc(p.uid)}','${esc(p.uname||"")}')">Kick</button></div></td></tr>`).join("");
+  tb.innerHTML=pl.map(p=>`<tr><td><span class="odot"></span><strong>${esc(p.uname||"unknown")}</strong></td><td><span class="uid">${esc(p.uid)}</span></td><td class="mc">${esc(p.gname||"—")}</td><td class="mc">${fd(p.ts)}</td><td><div class="acts">${cache?.bans?.[p.uid]?`<button class="btn bgrn bsm" onclick="doUnban('${esc(p.uid)}')">Unban</button>`:`<button class="btn bred bsm" onclick="pBan('${esc(p.uid)}')">Ban</button>`}<button class="btn bamb bsm" onclick="promptKick('${esc(p.uid)}','${esc(p.uname||"")}')">Kick</button></div></td></tr>`).join("");
 }
 
-function rPlayers(pl){
+function renderPlayers(pl){
   document.getElementById("pl-cnt").textContent=pl.length;
-  const tb=document.getElementById("tb-players");
+  const tb=document.getElementById("tb-players");if(!tb)return;
   if(!pl.length){tb.innerHTML=`<tr><td colspan="6"><div class="empty-s">No players yet</div></td></tr>`;return}
-  tb.innerHTML=pl.map(p=>`<tr><td><strong>${esc(p.uname||"unknown")}</strong></td><td><span class="uid">${esc(p.uid)}</span></td><td><strong>${p.count}</strong></td><td class="mt-c">${esc(p.gname||"—")}</td><td class="mt-c">${fd(p.last)}</td><td><div class="acts">${cache?.bans?.[p.uid]?`<button class="btn bgrn bsm" onclick="doUnban('${esc(p.uid)}')">Unban</button>`:`<button class="btn bred bsm" onclick="pBan('${esc(p.uid)}')">Ban</button>`}<button class="btn bamb bsm" onclick="doKick('${esc(p.uid)}','${esc(p.uname||"")}')">Kick</button></div></td></tr>`).join("");
+  tb.innerHTML=pl.map(p=>`<tr><td><strong>${esc(p.uname||"unknown")}</strong></td><td><span class="uid">${esc(p.uid)}</span></td><td><strong>${p.count}</strong></td><td class="mc">${esc(p.gname||"—")}</td><td class="mc">${fd(p.last)}</td><td><div class="acts">${cache?.bans?.[p.uid]?`<button class="btn bgrn bsm" onclick="doUnban('${esc(p.uid)}')">Unban</button>`:`<button class="btn bred bsm" onclick="pBan('${esc(p.uid)}')">Ban</button>`}<button class="btn bamb bsm" onclick="promptKick('${esc(p.uid)}','${esc(p.uname||"")}')">Kick</button></div></td></tr>`).join("");
 }
 
-function rBans(bans){
+function filterPlayers(){
+  const q=document.getElementById("search-players").value.toLowerCase();
+  renderPlayers(allPlayers.filter(p=>(p.uname||"").toLowerCase().includes(q)||p.uid.includes(q)));
+}
+function filterLogs(){
+  const q=document.getElementById("search-logs").value.toLowerCase();
+  renderLogs(allLogs.filter(e=>(e.uname||"").toLowerCase().includes(q)||e.uid.includes(q)||(e.gname||"").toLowerCase().includes(q)));
+}
+
+function renderBans(bans){
   const e=Object.entries(bans);
   document.getElementById("bn-cnt").textContent=e.length;
-  const tb=document.getElementById("tb-bans");
-  if(!e.length){tb.innerHTML=`<tr><td colspan="5"><div class="empty-s">No active bans</div></td></tr>`;return}
-  tb.innerHTML=e.map(([uid,b])=>`<tr><td><span class="uid">${esc(uid)}</span></td><td>${esc(b.reason||"—")}</td><td class="mt-c">${esc(b.by||"—")}</td><td class="mt-c">${fd(b.at)}</td><td><button class="btn bgrn bsm" onclick="doUnban('${esc(uid)}')">Unban</button></td></tr>`).join("");
+  const tb=document.getElementById("tb-bans");if(!tb)return;
+  if(!e.length){tb.innerHTML=`<tr><td colspan="6"><div class="empty-s">No active bans</div></td></tr>`;return}
+  tb.innerHTML=e.map(([uid,b])=>`<tr><td><span class="uid">${esc(uid)}</span></td><td>${esc(b.reason||"—")}</td><td class="mc">${esc(b.by||"—")}</td><td class="mc">${fd(b.at)}</td><td class="mc">${b.expires?fd(b.expires):"Permanent"}</td><td><button class="btn bgrn bsm" onclick="doUnban('${esc(uid)}')">Unban</button></td></tr>`).join("");
 }
 
-function rLogs(logs){
+function renderLogs(logs){
   document.getElementById("log-cnt").textContent=logs.length;
-  const tb=document.getElementById("tb-logs");
+  const tb=document.getElementById("tb-logs");if(!tb)return;
   if(!logs.length){tb.innerHTML=`<tr><td colspan="5"><div class="empty-s">No logs</div></td></tr>`;return}
-  tb.innerHTML=logs.map(e=>`<tr><td><strong>${esc(e.uname||"unknown")}</strong></td><td><span class="uid">${esc(e.uid)}</span></td><td class="mt-c">${esc(e.gname||"—")}</td><td><span class="uid">${esc(e.pid||"—")}</span></td><td class="mt-c">${fd(e.ts)}</td></tr>`).join("");
+  tb.innerHTML=logs.map(e=>`<tr><td><strong>${esc(e.uname||"unknown")}</strong></td><td><span class="uid">${esc(e.uid)}</span></td><td class="mc">${esc(e.gname||"—")}</td><td><span class="uid">${esc(e.pid||"—")}</span></td><td class="mc">${fd(e.ts)}</td></tr>`).join("");
 }
 
-function pBan(uid){document.getElementById("ban-uid").value=uid;document.querySelector(".ntab:nth-child(4)").click();document.getElementById("ban-uid").focus()}
-async function doBan(){const uid=document.getElementById("ban-uid").value.trim(),rsn=document.getElementById("ban-rsn").value.trim();if(!uid){toast("Enter a user ID","err");return}const d=await api("/api/ban","POST",{userId:uid,reason:rsn});if(d.ok){toast("Player banned","suc");document.getElementById("ban-uid").value="";document.getElementById("ban-rsn").value="";await load();}else toast(d.error||"Error","err")}
-async function doUnban(uid){const d=await api("/api/unban","POST",{userId:uid});if(d.ok){toast("Player unbanned","suc");await load();}else toast(d.error||"Error","err")}
-async function doKick(uid,uname){const r=prompt(`Kick reason for ${uname||uid}:`);if(r===null)return;const d=await api("/api/kick","POST",{userId:uid,reason:r||"Kicked by admin."});if(d.ok)toast("Kick queued","suc");else toast(d.error||"Error","err")}
-async function sendAnn(){const msg=document.getElementById("ann-txt").value.trim(),dur=Number(document.getElementById("ann-dur").value)||300;if(!msg){toast("Enter a message","err");return}const d=await api("/api/announce","POST",{msg,duration:dur});if(d.ok){toast("Announcement sent","suc");document.getElementById("ann-txt").value="";await load();}else toast(d.error||"Error","err")}
-async function clearAnn(){const d=await api("/api/announce","POST",{msg:""});if(d.ok){toast("Announcement cleared","suc");await load();}}
-async function setMaint(on){const msg=on?document.getElementById("maint-txt").value.trim():"";const d=await api("/api/maintenance","POST",{on,msg});if(d.ok){toast(on?"Maintenance enabled":"Maintenance disabled","suc");await load();}else toast(d.error||"Error","err")}
-async function loadAcc(){const d=await api("/api/accounts");const tb=document.getElementById("tb-acc");if(!d.accounts?.length){tb.innerHTML=`<tr><td colspan="4"><div class="empty-s">No accounts</div></td></tr>`;return}tb.innerHTML=d.accounts.map(a=>`<tr><td><strong>${esc(a.username)}</strong></td><td><span class="badge ${a.role==="owner"?"bo":a.role==="pending"?"":"ba"}">${a.role==="owner"?"Owner":a.role==="pending"?"Pending":"Admin"}</span></td><td class="mt-c">${fd(a.created)}</td><td><div class="acts">${a.role==="pending"?`<button class="btn bgrn bsm" onclick="appAcc('${esc(a.username)}')">Approve</button>`:""}${a.role!=="owner"?`<button class="btn bred bsm" onclick="delAcc('${esc(a.username)}')">Delete</button>`:""}</div></td></tr>`).join("")}
-async function appAcc(u){const d=await api("/api/accounts/approve","POST",{username:u});if(d.ok){toast(`${u} is now admin`,"suc");loadAcc();}else toast(d.error,"err")}
-async function delAcc(u){if(!confirm(`Delete "${u}"?`))return;const d=await api("/api/accounts/delete","POST",{username:u});if(d.ok){toast(`${u} deleted`,"suc");loadAcc();}else toast(d.error,"err")}
+function renderLeaderboard(lb){
+  const box=document.getElementById("lb-box");if(!box)return;
+  if(!lb.length){box.innerHTML=`<div class="empty-s">No data yet</div>`;return}
+  box.innerHTML=lb.map(p=>`
+    <div class="lb-item">
+      <div class="lb-rank ${p.rank===1?"gold":p.rank===2?"silver":p.rank===3?"bronze":""}">${p.rank}</div>
+      <div class="lb-avatar">${(p.uname||"?")[0].toUpperCase()}</div>
+      <div class="lb-info"><div class="lb-name">${esc(p.uname||"unknown")}</div><div class="lb-sub"><span class="uid">${esc(p.uid)}</span></div></div>
+      <div class="lb-count">${p.count}</div>
+    </div>
+  `).join("");
+}
+
+function renderAudit(log){
+  const box=document.getElementById("audit-box");if(!box)return;
+  if(!log.length){box.innerHTML=`<div class="empty-s">No audit entries</div>`;return}
+  const types={ban:"ban",unban:"unban",kick:"kick",announce:"announce"};
+  box.innerHTML=log.map(e=>`
+    <div class="audit-line">
+      <div class="audit-dot ${types[e.action]||"other"}"></div>
+      <div class="audit-txt"><span class="audit-who">${esc(e.who)}</span> — ${esc(e.action)}${e.detail?" — "+esc(e.detail):""}</div>
+      <div class="audit-ts">${fd(e.ts)}</div>
+    </div>
+  `).join("");
+}
+
+// Actions admin
+function pBan(uid){document.getElementById("ban-uid").value=uid;goPage("bans",document.querySelector(".slink:nth-child(5)"));document.getElementById("ban-uid").focus();}
+function setRsn(r){document.getElementById("ban-rsn").value=r}
+
+async function doBan(){
+  const uid=document.getElementById("ban-uid").value.trim(),rsn=document.getElementById("ban-rsn").value.trim(),dur=document.getElementById("ban-dur").value;
+  if(!uid){toast("Enter a user ID","err");return}
+  confirm2(`Ban ${uid}?`,`Reason: ${rsn||"none"} · ${dur?"Expires in "+dur+"s":"Permanent"}`,async()=>{
+    const d=await api("/api/ban","POST",{userId:uid,reason:rsn,duration:dur?Number(dur):null});
+    if(d.ok){toast("Player banned","suc");document.getElementById("ban-uid").value="";await load();}else toast(d.error||"Error","err");
+  });
+}
+
+async function doUnban(uid){
+  const d=await api("/api/unban","POST",{userId:uid});
+  if(d.ok){toast("Player unbanned","suc");await load();}else toast(d.error||"Error","err");
+}
+
+function promptKick(uid,uname){
+  const el=document.getElementById("kick-reason-input");
+  confirm2(`Kick ${uname||uid}?`,"Enter a reason:",async()=>{
+    const r=document.getElementById("confirm-extra-input")?.value||"Kicked by admin.";
+    const d=await api("/api/kick","POST",{userId:uid,reason:r});
+    if(d.ok)toast("Kick queued","suc");else toast(d.error||"Error","err");
+  },true);
+}
+
+async function sendAnn(){
+  const msg=document.getElementById("ann-txt").value.trim(),dur=Number(document.getElementById("ann-dur").value)||300;
+  if(!msg){toast("Enter a message","err");return}
+  const d=await api("/api/announce","POST",{msg,duration:dur});
+  if(d.ok){toast("Announcement sent","suc");document.getElementById("ann-txt").value="";await load();}else toast(d.error||"Error","err");
+}
+async function clearAnn(){const d=await api("/api/announce","POST",{msg:""});if(d.ok){toast("Cleared","suc");await load();}}
+async function setMaint(on){const msg=on?document.getElementById("mnt-txt")?.value.trim():"";const d=await api("/api/maintenance","POST",{on,msg});if(d.ok){toast(on?"Maintenance enabled":"Disabled","suc");await load();}else toast(d.error||"Error","err")}
+async function saveMOTD(){const msg=document.getElementById("motd-txt").value.trim();const d=await api("/api/settings","POST",{motd:msg});if(d.ok)toast("MOTD saved","suc");else toast(d.error||"Error","err")}
+async function clearMOTD(){document.getElementById("motd-txt").value="";const d=await api("/api/settings","POST",{motd:""});if(d.ok)toast("MOTD cleared","suc");}
+async function toggleGhost(){ghostMode=!ghostMode;const d=await api("/api/settings","POST",{ghostMode});if(d.ok){toast(`Ghost mode ${ghostMode?"ON":"OFF"}`,ghostMode?"suc":"err");await load();}else toast(d.error||"Error","err")}
+async function doSnapshot(){const d=await api("/api/snapshot","POST");if(d.ok)toast("Snapshot saved","suc");else toast(d.error||"Error","err")}
+function exportLogs(){if(!allLogs.length){toast("No logs to export","err");return}const blob=new Blob([JSON.stringify(allLogs,null,2)],{type:"application/json"});const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download=`legacy-logs-${Date.now()}.json`;a.click();}
+
+// Accounts
+async function loadAccounts(){
+  const d=await api("/api/accounts");
+  const tb=document.getElementById("tb-acc");if(!tb)return;
+  if(!d.accounts?.length){tb.innerHTML=`<tr><td colspan="5"><div class="empty-s">No accounts</div></td></tr>`;return}
+  tb.innerHTML=d.accounts.map(a=>`<tr>
+    <td><strong>${esc(a.username)}</strong></td>
+    <td><span class="badge ${a.role==="owner"?"b-owner":a.role==="admin"?"b-admin":"b-user"}">${a.role}</span></td>
+    <td>
+      <select onchange="setPlan('${esc(a.username)}',this.value)" style="background:var(--s1);border:1px solid var(--b);border-radius:6px;color:var(--tx);font-size:11px;padding:3px 6px;cursor:pointer">
+        <option value="free" ${a.plan==="free"?"selected":""}>Free</option>
+        <option value="premium" ${a.plan==="premium"?"selected":""}>Premium</option>
+        <option value="owner" ${a.plan==="owner"?"selected":""}>Owner</option>
+      </select>
+    </td>
+    <td class="mc">${fd(a.created)}</td>
+    <td><div class="acts">
+      ${a.role!=="owner"?`
+        <select id="role-sel-${esc(a.username)}" style="background:var(--s1);border:1px solid var(--b);border-radius:6px;color:var(--tx);font-size:11px;padding:3px 6px;cursor:pointer">
+          <option value="user" ${a.role==="user"?"selected":""}>User</option>
+          <option value="admin" ${a.role==="admin"?"selected":""}>Admin</option>
+        </select>
+        <button class="btn bblu bsm" onclick="setRole('${esc(a.username)}')">Set role</button>
+        <button class="btn bred bsm" onclick="delAcc('${esc(a.username)}')">Delete</button>
+      `:"<span class='mc'>—</span>"}
+    </div></td>
+  </tr>`).join("");
+}
+
+async function setRole(u){
+  const sel=document.getElementById(`role-sel-${u}`);
+  if(!sel)return;
+  const d=await api("/api/accounts/setrole","POST",{username:u,role:sel.value});
+  if(d.ok){toast(`${u} is now ${sel.value}`,"suc");loadAccounts();}else toast(d.error||"Error","err");
+}
+async function setPlan(u,p){
+  const d=await api("/api/accounts/setrole","POST",{username:u,plan:p});
+  if(d.ok)toast(`${u} → ${p}`,"suc");else toast(d.error||"Error","err");
+}
+async function delAcc(u){
+  confirm2(`Delete ${u}?`,"This action cannot be undone.",async()=>{
+    const d=await api("/api/accounts/delete","POST",{username:u});
+    if(d.ok){toast(`${u} deleted`,"suc");loadAccounts();}else toast(d.error||"Error","err");
+  });
+}
+
+// USER SIDE
+async function initUserPage(){
+  loadMyData();
+}
+
+async function loadMyData(){
+  try{
+    const d=await api("/api/me");myData=d;
+    document.getElementById("u-avatar").textContent=d.avatar||d.username[0].toUpperCase();
+    document.getElementById("u-name").textContent=d.username;
+    document.getElementById("u-since").textContent="Member since "+fd(d.created);
+    document.getElementById("u-role-stat").textContent=d.role;
+    document.getElementById("u-plan-stat").textContent=(d.plan||"free");
+    document.getElementById("u-execs").textContent=d.execCount||0;
+    document.getElementById("u-tickets-stat").textContent=(d.tickets||[]).length;
+    const badges=document.getElementById("u-badges");
+    badges.innerHTML="";
+    if(d.plan==="premium"){const b=document.createElement("span");b.className="badge b-premium";b.textContent="Premium";badges.appendChild(b);}
+    if(d.role==="owner"){const b=document.createElement("span");b.className="badge b-owner";b.textContent="Owner";badges.appendChild(b);}
+    const logins=document.getElementById("u-logins");
+    if(d.loginHistory?.length){logins.innerHTML=d.loginHistory.map(l=>`<div style="padding:6px 0;border-bottom:1px solid rgba(255,255,255,0.04);font-size:12px;color:var(--mt)">${fd(l.ts)}</div>`).join("");}
+    else{logins.textContent="No login history.";}
+  }catch{}
+}
+
+function initPlan(){
+  const p=plan||"free";
+  document.getElementById("badge-free").style.display=p==="free"?"block":"none";
+  document.getElementById("badge-premium").style.display=p==="premium"||p==="owner"?"block":"none";
+}
+
+async function loadMyTickets(){
+  const d=await api("/api/me");
+  const box=document.getElementById("tickets-list");
+  const tickets=d.tickets||[];
+  if(!tickets.length){box.innerHTML=`<div class="empty-s">No tickets yet. Open one if you need help.</div>`;return}
+  box.innerHTML=tickets.map(t=>`
+    <div class="ticket-item" onclick="toggleTicket('${t.id}')">
+      <div class="ticket-hd">
+        <div class="ticket-subj">${esc(t.subject)}</div>
+        <span class="ticket-status ${t.status}">${t.status}</span>
+      </div>
+      <div class="ticket-meta">${esc(t.category)} · ${fd(t.created)}</div>
+      <div class="ticket-replies" id="tr-${t.id}">
+        <div style="padding:8px;background:rgba(255,255,255,0.03);border-radius:8px;font-size:12px;color:var(--mt)">${esc(t.message)}</div>
+        ${(t.replies||[]).map(r=>`<div class="reply ${["owner","admin"].includes(r.role)?"admin":"user"}"><div class="reply-who">${esc(r.author)} · ${fd(r.ts)}</div>${esc(r.message)}</div>`).join("")}
+        ${t.status==="open"?`<div style="display:flex;gap:8px;margin-top:4px"><input id="reply-${t.id}" placeholder="Reply..." style="flex:1;padding:8px 10px;background:rgba(255,255,255,0.04);border:1px solid var(--b);border-radius:8px;color:var(--tx);font-size:12px;font-family:inherit;outline:none"><button class="btn bpri bsm" onclick="replyTicket('${t.id}')">Send</button></div>`:""}
+      </div>
+    </div>
+  `).join("");
+  // admin: show all tickets
+  if(["owner","admin"].includes(role)){
+    const allT=await api("/api/stats");
+    const allTickets=(allT.tickets||[]);
+    if(allTickets.length){
+      box.innerHTML+=`<div class="shd" style="margin-top:20px">All tickets (admin view) <span class="cnt">${allTickets.length}</span></div>`;
+      box.innerHTML+=allTickets.map(t=>`
+        <div class="ticket-item" onclick="toggleTicket('admin-${t.id}')">
+          <div class="ticket-hd"><div class="ticket-subj">${esc(t.subject)} <span class="mc">— ${esc(t.author)}</span></div><span class="ticket-status ${t.status}">${t.status}</span></div>
+          <div class="ticket-meta">${esc(t.category)} · ${fd(t.created)}</div>
+          <div class="ticket-replies" id="tr-admin-${t.id}">
+            <div style="padding:8px;background:rgba(255,255,255,0.03);border-radius:8px;font-size:12px;color:var(--mt)">${esc(t.message)}</div>
+            ${(t.replies||[]).map(r=>`<div class="reply ${["owner","admin"].includes(r.role)?"admin":"user"}"><div class="reply-who">${esc(r.author)} · ${fd(r.ts)}</div>${esc(r.message)}</div>`).join("")}
+            ${t.status==="open"?`<div style="display:flex;gap:8px;margin-top:4px"><input id="reply-admin-${t.id}" placeholder="Reply as admin..." style="flex:1;padding:8px 10px;background:rgba(255,255,255,0.04);border:1px solid var(--b);border-radius:8px;color:var(--tx);font-size:12px;font-family:inherit;outline:none"><button class="btn bpri bsm" onclick="replyTicket('${t.id}',true)">Reply</button><button class="btn bgh bsm" onclick="replyTicket('${t.id}',true,true)">Close</button></div>`:""}
+          </div>
+        </div>
+      `).join("");
+    }
+  }
+}
+
+function toggleTicket(id){const el=document.getElementById(`tr-${id}`);if(el)el.classList.toggle("show")}
+function showNewTicket(){document.getElementById("new-ticket-box").style.display="block"}
+function hideNewTicket(){document.getElementById("new-ticket-box").style.display="none"}
+
+async function submitTicket(){
+  const cat=document.getElementById("tkt-cat").value,subj=document.getElementById("tkt-subj").value.trim(),msg=document.getElementById("tkt-msg").value.trim();
+  if(!subj||!msg){toast("Fill all fields","err");return}
+  const d=await api("/api/tickets/create","POST",{subject:subj,category:cat,message:msg});
+  if(d.ok){toast("Ticket submitted","suc");hideNewTicket();document.getElementById("tkt-subj").value="";document.getElementById("tkt-msg").value="";loadMyTickets();}else toast(d.error||"Error","err");
+}
+
+async function replyTicket(id,isAdmin=false,close=false){
+  const inp=document.getElementById(isAdmin?`reply-admin-${id}`:`reply-${id}`);
+  const msg=inp?.value.trim();
+  if(!msg&&!close){toast("Enter a message","err");return}
+  const d=await api("/api/tickets/reply","POST",{id,message:msg||"(closed)",close});
+  if(d.ok){toast(close?"Ticket closed":"Reply sent","suc");loadMyTickets();}else toast(d.error||"Error","err");
+}
+
+function initSettings(){
+  // Avatars
+  const wrap=document.getElementById("avatar-select");if(!wrap)return;
+  wrap.innerHTML=AVATARS.map(a=>`
+    <div onclick="selectAvatar('${a}')" id="av-${a}" style="width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,var(--p2),#4c1d95);display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700;color:#fff;cursor:pointer;transition:all .15s;border:2px solid transparent;${myData?.avatar===a?"border-color:var(--p1);":" "}">${a}</div>
+  `).join("");
+}
+
+async function selectAvatar(a){
+  const d=await api("/api/profile/update","POST",{avatar:a});
+  if(d.ok){toast("Avatar updated","suc");if(myData)myData.avatar=a;document.querySelectorAll("[id^='av-']").forEach(el=>el.style.borderColor="transparent");const el=document.getElementById(`av-${a}`);if(el)el.style.borderColor="var(--p1)";}else toast(d.error||"Error","err");
+}
+
+async function changePw(){
+  const p1=document.getElementById("new-pw").value,p2=document.getElementById("new-pw2").value;
+  if(!p1||!p2){toast("Fill both fields","err");return}
+  if(p1!==p2){toast("Passwords don't match","err");return}
+  if(p1.length<6){toast("Min. 6 characters","err");return}
+  const d=await api("/api/profile/update","POST",{newPassword:p1});
+  if(d.ok){toast("Password updated","suc");document.getElementById("new-pw").value="";document.getElementById("new-pw2").value="";}else toast(d.error||"Error","err");
+}
+
+// Confirm modal
+let confirmCb=null;
+function confirm2(title,msg,cb,withInput=false){
+  document.getElementById("confirm-title").textContent=title;
+  document.getElementById("confirm-msg").textContent=msg;
+  const extra=document.getElementById("confirm-extra-input");
+  if(extra)extra.remove();
+  if(withInput){const inp=document.createElement("input");inp.id="confirm-extra-input";inp.placeholder="Reason...";inp.style.cssText="width:100%;padding:9px 12px;background:rgba(255,255,255,0.04);border:1px solid var(--b);border-radius:9px;color:var(--tx);font-size:12px;font-family:inherit;outline:none;margin-bottom:16px";document.getElementById("confirm-msg").after(inp);}
+  confirmCb=cb;
+  document.getElementById("modal-confirm").classList.add("show");
+  document.getElementById("confirm-ok").onclick=async()=>{hideConfirm();if(confirmCb)await confirmCb();};
+}
+function hideConfirm(){document.getElementById("modal-confirm").classList.remove("show");confirmCb=null;}
+
+// Modals
+function showModal(id){document.getElementById(`modal-${id}`).classList.add("show")}
+function hideModal(id){document.getElementById(`modal-${id}`).classList.remove("show")}
+
+// Helpers
 function esc(s){return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;")}
 function fd(ts){if(!ts)return"—";return new Date(ts).toLocaleString("fr-FR",{day:"2-digit",month:"2-digit",hour:"2-digit",minute:"2-digit"})}
 function sm(el,t,tx){el.className=`msg ${t} show`;el.textContent=tx}
 let tt;
-function toast(text,type="suc"){const el=document.getElementById("toast");el.textContent=text;el.className=`show ${type}`;clearTimeout(tt);tt=setTimeout(()=>{el.className=""},3000)}
-document.addEventListener("keydown",e=>{if(e.key==="Enter"&&document.getElementById("auth").style.display!=="none"){if(document.getElementById("fl").style.display!=="none")doLogin();else doReg();}});
+function toast(text,type="suc"){const el=document.getElementById("toast");el.textContent=text;el.className=`show ${type}`;clearTimeout(tt);tt=setTimeout(()=>{el.className=""},3200)}
+
+document.addEventListener("keydown",e=>{
+  if(e.key==="Escape"){document.querySelectorAll(".modal-bg.show").forEach(m=>m.classList.remove("show"));}
+  if(e.key==="Enter"&&document.getElementById("auth").style.display!=="none"){
+    if(document.getElementById("fl").style.display!=="none")doLogin();else doReg();
+  }
+});
 </script>
 </body>
 </html>
