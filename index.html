@@ -76,6 +76,7 @@
         <button class="nav active" data-page="overview">Overview</button>
         <button class="nav" data-page="players">Players</button>
         <button class="nav" data-page="bans">Bans</button>
+        <button class="nav admin-only hidden" data-page="bots">Bots</button>
         <button class="nav" data-page="logs">Logs</button>
         <button class="nav owner-only hidden" data-page="accounts">Accounts</button>
         <button class="nav" data-page="tickets">Tickets</button>
@@ -145,6 +146,7 @@
         qs("#role-pill").textContent = (state.role || "user") + (state.plan ? " · " + state.plan : "");
         qs("#role-pill").className = "pill " + (state.role === "owner" ? "owner" : state.role === "admin" ? "admin" : "");
         qsa(".owner-only").forEach(el => el.classList.toggle("hidden", state.role !== "owner"));
+        qsa(".admin-only").forEach(el => el.classList.toggle("hidden", !["owner","admin"].includes(state.role)));
         go(state.page);
       }
       function setAuthMode(mode) {
@@ -207,6 +209,28 @@
           qsa(".unban").forEach(btn => btn.onclick = async () => { try { await api("/api/unban","POST",{userId:btn.dataset.id}); toast("Bannissement retiré"); renderBans(); } catch(error){showError(error)} });
         }
       }
+      let botsTimer = null;
+      async function renderBots() {
+        if (!["owner","admin"].includes(state.role)) return go("overview");
+        clearTimeout(botsTimer);
+        const d = await api("/api/bots");
+        const online = d.online || 0, starting = d.starting || 0;
+        qs("#main").innerHTML = pageHead("Bots", "Simulation visuelle de comptes fictifs et de VPS.", `<div class="row"><button class="btn primary small" id="start-bots">Start all</button><button class="btn small" id="stop-bots">Stop all</button></div>`) +
+          `<section class="card" style="margin-bottom:14px"><div class="row"><div><strong>Mode simulation uniquement</strong><p class="muted" style="margin:6px 0 0">Aucun cookie, token ou compte Roblox réel n’est utilisé. Les VPS et les statuts sont fictifs.</p></div><span class="tag ${starting ? "yellow" : online ? "green" : ""}">${starting ? starting + " en démarrage" : online + " en ligne"}</span></div></section>
+          <section class="card hidden" id="bot-form"><h3>Ajouter un bot fictif</h3><form id="bot-submit" class="form-grid"><div><label>Nom d’affichage</label><input class="input" id="bot-name" maxlength="40" placeholder="Bot EU 01" required></div><div><label>Région VPS</label><select class="select" id="bot-region"><option value="EU">EU</option><option value="US">US</option><option value="AS">AS</option></select></div><div class="full row"><button class="btn primary fit">Ajouter</button><button type="button" class="btn fit" id="cancel-bot">Annuler</button></div></form></section>
+          <section class="card"><div class="row" style="margin-bottom:14px"><h3 style="margin:0">Bot accounts fictifs</h3><button class="btn small fit" id="new-bot">Ajouter un bot</button></div><div class="table-wrap"><table class="table"><thead><tr><th>Bot</th><th>VPS</th><th>Région</th><th>Statut</th><th>Uptime</th><th></th></tr></thead><tbody>${(d.bots || []).map(bot => `<tr><td><strong>${esc(bot.name)}</strong><div class="muted mono">${esc(String(bot.id || "").slice(0,8))}</div></td><td class="mono">${esc(bot.vps)}</td><td>${esc(bot.region)}</td><td><span class="tag ${bot.status==="online"?"green":bot.status==="starting"?"yellow":""}">${esc(bot.status)}</span></td><td class="mono">${bot.status==="online" ? formatUptime(bot.uptime) : "—"}</td><td><button class="btn danger small delete-bot" data-id="${esc(bot.id)}">Supprimer</button></td></tr>`).join("") || emptyRow(6, "Ajoute ton premier bot fictif")}</tbody></table></div></section>`;
+        qs("#start-bots").onclick = async () => { try { const result = await api("/api/bots/start","POST",{}); toast(result.scheduled ? `Démarrage simulé de ${result.scheduled} bot(s)` : "Aucun bot à démarrer"); renderBots(); } catch(error){showError(error)} };
+        qs("#stop-bots").onclick = async () => { try { await api("/api/bots/stop","POST",{}); toast("Simulation arrêtée"); renderBots(); } catch(error){showError(error)} };
+        qs("#new-bot").onclick = () => qs("#bot-form").classList.remove("hidden");
+        qs("#cancel-bot").onclick = () => qs("#bot-form").classList.add("hidden");
+        qs("#bot-submit").onsubmit = async e => { e.preventDefault(); try { await api("/api/bots","POST",{name:qs("#bot-name").value.trim(),region:qs("#bot-region").value}); toast("Bot fictif ajouté"); renderBots(); } catch(error){showError(error)} };
+        qsa(".delete-bot").forEach(btn => btn.onclick = async () => { if (!confirm("Supprimer ce bot fictif ?")) return; try { await api("/api/bots/delete","POST",{id:btn.dataset.id}); toast("Bot supprimé"); renderBots(); } catch(error){showError(error)} });
+        if (starting) botsTimer = setTimeout(() => renderBots().catch(showError), 3000);
+      }
+      function formatUptime(seconds) {
+        const s = Math.max(0, Number(seconds) || 0), h = Math.floor(s / 3600), m = Math.floor((s % 3600) / 60), sec = s % 60;
+        return `${String(h).padStart(2,"0")}:${String(m).padStart(2,"0")}:${String(sec).padStart(2,"0")}`;
+      }
       async function renderLogs() {
         const d = await loadStats();
         qs("#main").innerHTML = pageHead("Logs", "Événements et actions administratives.") +
@@ -244,6 +268,7 @@
           if (page === "overview") await renderOverview();
           else if (page === "players") await renderPlayers();
           else if (page === "bans") await renderBans();
+          else if (page === "bots") await renderBots();
           else if (page === "logs") await renderLogs();
           else if (page === "accounts") await renderAccounts();
           else if (page === "settings") await renderSettings();
