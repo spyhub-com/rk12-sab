@@ -1,299 +1,1109 @@
-p<!doctype html>
+<!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Legacy — Simulation Control</title>
-  <style>
-    @import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap");
-    :root{
-      --bg:#070711;--panel:#10101d;--panel2:#151526;--line:#27273b;
-      --text:#f4f1ff;--muted:#9895ad;--purple:#8b5cf6;--purple2:#6d28d9;
-      --green:#34d399;--red:#fb7185;--amber:#fbbf24;--blue:#60a5fa;
-      --mono:"JetBrains Mono",monospace;
-    }
-    *{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 20% 0,#18102c 0,transparent 38%),var(--bg);color:var(--text);font:14px Inter,system-ui,sans-serif;min-height:100vh}
-    button,input,select{font:inherit}button{cursor:pointer}
-    .hidden{display:none!important}.muted{color:var(--muted)}.mono{font-family:var(--mono)}
-    .auth{min-height:100vh;display:grid;place-items:center;padding:24px;position:relative}
-    .corner-lock{position:fixed;top:18px;right:20px;width:34px;height:34px;border:1px solid transparent;border-radius:9px;background:transparent;color:#6c687d;opacity:.35;cursor:pointer;font-size:16px;transition:.2s}.corner-lock:hover{opacity:.8;border-color:var(--line);background:#ffffff08}
-    .auth-card{width:min(440px,100%);background:rgba(16,16,29,.9);border:1px solid var(--line);border-radius:22px;padding:32px;box-shadow:0 30px 100px #0008}
-    .brand{display:flex;align-items:center;gap:10px;font-weight:700;font-size:19px;margin-bottom:28px}.brand-mark{display:grid;place-items:center;width:35px;height:35px;border-radius:11px;background:linear-gradient(135deg,var(--purple2),var(--purple));box-shadow:0 8px 22px #7c3aed55}
-    .brand-mark:after{content:"";width:11px;height:11px;border:2px solid white;border-radius:4px;transform:rotate(45deg)}
-    h1,h2,h3,p{margin-top:0}h1{font-size:28px;margin-bottom:8px}h2{font-size:21px;margin-bottom:5px}h3{font-size:14px;margin-bottom:16px}
-    .auth-card p{line-height:1.6}.tabs{display:flex;gap:5px;background:#ffffff08;padding:4px;border:1px solid var(--line);border-radius:11px;margin:24px 0}
-    .tabs button{flex:1;background:transparent;color:var(--muted);border:0;border-radius:8px;padding:9px}.tabs button.on{background:#8b5cf633;color:#ddd1ff}
-    label{display:block;color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.7px;margin:15px 0 7px}
-    input,select,textarea{width:100%;background:#ffffff08;border:1px solid var(--line);border-radius:10px;color:var(--text);padding:11px 12px;outline:none}
-    input:focus,select:focus,textarea:focus{border-color:#9b7aff;box-shadow:0 0 0 3px #8b5cf622}select option{background:#141322}
-    .btn{border:1px solid var(--line);border-radius:9px;padding:10px 14px;color:var(--text);background:#ffffff08;transition:.15s}.btn:hover{background:#ffffff14;border-color:#615486}
-    .btn.primary{border:0;background:linear-gradient(135deg,var(--purple2),var(--purple));box-shadow:0 6px 18px #7c3aed33}.btn.danger{color:var(--red);border-color:#fb718533}.btn.success{color:var(--green);border-color:#34d39933}.btn.small{font-size:12px;padding:7px 10px}
-    .notice{margin-top:16px;padding:11px 12px;border:1px solid #fbbf2433;background:#fbbf240d;color:#f7d778;border-radius:10px;font-size:12px;line-height:1.5}
-    .error,.success{padding:10px 12px;border-radius:9px;margin-top:14px;font-size:12px}.error{color:var(--red);background:#fb718514;border:1px solid #fb718533}.success{color:var(--green);background:#34d39914;border:1px solid #34d39933}
-    .app{min-height:100vh}.topbar{height:62px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;padding:0 25px;background:#090914dd;backdrop-filter:blur(14px);position:sticky;top:0;z-index:5}
-    .topbar .brand{margin:0;font-size:15px}.top-right{display:flex;align-items:center;gap:13px}.pill{border:1px solid var(--line);border-radius:30px;padding:6px 10px;color:var(--muted);font-size:11px}.pill.online{color:var(--green);border-color:#34d39944}.avatar{display:grid;place-items:center;width:29px;height:29px;border-radius:50%;background:linear-gradient(135deg,var(--purple2),#4c1d95);font-weight:700;font-size:12px}
-    .layout{display:flex;min-height:calc(100vh - 62px)}.sidebar{width:220px;flex:0 0 220px;border-right:1px solid var(--line);padding:20px 12px;background:#09091499}.side-label{color:#66647a;font-size:10px;text-transform:uppercase;letter-spacing:1px;padding:0 11px;margin:10px 0 7px}.nav{width:100%;display:flex;gap:9px;align-items:center;border:0;background:transparent;color:var(--muted);padding:10px 11px;border-radius:9px;text-align:left}.nav:hover,.nav.on{color:var(--text);background:#8b5cf625}.nav .ico{width:19px;text-align:center;opacity:.75}.side-bottom{margin-top:auto;padding:15px 11px;color:#68657a;font-size:11px;line-height:1.5}
-    main{width:100%;max-width:1500px;padding:30px;margin:0 auto}.page{display:none}.page.on{display:block}.page-head{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;margin-bottom:25px}.page-head p{color:var(--muted);margin:6px 0 0}
-    .actions{display:flex;gap:9px;flex-wrap:wrap}.grid{display:grid;gap:14px}.stats{grid-template-columns:repeat(4,minmax(0,1fr));margin-bottom:16px}.two{grid-template-columns:1.3fr .7fr}.card{background:#10101dcc;border:1px solid var(--line);border-radius:15px;padding:19px}.stat-label{color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.7px}.stat-value{font-size:28px;font-weight:700;margin-top:11px}.stat-value.green{color:var(--green)}.stat-value.purple{color:#c4b5fd}.stat-value.amber{color:var(--amber)}.stat-value.blue{color:var(--blue)}
-    .card-head{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:15px}.card-head h3{margin:0}.subtle{font-size:11px;color:var(--muted)}.table-wrap{overflow:auto;border:1px solid var(--line);border-radius:11px}table{width:100%;border-collapse:collapse;min-width:610px}th,td{text-align:left;padding:12px 13px;border-bottom:1px solid #ffffff09;font-size:12px}th{color:var(--muted);font-size:10px;text-transform:uppercase;letter-spacing:.7px;background:#ffffff04}tr:last-child td{border-bottom:0}.empty{text-align:center;padding:30px;color:var(--muted);font-size:12px}
-    .dot{width:7px;height:7px;border-radius:50%;display:inline-block;margin-right:6px;background:var(--muted)}.dot.green{background:var(--green);box-shadow:0 0 8px var(--green)}.dot.amber{background:var(--amber)}.dot.red{background:var(--red)}
-    .progress{height:8px;border-radius:20px;background:#ffffff0c;overflow:hidden}.progress i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--purple2),#c084fc);border-radius:inherit;transition:width .4s}
-    .vps-grid{grid-template-columns:repeat(auto-fill,minmax(245px,1fr))}.vps-card{background:#10101dcc;border:1px solid var(--line);border-radius:14px;padding:16px}.vps-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}.vps-name{font-weight:600}.vps-id{font:10px var(--mono);color:#a78bfa}.vps-meta{display:flex;justify-content:space-between;color:var(--muted);font-size:11px;margin:11px 0}.form-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}.full{grid-column:1/-1}.inline{display:flex;gap:8px;align-items:end}.inline>div{flex:1}
-    .log{display:flex;gap:11px;padding:12px 0;border-bottom:1px solid #ffffff09}.log:last-child{border:0}.log-time{font:10px var(--mono);color:#77738d;min-width:120px}.log-text{font-size:12px}.tag{display:inline-block;padding:3px 7px;border-radius:5px;font-size:10px;background:#ffffff0b;color:var(--muted)}.tag.ban{color:var(--red);background:#fb718514}.tag.start{color:var(--green);background:#34d39914}
-    @media(max-width:900px){.sidebar{width:66px;flex-basis:66px;padding:14px 8px}.nav{justify-content:center}.nav span:not(.ico),.side-label,.side-bottom{display:none}.stats{grid-template-columns:repeat(2,1fr)}.two{grid-template-columns:1fr}main{padding:21px}}
-    @media(max-width:580px){.topbar{padding:0 14px}.topbar .brand span{display:none}.stats,.form-grid{grid-template-columns:1fr}.page-head{display:block}.page-head .actions{margin-top:15px}.card{padding:15px}}
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Legacy — Panel</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap');
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#05050e;--s1:rgba(255,255,255,0.03);--s2:rgba(255,255,255,0.055);
+  --b:rgba(255,255,255,0.07);--b2:rgba(120,70,255,0.22);
+  --p1:#a78bfa;--p2:#7c3aed;--p3:#c4b5fd;--p4:#ddd6fe;
+  --tx:#ede9fe;--mt:rgba(237,233,254,0.38);
+  --red:#f87171;--grn:#34d399;--amb:#fbbf24;--blu:#60a5fa;
+  --mono:'JetBrains Mono',monospace;
+}
+body{font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--tx);min-height:100vh;overflow-x:hidden}
+#app{position:relative;z-index:1}
+
+/* ── GATE ── */
+#gate{position:fixed;inset:0;z-index:5000;display:flex;align-items:center;justify-content:center;background:#05050e;overflow:hidden;transition:opacity .6s}
+#gate::before{content:'';position:absolute;inset:0;background-image:radial-gradient(circle,rgba(130,80,255,0.08) 1px,transparent 1px);background-size:26px 26px;}
+#gate::after{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 60% 60% at 50% 50%,rgba(90,30,180,0.25) 0%,transparent 65%);pointer-events:none}
+.gate-inner{position:relative;z-index:2;text-align:center;user-select:none;pointer-events:none}
+.gate-icon{font-size:56px;margin-bottom:16px;filter:drop-shadow(0 0 30px rgba(150,80,255,.6));animation:gatePulse 2.4s ease-in-out infinite}
+@keyframes gatePulse{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.06);opacity:.85}}
+.gate-inner h1{font-family:var(--mono);font-size:22px;font-weight:600;letter-spacing:.5px;color:var(--p3);margin-bottom:8px}
+.gate-inner p{font-size:13px;color:var(--mt)}
+.gate-trigger{position:absolute;top:0;right:0;width:90px;height:90px;cursor:default;z-index:3}
+.gate-hint{position:absolute;bottom:20px;left:50%;transform:translateX(-50%);font-family:var(--mono);font-size:10px;color:rgba(237,233,254,0.15);z-index:2;letter-spacing:1px}
+#gate.hide{opacity:0;pointer-events:none}
+
+/* ── AUTH ── */
+#auth{min-height:100vh;display:none;align-items:stretch;position:relative;overflow:hidden;}
+#auth.on{display:flex}
+#auth::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 60% 70% at 0% 50%,rgba(90,30,180,0.35) 0%,transparent 55%),radial-gradient(ellipse 50% 60% at 100% 20%,rgba(150,80,255,0.2) 0%,transparent 50%);pointer-events:none;z-index:0;}
+#auth::after{content:'';position:absolute;inset:0;background-image:radial-gradient(circle,rgba(130,80,255,0.14) 1px,transparent 1px);background-size:24px 24px;pointer-events:none;z-index:0;}
+.auth-topnav{position:absolute;top:0;left:0;right:0;z-index:10;display:flex;align-items:center;justify-content:space-between;padding:18px 32px}
+.auth-topnav .ver{font-family:var(--mono);font-size:11px;color:var(--mt);letter-spacing:.5px}
+.auth-left{flex:1;display:flex;flex-direction:column;justify-content:center;padding:64px 56px;padding-top:96px;position:relative;z-index:1;}
+.auth-brand{display:flex;align-items:center;gap:10px;margin-bottom:48px;}
+.auth-brand .logo{width:34px;height:34px;background:linear-gradient(135deg,var(--p2),#4c1d95);border-radius:9px;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 20px rgba(100,40,200,0.4);}
+.auth-brand .logo svg{width:18px;height:18px;fill:none;stroke:#fff;stroke-width:2}
+.auth-brand span{font-size:16px;font-weight:600;color:var(--tx);letter-spacing:-.1px}
+.auth-tagline{margin-bottom:36px;}
+.auth-tagline h2{font-size:30px;font-weight:600;letter-spacing:-.5px;line-height:1.2;color:var(--tx);margin-bottom:10px;}
+.auth-tagline h2 em{font-style:normal;background:linear-gradient(135deg,var(--p1),var(--p4));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.auth-tagline p{font-size:13px;color:var(--mt);line-height:1.6;max-width:340px}
+.terminal{background:rgba(0,0,0,0.45);border:1px solid rgba(255,255,255,0.07);border-radius:14px;overflow:hidden;max-width:400px;backdrop-filter:blur(12px);box-shadow:0 20px 60px rgba(0,0,0,0.4);}
+.term-bar{display:flex;align-items:center;gap:6px;padding:10px 14px;background:rgba(255,255,255,0.03);border-bottom:1px solid rgba(255,255,255,0.06);}
+.term-dot{width:10px;height:10px;border-radius:50%}
+.term-dot:nth-child(1){background:#ff5f57}.term-dot:nth-child(2){background:#febc2e}.term-dot:nth-child(3){background:#28c840}
+.term-title{font-family:var(--mono);font-size:11px;color:var(--mt);margin-left:auto;margin-right:auto;}
+.term-body{padding:16px;font-family:var(--mono);font-size:12px;line-height:1.8}
+.term-line{display:flex;gap:8px;margin-bottom:2px}
+.term-prompt{color:var(--p1);user-select:none}.term-cmd{color:rgba(237,233,254,0.75)}
+.term-out{color:var(--mt);padding-left:16px}.term-out.ok{color:var(--grn)}.term-out.dim{color:rgba(237,233,254,0.28)}
+.term-cursor{display:inline-block;width:7px;height:13px;background:var(--p1);border-radius:1px;animation:blink 1.1s steps(1) infinite;vertical-align:middle;margin-left:2px;}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
+.auth-right{width:420px;flex-shrink:0;display:flex;align-items:center;justify-content:center;padding:40px;position:relative;z-index:1;border-left:1px solid rgba(255,255,255,0.05);background:rgba(5,5,14,0.6);backdrop-filter:blur(32px);}
+.auth-form-wrap{width:100%;max-width:340px}
+.form-header{margin-bottom:28px}
+.form-header .eyebrow{font-family:var(--mono);font-size:10px;color:var(--p1);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:8px;}
+.form-header h3{font-size:20px;font-weight:600;color:var(--tx);letter-spacing:-.2px}
+.form-header p{font-size:12px;color:var(--mt);margin-top:4px;line-height:1.5}
+.tsw{display:flex;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:10px;padding:3px;margin-bottom:24px;}
+.tbtn{flex:1;padding:9px;background:none;border:none;color:var(--mt);font-size:12px;font-weight:500;cursor:pointer;border-radius:8px;transition:all .18s;font-family:inherit;}
+.tbtn.on{background:rgba(100,40,200,0.28);color:var(--p3);}
+.fld{margin-bottom:14px}
+.fld label{display:flex;align-items:center;justify-content:space-between;font-size:11px;font-weight:500;color:var(--mt);margin-bottom:6px;letter-spacing:.3px;}
+.inp-wrap{position:relative}
+.inp-wrap .ico{position:absolute;left:12px;top:50%;transform:translateY(-50%);width:14px;height:14px;opacity:.3;pointer-events:none;}
+.fld input{width:100%;padding:11px 12px 11px 36px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:10px;color:var(--tx);font-size:13px;font-family:inherit;outline:none;transition:border-color .18s,box-shadow .18s;}
+.fld input:focus{border-color:rgba(120,70,255,0.55);box-shadow:0 0 0 3px rgba(100,40,200,0.12);}
+.fld input::placeholder{color:rgba(237,233,254,0.18)}
+.sec-notice{display:flex;align-items:center;gap:8px;padding:9px 12px;background:rgba(52,211,153,0.07);border:1px solid rgba(52,211,153,0.15);border-radius:9px;margin-bottom:16px;font-size:11px;color:rgba(52,211,153,0.8);}
+.sec-notice svg{width:12px;height:12px;flex-shrink:0;stroke:currentColor;fill:none;stroke-width:2}
+.btn-main{width:100%;padding:12px;background:linear-gradient(135deg,#6d28d9,#7c3aed,#8b5cf6);border:none;border-radius:11px;color:#fff;font-size:13px;font-weight:600;font-family:inherit;cursor:pointer;box-shadow:0 4px 20px rgba(100,40,200,0.35);transition:all .2s;}
+.btn-main:hover{transform:translateY(-1px);box-shadow:0 8px 28px rgba(100,40,200,0.45)}
+.terms{font-size:11px;color:var(--mt);text-align:center;margin-top:16px;line-height:1.6;}
+.msg{margin-top:12px;padding:10px 13px;border-radius:9px;font-size:12px;font-weight:500;display:none}
+.msg.err{background:rgba(248,113,113,0.09);border:1px solid rgba(248,113,113,0.2);color:var(--red)}
+.msg.suc{background:rgba(52,211,153,0.09);border:1px solid rgba(52,211,153,0.2);color:var(--grn)}
+.msg.show{display:block}
+
+/* ── DASHBOARD ── */
+#dash{display:none;min-height:100vh}
+body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(circle,rgba(130,80,255,0.1) 1px,transparent 1px);background-size:26px 26px;pointer-events:none;z-index:0;opacity:.4}
+.topbar{position:sticky;top:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:0 24px;height:54px;background:rgba(5,5,14,0.9);border-bottom:1px solid var(--b);backdrop-filter:blur(20px)}
+.tbrand{display:flex;align-items:center;gap:9px;font-size:14px;font-weight:600;color:var(--tx)}
+.pip{width:6px;height:6px;background:var(--grn);border-radius:50%;box-shadow:0 0 6px var(--grn)}
+.tright{display:flex;align-items:center;gap:8px}
+.badge{padding:3px 10px;border-radius:20px;font-size:10px;font-weight:500}
+.b-owner{background:rgba(167,139,250,0.12);border:1px solid rgba(167,139,250,0.28);color:var(--p3)}
+.b-admin{background:rgba(100,40,200,0.1);border:1px solid rgba(100,40,200,0.25);color:var(--p1)}
+.b-premium{background:rgba(251,191,36,0.12);border:1px solid rgba(251,191,36,0.28);color:var(--amb)}
+.b-free{background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);color:var(--mt)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:9px 15px;border:none;border-radius:9px;font-size:12px;font-weight:500;font-family:inherit;cursor:pointer;transition:all .15s;white-space:nowrap}
+.bgh{background:var(--s1);border:1px solid var(--b);color:var(--tx)}.bgh:hover{background:var(--s2);border-color:var(--b2)}
+.bred{background:rgba(248,113,113,0.09);border:1px solid rgba(248,113,113,0.22);color:var(--red)}.bred:hover{background:rgba(248,113,113,0.16)}
+.bgrn{background:rgba(52,211,153,0.09);border:1px solid rgba(52,211,153,0.22);color:var(--grn)}.bgrn:hover{background:rgba(52,211,153,0.16)}
+.bamb{background:rgba(251,191,36,0.09);border:1px solid rgba(251,191,36,0.22);color:var(--amb)}.bamb:hover{background:rgba(251,191,36,0.16)}
+.bblu{background:rgba(96,165,250,0.09);border:1px solid rgba(96,165,250,0.22);color:var(--blu)}.bblu:hover{background:rgba(96,165,250,0.16)}
+.bsm{padding:5px 11px;font-size:11px;border-radius:7px}
+.bpri{background:linear-gradient(135deg,var(--p2),#8b5cf6);color:#fff;border:none;box-shadow:0 3px 12px rgba(100,40,200,0.3)}.bpri:hover{box-shadow:0 5px 18px rgba(100,40,200,0.4);transform:translateY(-1px)}
+.dash-layout{display:flex;min-height:calc(100vh - 54px)}
+.sidebar{width:200px;flex-shrink:0;border-right:1px solid var(--b);padding:16px 12px;display:flex;flex-direction:column;gap:2px;background:rgba(5,5,14,0.5)}
+.slink{display:flex;align-items:center;gap:9px;padding:9px 12px;border-radius:9px;font-size:13px;font-weight:500;color:var(--mt);cursor:pointer;transition:all .15s;border:none;background:none;font-family:inherit;width:100%;text-align:left;position:relative}
+.slink svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:2;flex-shrink:0;opacity:.6}
+.slink:hover{background:var(--s2);color:var(--tx)}
+.slink.on{background:rgba(100,40,200,0.2);color:var(--p3)}
+.slink.on svg{opacity:1}
+.sidebar-sep{height:1px;background:var(--b);margin:8px 0}
+.sidebar-lbl{font-size:10px;font-weight:500;color:var(--mt);letter-spacing:.8px;text-transform:uppercase;padding:0 12px;margin-bottom:4px;margin-top:8px}
+.content{flex:1;padding:24px;overflow-x:hidden;min-width:0}
+.pane{display:none}.pane.on{display:block}
+.sgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-bottom:24px}
+.sc{background:rgba(12,8,26,0.5);border:1px solid var(--b);border-radius:13px;padding:20px;position:relative;overflow:hidden}
+.sc::after{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(150,100,255,0.3),transparent)}
+.sc:hover{border-color:var(--b2)}
+.slbl{font-size:10px;font-weight:500;color:var(--mt);text-transform:uppercase;letter-spacing:.8px;margin-bottom:8px}
+.sval{font-size:26px;font-weight:600;letter-spacing:-1px;color:var(--p3);line-height:1}
+.sval.grn{color:var(--grn)}.sval.amb{color:var(--amb)}.sval.red{color:var(--red)}
+.chart-box{background:rgba(12,8,26,0.5);border:1px solid var(--b);border-radius:13px;padding:20px;margin-bottom:22px}
+.chart-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+.chart-hd h4{font-size:13px;font-weight:500;color:var(--tx)}
+.chart-wrap{height:120px;display:flex;align-items:flex-end;gap:6px}
+.chart-bar-col{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;height:100%}
+.chart-bar{width:100%;border-radius:4px 4px 0 0;background:linear-gradient(180deg,var(--p2),rgba(100,40,200,0.3));transition:height .4s;min-height:3px;position:relative}
+.chart-lbl{font-size:9px;color:var(--mt);font-family:var(--mono)}
+.shd{font-size:12px;font-weight:500;color:var(--tx);margin-bottom:12px;display:flex;align-items:center;gap:7px}
+.cnt{font-size:10px;padding:2px 8px;background:var(--s2);border-radius:20px;color:var(--mt)}
+.gt{width:100%;background:rgba(12,8,26,0.45);border:1px solid var(--b);border-radius:13px;overflow:hidden;margin-bottom:20px;overflow-x:auto}
+.gt table{width:100%;border-collapse:collapse;min-width:500px}
+.gt thead th{padding:10px 14px;text-align:left;font-size:9px;font-weight:500;color:var(--mt);text-transform:uppercase;letter-spacing:.7px;border-bottom:1px solid var(--b);background:rgba(255,255,255,0.015)}
+.gt tbody td{padding:10px 14px;font-size:12px;color:var(--tx);border-bottom:1px solid rgba(255,255,255,0.03)}
+.gt tbody tr:hover td{background:rgba(150,100,255,0.04)}
+.uid{font-family:var(--mono);font-size:10px;color:var(--p1);background:rgba(100,40,200,0.09);padding:2px 6px;border-radius:5px}
+.mc{color:var(--mt);font-size:11px}
+.acts{display:flex;gap:5px;align-items:center;flex-wrap:wrap}
+.odot{width:6px;height:6px;background:var(--grn);border-radius:50%;display:inline-block;box-shadow:0 0 5px var(--grn);margin-right:5px}
+.box{background:rgba(12,8,26,0.45);border:1px solid var(--b);border-radius:13px;padding:20px;margin-bottom:20px}
+.frow{display:flex;gap:8px;align-items:flex-end;flex-wrap:wrap}
+.fd{flex:1;min-width:120px}
+.fd label{display:block;font-size:10px;font-weight:500;color:var(--mt);margin-bottom:6px;letter-spacing:.4px;text-transform:uppercase}
+.fd input,.fd select,.fd textarea{width:100%;padding:9px 12px;background:rgba(255,255,255,0.04);border:1px solid var(--b);border-radius:9px;color:var(--tx);font-size:12px;font-family:inherit;outline:none;resize:vertical}
+.fd input:focus,.fd select:focus,.fd textarea:focus{border-color:rgba(100,40,200,0.5);box-shadow:0 0 0 3px rgba(100,40,200,0.1)}
+.fd select option{background:#10081e}
+.ann-bar{background:rgba(251,191,36,0.08);border:1px solid rgba(251,191,36,0.2);border-radius:10px;padding:10px 14px;margin-bottom:14px;font-size:12px;color:var(--amb);display:none;align-items:center;justify-content:space-between;gap:10px}
+.ann-bar.show{display:flex}
+.mnt-bar{background:rgba(248,113,113,0.08);border:1px solid rgba(248,113,113,0.2);border-radius:10px;padding:10px 14px;margin-bottom:14px;font-size:12px;color:var(--red);display:none;align-items:center;justify-content:space-between;gap:10px}
+.mnt-bar.show{display:flex}
+.audit-line{display:flex;align-items:flex-start;gap:10px;padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.04)}
+.audit-line:last-child{border-bottom:none}
+.audit-dot{width:6px;height:6px;border-radius:50%;margin-top:5px;flex-shrink:0;background:var(--mt)}
+.audit-dot.ban{background:var(--red)}.audit-dot.unban{background:var(--grn)}.audit-dot.kick{background:var(--amb)}.audit-dot.announce{background:var(--p1)}.audit-dot.bot_start{background:var(--grn)}.audit-dot.bot_stop{background:var(--amb)}.audit-dot.bot_add{background:var(--p1)}
+.audit-txt{flex:1;font-size:12px;color:var(--tx)}.audit-who{color:var(--p1)}.audit-ts{font-size:10px;color:var(--mt);flex-shrink:0;font-family:var(--mono)}
+
+/* Notif badge topbar */
+.notif-btn{position:relative;background:var(--s1);border:1px solid var(--b);border-radius:9px;width:34px;height:34px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--mt);transition:all .15s}
+.notif-btn:hover{background:var(--s2);color:var(--tx);border-color:var(--b2)}
+.notif-btn svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:2}
+.notif-badge{position:absolute;top:-5px;right:-5px;background:var(--red);color:#fff;border-radius:50%;min-width:16px;height:16px;font-size:9px;display:flex;align-items:center;justify-content:center;font-weight:700;padding:0 4px}
+
+/* Notif items */
+.notif-item{background:rgba(12,8,26,0.5);border:1px solid var(--b);border-radius:11px;padding:14px;margin-bottom:10px;display:flex;gap:12px;align-items:center;cursor:pointer;transition:border-color .15s}
+.notif-item:hover{border-color:var(--b2)}
+.notif-item.unread{border-color:rgba(120,70,255,0.35);background:rgba(30,15,60,0.5)}
+.notif-item.read{opacity:.55}
+.notif-dot{width:8px;height:8px;border-radius:50%;background:var(--p1);flex-shrink:0;box-shadow:0 0 8px var(--p1)}
+.notif-item.read .notif-dot{background:var(--mt);box-shadow:none}
+.notif-title{font-size:13px;font-weight:500;color:var(--tx);margin-bottom:2px}
+.notif-sub{font-size:11px;color:var(--mt);font-family:var(--mono)}
+.notif-lock{margin-left:auto;font-size:11px;color:var(--mt);font-family:var(--mono)}
+
+/* VPS Pterodactyl style */
+.vps-shell{background:#0a0a13;border:1px solid var(--b);border-radius:13px;overflow:hidden;margin-bottom:20px}
+.vps-hd{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;background:rgba(255,255,255,0.02);border-bottom:1px solid var(--b)}
+.vps-hd-l{display:flex;align-items:center;gap:10px}
+.vps-status{width:8px;height:8px;border-radius:50%;background:var(--grn);box-shadow:0 0 8px var(--grn)}
+.vps-name{font-size:13px;font-weight:500;color:var(--tx)}
+.vps-id{font-family:var(--mono);font-size:10px;color:var(--mt);background:rgba(255,255,255,0.04);padding:3px 8px;border-radius:6px}
+.vps-hd-r{display:flex;gap:6px}
+.vps-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--b)}
+.vps-stat{background:#0a0a13;padding:14px 16px}
+.vps-stat-lbl{font-family:var(--mono);font-size:9px;color:var(--mt);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px}
+.vps-stat-val{font-family:var(--mono);font-size:16px;font-weight:600;color:var(--p3)}
+.vps-stat-bar{height:3px;background:rgba(255,255,255,0.06);border-radius:2px;margin-top:6px;overflow:hidden}
+.vps-stat-fill{height:100%;background:linear-gradient(90deg,var(--p2),var(--p1));border-radius:2px;transition:width .5s}
+.vps-tabs{display:flex;gap:0;background:rgba(255,255,255,0.02);border-bottom:1px solid var(--b)}
+.vps-tab{padding:10px 18px;background:none;border:none;color:var(--mt);font-size:12px;font-family:inherit;cursor:pointer;border-bottom:2px solid transparent;transition:all .15s}
+.vps-tab:hover{color:var(--tx);background:rgba(255,255,255,0.02)}
+.vps-tab.on{color:var(--p3);border-bottom-color:var(--p1);background:rgba(100,40,200,0.06)}
+.vps-pane{display:none;padding:0}
+.vps-pane.on{display:block}
+.vps-console{background:#05050a;padding:14px;font-family:var(--mono);font-size:12px;line-height:1.7;height:340px;overflow-y:auto;color:rgba(237,233,254,0.85)}
+.vps-console::-webkit-scrollbar{width:6px}.vps-console::-webkit-scrollbar-thumb{background:rgba(120,70,255,.3);border-radius:3px}
+.vps-line{margin-bottom:1px;white-space:pre-wrap;word-break:break-all}
+.vps-line.cmd{color:var(--p1)}
+.vps-line.err{color:var(--red)}
+.vps-line.ok{color:var(--grn)}
+.vps-line.dim{color:var(--mt)}
+.vps-prompt{display:flex;align-items:center;gap:8px;padding:10px 14px;border-top:1px solid var(--b);background:rgba(255,255,255,0.02)}
+.vps-prompt .p{color:var(--p1);font-family:var(--mono);font-size:12px}
+.vps-prompt input{flex:1;background:transparent;border:none;outline:none;color:var(--tx);font-family:var(--mono);font-size:12px;padding:4px}
+.vps-files{display:grid;grid-template-columns:240px 1fr;height:400px}
+.vps-tree{border-right:1px solid var(--b);background:rgba(0,0,0,0.15);overflow-y:auto;padding:8px}
+.vps-tree-item{padding:6px 10px;border-radius:6px;font-family:var(--mono);font-size:12px;color:var(--mt);cursor:pointer;display:flex;align-items:center;gap:8px}
+.vps-tree-item:hover{background:rgba(255,255,255,0.04);color:var(--tx)}
+.vps-tree-item.on{background:rgba(100,40,200,0.15);color:var(--p3)}
+.vps-editor{display:flex;flex-direction:column}
+.vps-editor-hd{display:flex;align-items:center;justify-content:space-between;padding:8px 14px;border-bottom:1px solid var(--b);font-family:var(--mono);font-size:11px;color:var(--mt)}
+.vps-editor textarea{flex:1;width:100%;background:#05050a;border:none;outline:none;color:var(--tx);font-family:var(--mono);font-size:12px;padding:14px;resize:none;line-height:1.6}
+
+/* Bots (Login Auth) */
+.bot-item{background:rgba(12,8,26,0.5);border:1px solid var(--b);border-radius:11px;padding:14px;margin-bottom:10px;display:flex;gap:12px;align-items:center}
+.bot-avatar{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--p2),#4c1d95);display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:700;color:#fff;flex-shrink:0}
+.bot-info{flex:1;min-width:0}
+.bot-name{font-size:13px;font-weight:500;color:var(--tx)}
+.bot-token{font-family:var(--mono);font-size:10px;color:var(--mt);margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.bot-dot{width:8px;height:8px;border-radius:50%;background:var(--mt);flex-shrink:0}
+.bot-dot.on{background:var(--grn);box-shadow:0 0 8px var(--grn)}
+
+/* Modal */
+.modal-bg{display:none;position:fixed;inset:0;z-index:200;align-items:center;justify-content:center;padding:24px}
+.modal-bg.show{display:flex}
+.modal-overlay{position:absolute;inset:0;background:rgba(0,0,0,0.6);backdrop-filter:blur(8px)}
+.modal-box{position:relative;z-index:1;width:100%;max-width:520px;background:rgba(10,7,22,0.96);border:1px solid rgba(120,70,255,0.25);border-radius:18px;padding:32px;backdrop-filter:blur(40px);box-shadow:0 32px 80px rgba(0,0,0,0.6)}
+.modal-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px}
+.modal-close{background:rgba(255,255,255,0.05);border:1px solid var(--b);border-radius:8px;color:var(--mt);width:30px;height:30px;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center}
+.modal-body{font-size:12px;color:var(--mt);line-height:1.8}
+.modal-body h4{color:var(--tx);font-weight:500;margin-bottom:6px;margin-top:14px}
+.kv{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.05);font-size:12px}
+.kv-k{color:var(--mt)}
+.kv-v{color:var(--p3);font-family:var(--mono)}
+
+/* Toast */
+#toast{position:fixed;bottom:24px;right:24px;padding:12px 16px;border-radius:11px;font-size:12px;font-weight:500;backdrop-filter:blur(20px);z-index:9999;transform:translateY(60px);opacity:0;transition:all .25s;max-width:280px;pointer-events:none}
+#toast.show{transform:translateY(0);opacity:1}
+#toast.suc{background:rgba(52,211,153,0.12);border:1px solid rgba(52,211,153,0.28);color:var(--grn)}
+#toast.err{background:rgba(248,113,113,0.12);border:1px solid rgba(248,113,113,0.28);color:var(--red)}
+.spin{display:inline-block;width:14px;height:14px;border:2px solid rgba(255,255,255,0.12);border-top-color:rgba(255,255,255,0.5);border-radius:50%;animation:sp .6s linear infinite}
+@keyframes sp{to{transform:rotate(360deg)}}
+.empty-s{text-align:center;padding:32px;color:var(--mt);font-size:12px}
+@media(max-width:860px){#auth{flex-direction:column}.terminal{display:none}.auth-right{width:100%;border-left:none;padding:20px}.sidebar{display:none}.content{padding:16px}.vps-files{grid-template-columns:1fr}}
+</style>
 </head>
 <body>
-  <section id="auth" class="auth">
-    <button class="corner-lock" id="corner-lock" aria-label="Owner access" title="Owner access">⌁</button>
-    <div class="auth-card">
-      <div class="brand"><span class="brand-mark"></span><span>Legacy Control</span></div>
-      <div id="locked-copy">
-        <h1>Web is Obfuscate</h1>
-        <p class="muted">Access restricted to the owner account. Simulations use fictitious references and no Roblox secrets.</p>
-      </div>
-      <div id="owner-login" class="hidden">
-        <h1>Owner access</h1>
-        <p class="muted">Sign in with the owner account to open the private dashboard.</p>
-        <form id="login-form" onsubmit="login(event)">
-          <label>Username</label><input id="login-user" autocomplete="username" required>
-          <label>Password</label><input id="login-pass" type="password" autocomplete="current-password" required>
-          <button class="btn primary" style="width:100%;margin-top:20px">Open dashboard</button>
-        </form>
-      </div>
-      <div id="auth-msg"></div>
-      <div id="unlock-hint" class="notice">Owner access is available from the lock control in the top-right corner.</div>
+<div id="app">
+
+<!-- ══ GATE ══ -->
+<div id="gate">
+  <div class="gate-inner">
+    <div class="gate-icon">🔒</div>
+    <h1>Web is Obfuscate 🔒</h1>
+    <p>Accès seulement pour les owner.</p>
+  </div>
+  <div class="gate-trigger" id="gate-trigger"></div>
+  <div class="gate-hint">unauthorized access is logged</div>
+</div>
+
+<!-- ══ AUTH ══ -->
+<div id="auth">
+  <div class="auth-topnav">
+    <div class="ver">legacy v1.0</div>
+  </div>
+  <div class="auth-left">
+    <div class="auth-brand">
+      <div class="logo"><svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg></div>
+      <span>Legacy</span>
     </div>
-  </section>
-
-  <section id="app" class="app hidden">
-    <header class="topbar">
-      <div class="brand"><span class="brand-mark"></span><span>Legacy Control</span></div>
-      <div class="top-right"><span id="api-status" class="pill">Connexion…</span><span id="user-role" class="pill">user</span><span id="user-avatar" class="avatar">A</span><button class="btn small" onclick="logout()">Déconnexion</button></div>
-    </header>
-    <div class="layout">
-      <aside class="sidebar">
-        <div class="side-label">Console</div>
-        <button class="nav on" data-page="overview" onclick="go('overview')"><span class="ico">⌂</span><span>Vue générale</span></button>
-        <button class="nav" data-page="simulator" onclick="go('simulator')"><span class="ico">◈</span><span>VPS simulés</span></button>
-        <button class="nav" data-page="players" onclick="go('players')"><span class="ico">◎</span><span>Joueurs & bans</span></button>
-        <button class="nav" data-page="activity" onclick="go('activity')"><span class="ico">≡</span><span>Activité</span></button>
-        <div class="side-label">Compte</div>
-        <button class="nav" onclick="go('console')"><span class="ico">⌘</span><span>Console VPS</span></button>
-        <div class="side-bottom">Worker API<br><span class="mono">WebSocket géré côté backend</span></div>
-      </aside>
-      <main>
-        <section id="page-overview" class="page on">
-          <div class="page-head"><div><h2>Vue générale</h2><p>État de la plateforme et des simulations en cours.</p></div><div class="actions"><button class="btn" onclick="refresh()">↻ Actualiser</button><button class="btn primary" onclick="go('simulator')">Nouvelle simulation</button></div></div>
-          <div class="grid stats">
-            <div class="card"><div class="stat-label">Exécutions</div><div id="s-total" class="stat-value purple">—</div></div>
-            <div class="card"><div class="stat-label">Joueurs uniques</div><div id="s-users" class="stat-value blue">—</div></div>
-            <div class="card"><div class="stat-label">Bannis</div><div id="s-bans" class="stat-value amber">—</div></div>
-            <div class="card"><div class="stat-label">VPS simulés</div><div id="s-bots" class="stat-value green">—</div></div>
-          </div>
-          <div id="run-card" class="card hidden" style="margin-bottom:16px"><div class="card-head"><h3>Simulation en cours</h3><span id="run-time" class="subtle">—</span></div><div class="progress"><i id="run-progress"></i></div><div id="run-label" class="subtle" style="margin-top:10px">Préparation…</div></div>
-          <div class="grid two">
-            <div class="card"><div class="card-head"><h3>Dernières exécutions</h3><span id="exec-count" class="subtle">0</span></div><div id="recent-table"></div></div>
-            <div class="card"><div class="card-head"><h3>Journal d'audit</h3><span class="subtle">50 max.</span></div><div id="audit-list"></div></div>
-          </div>
-        </section>
-
-        <section id="page-simulator" class="page">
-          <div class="page-head"><div><h2>VPS simulés</h2><p>Ajoute des unités de test et simule leur démarrage progressif.</p></div><div class="actions"><button class="btn danger" onclick="stopSimulation()">Arrêter</button><button class="btn primary" onclick="startSimulation()">Démarrer la simulation</button></div></div>
-          <div class="card" style="margin-bottom:16px"><div class="card-head"><h3>Ajouter une unité fictive</h3><span class="tag">Aucun secret accepté</span></div><div class="form-grid"><div><label>Libellé</label><input id="fake-label" placeholder="ex. Test EU 01"></div><div><label>Quantité</label><input id="fake-count" type="number" min="1" max="20" value="1"></div><div style="display:flex;align-items:end"><button class="btn success" style="width:100%" onclick="addSimulations()">+ Ajouter</button></div></div><p class="subtle" style="margin:14px 0 0">Le Worker reçoit uniquement une référence générée comme <span class="mono">SIM-XXXX</span>. Ce n'est pas un cookie Roblox.</p></div>
-          <div id="vps-grid" class="grid vps-grid"></div>
-          <div class="grid two" style="margin-top:16px">
-            <div class="card">
-              <div class="card-head"><h3>Fichiers du VPS virtuel</h3><span class="tag">Simulation locale</span></div>
-              <div id="virtual-files"></div>
-              <p class="subtle" style="margin:14px 0 0">Cette vue n'accède à aucun serveur réel : elle affiche uniquement des fichiers de démonstration en mémoire.</p>
-            </div>
-            <div class="card">
-              <div class="card-head"><h3>Console de simulation</h3><span class="mono subtle">sandbox@vps:~</span></div>
-              <pre id="virtual-console" style="min-height:150px;margin:0;padding:14px;border:1px solid var(--line);border-radius:10px;background:#08080f;color:#a7f3d0;font:11px/1.7 var(--mono);white-space:pre-wrap">Sélectionne un fichier fictif pour afficher son contenu.</pre>
-            </div>
-          </div>
-        </section>
-
-        <section id="page-players" class="page">
-          <div class="page-head"><div><h2>Joueurs & bans</h2><p>Modération des identifiants de joueurs reçus par ton endpoint d'exécution.</p></div></div>
-          <div class="card" style="margin-bottom:16px"><div class="card-head"><h3>Bannir un identifiant</h3><span class="tag ban">Action owner/admin</span></div><div class="form-grid"><div><label>User ID</label><input id="ban-id" placeholder="Identifiant de test"></div><div><label>Raison</label><input id="ban-reason" placeholder="Raison du ban"></div><div><label>Durée en secondes</label><input id="ban-duration" type="number" min="0" placeholder="Vide = permanent"></div><div class="full"><button class="btn danger" onclick="banPlayer()">Bannir l'identifiant</button></div></div></div>
-          <div class="card"><div class="card-head"><h3>Joueurs connus</h3><button class="btn small" onclick="refresh()">Actualiser</button></div><div id="players-table"></div></div>
-        </section>
-
-        <section id="page-activity" class="page">
-          <div class="page-head"><div><h2>Activité</h2><p>Historique des exécutions et des actions administratives.</p></div></div>
-          <div class="card"><div class="card-head"><h3>Journal complet</h3><span class="subtle">Données du Worker</span></div><div id="activity-list"></div></div>
-        </section>
-
-        <section id="page-console" class="page">
-          <div class="page-head"><div><h2>Console VPS</h2><p>Espace de démonstration isolé, sans accès à des fichiers réels.</p></div></div>
-          <div class="card"><div class="card-head"><h3>Terminal virtuel</h3><span class="pill online">Sandbox</span></div><pre id="console-copy" style="margin:0;padding:16px;background:#08080f;border-radius:10px;color:#a7f3d0;font:12px/1.8 var(--mono)">$ status
-simulation: ready
-filesystem: virtual
-network: disabled
-secrets: none</pre></div>
-        </section>
-      </main>
+    <div class="auth-tagline">
+      <h2>Control panel<br><em>built different.</em></h2>
+      <p>Monitor executions, manage bans, broadcast announcements and control your script from one place.</p>
     </div>
-  </section>
+    <div class="terminal">
+      <div class="term-bar">
+        <div class="term-dot"></div><div class="term-dot"></div><div class="term-dot"></div>
+        <div class="term-title">legacy — system status</div>
+      </div>
+      <div class="term-body">
+        <div class="term-line"><span class="term-prompt">$</span><span class="term-cmd">legacy status --check</span></div>
+        <div class="term-out ok">✓  Backend online</div>
+        <div class="term-out ok">✓  Auth system — operational</div>
+        <div class="term-line" style="margin-top:8px"><span class="term-prompt">$</span><span class="term-cursor"></span></div>
+      </div>
+    </div>
+  </div>
+  <div class="auth-right">
+    <div class="auth-form-wrap">
+      <div class="form-header">
+        <div class="eyebrow">// secure access</div>
+        <h3 id="fh-title">Sign in to Legacy</h3>
+        <p id="fh-sub">Enter your credentials to access the control panel.</p>
+      </div>
+      <div class="tsw" id="auth-tsw">
+        <button class="tbtn on" id="tab-login" onclick="atab('login')">Sign in</button>
+        <button class="tbtn" id="tab-reg" onclick="atab('reg')">Create account</button>
+      </div>
+      <div id="fl">
+        <div class="fld"><label>Username</label><div class="inp-wrap"><input id="lu" placeholder="Enter username" autocomplete="username"></div></div>
+        <div class="fld"><label>Password</label><div class="inp-wrap"><input id="lp" type="password" placeholder="Enter password" autocomplete="current-password"></div></div>
+        <button class="btn-main" onclick="doLogin()">Sign in to Legacy</button>
+        <div class="msg" id="lm"></div>
+      </div>
+      <div id="fr" style="display:none">
+        <div class="fld"><label>Username</label><div class="inp-wrap"><input id="ru" placeholder="Choose a username" autocomplete="username"></div></div>
+        <div class="fld"><label>Password</label><div class="inp-wrap"><input id="rp" type="password" placeholder="Min. 6 characters" autocomplete="new-password"></div></div>
+        <div class="sec-notice">First account becomes Owner automatically — following accounts become Admin</div>
+        <button class="btn-main" onclick="doReg()">Create account</button>
+        <div class="msg" id="rm"></div>
+      </div>
+      <div id="reg-disabled" style="display:none;padding:14px;background:rgba(248,113,113,0.08);border:1px solid rgba(248,113,113,0.2);border-radius:10px;font-size:12px;color:var(--red)">
+        Les inscriptions sont désactivées par l'owner.
+      </div>
+    </div>
+  </div>
+</div>
 
-  <script>
-    // L'URL WebSocket n'est jamais exposée ici : les paramètres réseau restent côté Worker.
-    const API_BASE = (new URLSearchParams(location.search).get("api") || location.origin).replace(/\/$/,"");
-    let authToken = localStorage.getItem("legacy_token");
-    let currentUser = localStorage.getItem("legacy_user") || "";
-    let currentRole = localStorage.getItem("legacy_role") || "user";
-    let stats = null, timer = null;
-    let unlockClicks = 0, unlockReset = null;
+<!-- ══ MODALS ══ -->
+<div class="modal-bg" id="modal-confirm">
+  <div class="modal-overlay"></div>
+  <div class="modal-box" style="max-width:360px">
+    <div class="modal-hd"><h3 style="font-size:15px;font-weight:600;color:var(--tx)" id="confirm-title">Confirm action</h3><button class="modal-close" onclick="hideConfirm()">×</button></div>
+    <p style="font-size:13px;color:var(--mt);margin-bottom:20px" id="confirm-msg"></p>
+    <div style="display:flex;gap:8px;justify-content:flex-end">
+      <button class="btn bgh" onclick="hideConfirm()">Cancel</button>
+      <button class="btn bred" id="confirm-ok">Confirm</button>
+    </div>
+  </div>
+</div>
 
-    const $ = id => document.getElementById(id);
-    const esc = value => String(value ?? "").replace(/[&<>"']/g, c => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;" }[c]));
-    const date = ts => ts ? new Date(ts).toLocaleString("fr-FR",{day:"2-digit",month:"2-digit",hour:"2-digit",minute:"2-digit"}) : "—";
-    const msg = (text, ok=false) => { $("auth-msg").innerHTML = `<div class="${ok?"success":"error"}">${esc(text)}</div>`; };
+<div class="modal-bg" id="modal-decrypt">
+  <div class="modal-overlay" onclick="hideModal('decrypt')"></div>
+  <div class="modal-box">
+    <div class="modal-hd"><div><div style="font-family:var(--mono);font-size:10px;color:var(--p1);letter-spacing:1px;margin-bottom:5px">// encrypted</div><h3 style="font-size:16px;font-weight:600;color:var(--tx)">Decrypt notification</h3></div><button class="modal-close" onclick="hideModal('decrypt')">×</button></div>
+    <p style="font-size:12px;color:var(--mt);margin-bottom:14px">Entre le code de déchiffrement pour voir les informations privées.</p>
+    <div class="fld"><input id="decrypt-code" placeholder="•••" maxlength="6" style="text-align:center;font-family:var(--mono);letter-spacing:6px;font-size:16px"></div>
+    <div id="decrypt-result" style="display:none;margin-top:16px"></div>
+    <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:16px">
+      <button class="btn bgh" onclick="hideModal('decrypt')">Close</button>
+      <button class="btn bpri" onclick="doDecrypt()">Décrypter</button>
+    </div>
+  </div>
+</div>
 
-    $("corner-lock").addEventListener("click",()=>{
-      unlockClicks++;
-      clearTimeout(unlockReset);
-      unlockReset=setTimeout(()=>{unlockClicks=0},2500);
-      if(unlockClicks>=10){
-        $("locked-copy").classList.add("hidden");
-        $("owner-login").classList.remove("hidden");
-        $("unlock-hint").classList.add("hidden");
-        $("login-user").focus();
-        unlockClicks=0;
-      }
-    });
+<!-- ══ DASHBOARD ══ -->
+<div id="dash">
+  <div class="topbar">
+    <div class="tbrand"><div class="pip"></div>Legacy</div>
+    <div class="tright">
+      <div class="notif-btn" onclick="goPage('notifications',document.querySelector('[data-page=notifications]'))" title="Notifications">
+        <svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+        <span class="notif-badge" id="notif-badge" style="display:none">0</span>
+      </div>
+      <span id="rbadge" class="badge"></span>
+      <button class="btn bgh bsm" onclick="doOut()">Sign out</button>
+    </div>
+  </div>
+  <div class="dash-layout">
+    <div class="sidebar">
+      <div class="sidebar-lbl">Panel</div>
+      <button class="slink on" data-page="overview" onclick="goPage('overview',this)">
+        <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>Overview
+      </button>
+      <button class="slink" data-page="online" onclick="goPage('online',this)">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3"/></svg>Online
+      </button>
+      <button class="slink" data-page="players" onclick="goPage('players',this)">
+        <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>Players
+      </button>
+      <button class="slink" data-page="bans" onclick="goPage('bans',this)">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg>Bans
+      </button>
+      <button class="slink" data-page="logs" onclick="goPage('logs',this)">
+        <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>Logs
+      </button>
+      <button class="slink" data-page="broadcast" onclick="goPage('broadcast',this)">
+        <svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.42A2 2 0 0 1 3.59 1H6.6a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.1a16 16 0 0 0 6 6l.91-.91a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 21.73 15h.19z"/></svg>Broadcast
+      </button>
+      <button class="slink" data-page="audit" onclick="goPage('audit',this)">
+        <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>Audit Log
+      </button>
 
-    function switchAuth(){ $("auth-msg").innerHTML = ""; }
-    async function request(path, method="GET", body=null){
-      const options = { method, headers: {"Content-Type":"application/json"} };
-      if(authToken) options.headers.Authorization = `Bearer ${authToken}`;
-      if(body) options.body = JSON.stringify(body);
-      const response = await fetch(`${API_BASE}${path}`, options);
-      let data = {};
-      try { data = await response.json(); } catch {}
-      if(response.status === 401){ logout(false); throw new Error("Session expirée"); }
-      if(!response.ok) throw new Error(data.error || `Erreur HTTP ${response.status}`);
-      return data;
+      <div class="sidebar-sep"></div>
+      <div class="sidebar-lbl">System</div>
+
+      <button class="slink" data-page="vps" onclick="goPage('vps',this)">
+        <svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>VPS
+      </button>
+      <button class="slink" data-page="bots" onclick="goPage('bots',this)">
+        <svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="10" rx="2"/><circle cx="12" cy="5" r="2"/><path d="M12 7v4"/><line x1="8" y1="16" x2="8" y2="16"/><line x1="16" y1="16" x2="16" y2="16"/></svg>Login Auth
+      </button>
+      <button class="slink" data-page="notifications" onclick="goPage('notifications',this)">
+        <svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>Notifications
+      </button>
+
+      <div class="sidebar-sep"></div>
+      <div class="sidebar-lbl owner-only">Owner</div>
+      <button class="slink owner-only" data-page="accounts" onclick="goPage('accounts',this)">
+        <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Accounts
+      </button>
+      <button class="slink owner-only" data-page="settings" onclick="goPage('settings',this)">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>Settings
+      </button>
+    </div>
+
+    <div class="content">
+      <div id="mnt-bar" class="mnt-bar"><span id="mnt-msg">Maintenance active</span><button class="btn bred bsm" onclick="setMaint(false)">Disable</button></div>
+      <div id="ann-bar" class="ann-bar"><span id="ann-msg"></span><button class="btn bamb bsm" onclick="clearAnn()">Clear</button></div>
+
+      <!-- OVERVIEW -->
+      <div id="pg-overview" class="pane on">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
+          <h2 style="font-size:18px;font-weight:600">Overview</h2>
+          <div style="display:flex;gap:8px;align-items:center"><span style="font-size:11px;color:var(--mt)" id="lupd"></span><button class="btn bgh bsm" onclick="load()">Refresh</button></div>
+        </div>
+        <div class="sgrid">
+          <div class="sc"><div class="slbl">Total executions</div><div class="sval" id="s-tot">—</div></div>
+          <div class="sc"><div class="slbl">Unique players</div><div class="sval" id="s-uniq">—</div></div>
+          <div class="sc"><div class="slbl">Online now</div><div class="sval grn" id="s-on">—</div></div>
+          <div class="sc"><div class="slbl">Banned</div><div class="sval red" id="s-ban">—</div></div>
+        </div>
+        <div class="chart-box">
+          <div class="chart-hd"><h4>Executions — last 7 days</h4></div>
+          <div class="chart-wrap" id="chart7"></div>
+          <div style="display:flex;gap:6px;margin-top:6px" id="chart7-lbls"></div>
+        </div>
+        <div class="shd">Top games</div>
+        <div class="gt"><table>
+          <thead><tr><th>#</th><th>Place ID</th><th>Game</th><th>Executions</th></tr></thead>
+          <tbody id="tb-games"><tr><td colspan="4"><div class="empty-s"><div class="spin"></div></div></td></tr></tbody>
+        </table></div>
+        <div class="shd">Recent activity</div>
+        <div class="gt"><table>
+          <thead><tr><th>Player</th><th>User ID</th><th>Game</th><th>Date</th></tr></thead>
+          <tbody id="tb-recent"><tr><td colspan="4"><div class="empty-s"><div class="spin"></div></div></td></tr></tbody>
+        </table></div>
+      </div>
+
+      <!-- ONLINE -->
+      <div id="pg-online" class="pane">
+        <h2 style="font-size:18px;font-weight:600;margin-bottom:20px">Online <span class="cnt" id="on-cnt">0</span></h2>
+        <div class="gt"><table>
+          <thead><tr><th>Player</th><th>User ID</th><th>Game</th><th>Last seen</th><th>Actions</th></tr></thead>
+          <tbody id="tb-online"><tr><td colspan="5"><div class="empty-s"><div class="spin"></div></div></td></tr></tbody>
+        </table></div>
+      </div>
+
+      <!-- PLAYERS -->
+      <div id="pg-players" class="pane">
+        <h2 style="font-size:18px;font-weight:600;margin-bottom:16px">Players <span class="cnt" id="pl-cnt">0</span></h2>
+        <div style="margin-bottom:14px"><input id="search-players" placeholder="Search by username or user ID..." style="width:100%;padding:9px 12px;background:rgba(255,255,255,0.04);border:1px solid var(--b);border-radius:9px;color:var(--tx);font-size:12px;font-family:inherit;outline:none" oninput="filterPlayers()"></div>
+        <div class="gt"><table>
+          <thead><tr><th>Player</th><th>User ID</th><th>Executions</th><th>Last game</th><th>Last seen</th><th>Actions</th></tr></thead>
+          <tbody id="tb-players"><tr><td colspan="6"><div class="empty-s"><div class="spin"></div></div></td></tr></tbody>
+        </table></div>
+      </div>
+
+      <!-- BANS -->
+      <div id="pg-bans" class="pane">
+        <h2 style="font-size:18px;font-weight:600;margin-bottom:16px">Bans</h2>
+        <div class="box">
+          <div class="shd" style="margin-bottom:14px">Ban a player</div>
+          <div class="frow">
+            <div class="fd"><label>User ID</label><input id="ban-uid" placeholder="123456789"></div>
+            <div class="fd"><label>Reason</label><input id="ban-rsn" placeholder="Exploiting..."></div>
+            <div class="fd" style="max-width:140px"><label>Duration</label><select id="ban-dur"><option value="">Permanent</option><option value="3600">1 hour</option><option value="86400">24 hours</option><option value="604800">7 days</option><option value="2592000">30 days</option></select></div>
+            <button class="btn bred" onclick="doBan()">Ban</button>
+          </div>
+        </div>
+        <div class="shd">Active bans <span class="cnt" id="bn-cnt">0</span></div>
+        <div class="gt"><table>
+          <thead><tr><th>User ID</th><th>Reason</th><th>Banned by</th><th>Date</th><th>Expires</th><th>Action</th></tr></thead>
+          <tbody id="tb-bans"><tr><td colspan="6"><div class="empty-s"><div class="spin"></div></div></td></tr></tbody>
+        </table></div>
+      </div>
+
+      <!-- LOGS -->
+      <div id="pg-logs" class="pane">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+          <h2 style="font-size:18px;font-weight:600">Execution logs <span class="cnt" id="log-cnt">0</span></h2>
+          <div style="display:flex;gap:8px"><button class="btn bgh bsm" onclick="load()">Refresh</button><button class="btn bgrn bsm" onclick="exportLogs()">Export JSON</button></div>
+        </div>
+        <div class="gt"><table>
+          <thead><tr><th>Player</th><th>User ID</th><th>Game</th><th>Place ID</th><th>Date</th></tr></thead>
+          <tbody id="tb-logs"><tr><td colspan="5"><div class="empty-s"><div class="spin"></div></div></td></tr></tbody>
+        </table></div>
+      </div>
+
+      <!-- BROADCAST -->
+      <div id="pg-broadcast" class="pane">
+        <h2 style="font-size:18px;font-weight:600;margin-bottom:20px">Broadcast</h2>
+        <div class="box">
+          <div class="shd" style="margin-bottom:14px">Send announcement</div>
+          <div class="frow">
+            <div class="fd" style="flex:2"><label>Message</label><input id="ann-txt" placeholder="Server update incoming..."></div>
+            <div class="fd" style="max-width:160px"><label>Duration (seconds)</label><input id="ann-dur" type="number" value="300"></div>
+            <button class="btn bamb" onclick="sendAnn()">Send</button>
+          </div>
+        </div>
+        <div class="box">
+          <div class="shd" style="margin-bottom:14px">MOTD (Message of the Day)</div>
+          <div class="frow">
+            <div class="fd"><label>Message</label><input id="motd-txt" placeholder="Welcome to Legacy v1.0!"></div>
+            <button class="btn bblu" onclick="saveMOTD()">Save MOTD</button>
+            <button class="btn bgh" onclick="clearMOTD()">Clear</button>
+          </div>
+        </div>
+        <div class="box">
+          <div class="shd" style="margin-bottom:14px">Maintenance mode</div>
+          <div class="frow">
+            <div class="fd"><label>Message</label><input id="mnt-txt" placeholder="Maintenance in progress..."></div>
+            <button class="btn bred" onclick="setMaint(true)">Enable</button>
+            <button class="btn bgrn" onclick="setMaint(false)">Disable</button>
+          </div>
+        </div>
+        <div class="box">
+          <div class="shd" style="margin-bottom:14px">Ghost mode</div>
+          <div style="display:flex;align-items:center;gap:12px">
+            <p style="font-size:12px;color:var(--mt);flex:1">When active, the script runs silently — no GUI, no prints.</p>
+            <button class="btn bgh" id="ghost-btn" onclick="toggleGhost()">—</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- AUDIT -->
+      <div id="pg-audit" class="pane">
+        <h2 style="font-size:18px;font-weight:600;margin-bottom:20px">Audit Log</h2>
+        <div class="box" id="audit-box"><div class="empty-s"><div class="spin"></div></div></div>
+      </div>
+
+      <!-- VPS -->
+      <div id="pg-vps" class="pane">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
+          <h2 style="font-size:18px;font-weight:600">VPS</h2>
+          <span style="font-size:11px;color:var(--mt);font-family:var(--mono)">Pterodactyl-Style Console</span>
+        </div>
+        <div class="vps-shell">
+          <div class="vps-hd">
+            <div class="vps-hd-l">
+              <div class="vps-status"></div>
+              <div class="vps-name">Legacy-VPS-01</div>
+              <div class="vps-id">node-eu-01 · 10.0.0.1</div>
+            </div>
+            <div class="vps-hd-r">
+              <button class="btn bgrn bsm" onclick="vpsAction('start')">▸ Start</button>
+              <button class="btn bamb bsm" onclick="vpsAction('restart')">↻ Restart</button>
+              <button class="btn bred bsm" onclick="vpsAction('stop')">■ Stop</button>
+            </div>
+          </div>
+          <div class="vps-stats">
+            <div class="vps-stat"><div class="vps-stat-lbl">CPU</div><div class="vps-stat-val" id="vps-cpu">4.2%</div><div class="vps-stat-bar"><div class="vps-stat-fill" id="vps-cpu-fill" style="width:4%"></div></div></div>
+            <div class="vps-stat"><div class="vps-stat-lbl">RAM</div><div class="vps-stat-val" id="vps-ram">512MB</div><div class="vps-stat-bar"><div class="vps-stat-fill" id="vps-ram-fill" style="width:12%"></div></div></div>
+            <div class="vps-stat"><div class="vps-stat-lbl">Disk</div><div class="vps-stat-val" id="vps-disk">12GB</div><div class="vps-stat-bar"><div class="vps-stat-fill" id="vps-disk-fill" style="width:12%"></div></div></div>
+            <div class="vps-stat"><div class="vps-stat-lbl">Uptime</div><div class="vps-stat-val" id="vps-uptime">0s</div><div class="vps-stat-bar"><div class="vps-stat-fill" style="width:100%"></div></div></div>
+          </div>
+          <div class="vps-tabs">
+            <button class="vps-tab on" onclick="vpsTab('console',this)">Console</button>
+            <button class="vps-tab" onclick="vpsTab('files',this)">Files</button>
+            <button class="vps-tab" onclick="vpsTab('startup',this)">Startup</button>
+          </div>
+          <div class="vps-pane on" id="vps-pane-console">
+            <div class="vps-console" id="vps-console"></div>
+            <div class="vps-prompt">
+              <span class="p">root@legacy:~$</span>
+              <input id="vps-input" placeholder="type a command... (help)" onkeydown="if(event.key==='Enter')vpsExec()">
+              <button class="btn bgh bsm" onclick="vpsExec()">Run</button>
+              <button class="btn bgh bsm" onclick="vpsClear()">Clear</button>
+            </div>
+          </div>
+          <div class="vps-pane" id="vps-pane-files">
+            <div class="vps-files">
+              <div class="vps-tree" id="vps-tree"></div>
+              <div class="vps-editor">
+                <div class="vps-editor-hd">
+                  <span id="vps-editor-path">— no file selected —</span>
+                  <div style="display:flex;gap:6px">
+                    <button class="btn bgrn bsm" onclick="vpsSaveFile()">Save</button>
+                  </div>
+                </div>
+                <textarea id="vps-editor-content" placeholder="// select a file"></textarea>
+              </div>
+            </div>
+          </div>
+          <div class="vps-pane" id="vps-pane-startup">
+            <div style="padding:20px">
+              <div class="shd" style="margin-bottom:14px">Startup command</div>
+              <div class="frow">
+                <div class="fd"><label>Command</label><input id="vps-startup-cmd" value="./legacy --run --prod" readonly></div>
+                <div class="fd" style="max-width:160px"><label>Port</label><input value="8080" readonly></div>
+              </div>
+              <div style="margin-top:16px;font-size:11px;color:var(--mt)">Read-only — managed by the owner.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- LOGIN AUTH / BOTS -->
+      <div id="pg-bots" class="pane">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
+          <h2 style="font-size:18px;font-weight:600">Login Auth <span class="cnt" id="bot-cnt">0</span></h2>
+          <span style="font-size:11px;color:var(--mt)">Fake Roblox bot tokens</span>
+        </div>
+        <div class="box">
+          <div class="shd" style="margin-bottom:14px">Add a bot token</div>
+          <div class="frow">
+            <div class="fd"><label>Roblox Username</label><input id="bot-user" placeholder="e.g. LegacyBot_01"></div>
+            <div class="fd" style="flex:2"><label>Auth Token</label><input id="bot-token" placeholder="_.|WARNING:-DO-NOT-SHARE..." style="font-family:var(--mono);font-size:11px"></div>
+            <button class="btn bpri" onclick="addBot()">+ Add bot</button>
+          </div>
+          <div style="margin-top:10px;font-size:11px;color:var(--mt)">Ces tokens sont factices et servent à simuler des connexions de bots via le VPS.</div>
+        </div>
+        <div class="shd">Configured bots <span class="cnt" id="bot-cnt2">0</span></div>
+        <div id="bot-list"><div class="empty-s">Aucun bot configuré.</div></div>
+      </div>
+
+      <!-- NOTIFICATIONS -->
+      <div id="pg-notifications" class="pane">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
+          <h2 style="font-size:18px;font-weight:600">Notifications <span class="cnt" id="notif-cnt">0</span></h2>
+          <button class="btn bgh bsm" onclick="clearNotifs()">Clear all</button>
+        </div>
+        <div class="box" style="background:rgba(120,70,255,0.05);border-color:rgba(120,70,255,0.15)">
+          <div style="display:flex;gap:10px;align-items:flex-start">
+            <span style="font-size:18px">🔐</span>
+            <div>
+              <div style="font-size:12px;color:var(--p3);font-weight:500;margin-bottom:4px">Notifications chiffrées</div>
+              <div style="font-size:11px;color:var(--mt);line-height:1.6">Chaque nouvelle inscription déclenche une notification contenant les informations sensibles (username, mot de passe, IP) chiffrées. Clique sur une notification pour la déchiffrer avec le code secret.</div>
+            </div>
+          </div>
+        </div>
+        <div id="notif-list"><div class="empty-s">Aucune notification.</div></div>
+      </div>
+
+      <!-- ACCOUNTS -->
+      <div id="pg-accounts" class="pane">
+        <h2 style="font-size:18px;font-weight:600;margin-bottom:20px">Accounts</h2>
+        <div class="gt"><table>
+          <thead><tr><th>Username</th><th>Role</th><th>Plan</th><th>Last IP</th><th>Created</th><th>Actions</th></tr></thead>
+          <tbody id="tb-acc"><tr><td colspan="6"><div class="empty-s"><div class="spin"></div></div></td></tr></tbody>
+        </table></div>
+      </div>
+
+      <!-- SETTINGS (owner) -->
+      <div id="pg-settings" class="pane">
+        <h2 style="font-size:18px;font-weight:600;margin-bottom:20px">Settings</h2>
+        <div class="box">
+          <div class="shd" style="margin-bottom:14px">Registration control</div>
+          <div style="display:flex;align-items:center;gap:16px">
+            <div style="flex:1">
+              <div style="font-size:13px;font-weight:500;color:var(--tx);margin-bottom:4px">Autoriser la création de comptes</div>
+              <div style="font-size:11px;color:var(--mt);line-height:1.5">Si désactivé, personne ne peut créer de compte via la page de login. Chaque nouveau compte est automatiquement admin et déclenche une notification chiffrée.</div>
+            </div>
+            <button class="btn bgh" id="reg-toggle" onclick="toggleReg()">—</button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+</div>
+<div id="toast"></div>
+
+<script>
+const W="https://legacy.spyuhq.workers.dev";
+let token=localStorage.getItem("lt")||null;
+let me=localStorage.getItem("lu2")||null;
+let role=localStorage.getItem("lr")||null;
+let cache=null;
+let allPlayers=[],allLogs=[];
+let gateClicks=0,gateUnlocked=false;
+let vpsState={files:{},logs:[],currentFile:null};
+let notifList=[];
+let decryptionTarget=null;
+
+// ── GATE ──
+(function(){
+  const t=document.getElementById("gate-trigger");
+  t.addEventListener("click",()=>{
+    if(gateUnlocked)return;
+    gateClicks++;
+    if(gateClicks>=10){
+      gateUnlocked=true;
+      document.getElementById("gate").classList.add("hide");
+      setTimeout(()=>document.getElementById("gate").remove(),700);
+      document.getElementById("auth").classList.add("on");
+      checkAuthState();
+      if(token){showDash();load();}
     }
-    async function login(event){
-      event.preventDefault();
-      try{
-        const d = await request("/api/login","POST",{username:$("login-user").value.trim(),password:$("login-pass").value});
-        saveSession(d); openApp(); await refresh();
-      }catch(error){ msg(error.message); }
+  });
+})();
+
+async function checkAuthState(){
+  try{
+    const r=await fetch(`${W}/api/authstate`);
+    const d=await r.json();
+    if(!d.allow){
+      document.getElementById("tab-reg").style.display="none";
+      document.getElementById("reg-disabled").style.display="block";
+    } else {
+      document.getElementById("tab-reg").style.display="";
+      document.getElementById("reg-disabled").style.display="none";
     }
-    async function register(event){
-      event.preventDefault();
-      try{
-        const d = await request("/api/register","POST",{username:$("reg-user").value.trim(),password:$("reg-pass").value});
-        saveSession(d); openApp(); await refresh();
-      }catch(error){ msg(error.message); }
-    }
-    function saveSession(data){
-      authToken=data.token;currentUser=data.username;currentRole=data.role;
-      localStorage.setItem("legacy_token",authToken);localStorage.setItem("legacy_user",currentUser);localStorage.setItem("legacy_role",currentRole);
-    }
-    function openApp(){
-      if(currentRole !== "owner"){
-        const rejected=currentUser;
-        logout(false);
-        msg(`Accès refusé : ${rejected||"ce compte"} n'est pas owner.`);
-        return;
-      }
-      $("auth").classList.add("hidden");$("app").classList.remove("hidden");
-      $("user-role").textContent=currentRole;$("user-avatar").textContent=(currentUser[0]||"A").toUpperCase();
-      $("api-status").textContent="Worker connecté";$("api-status").classList.add("online");
-    }
-    function logout(showAuth=true){
-      authToken=null;currentUser="";currentRole="user";
-      ["legacy_token","legacy_user","legacy_role"].forEach(k=>localStorage.removeItem(k));
-      if(timer) clearInterval(timer);
-      $("app").classList.add("hidden");$("auth").classList.remove("hidden");
-      if(showAuth) switchAuth("login");
-    }
-    function go(page){
-      document.querySelectorAll(".page").forEach(p=>p.classList.remove("on"));
-      document.querySelectorAll(".nav").forEach(n=>n.classList.toggle("on",n.dataset.page===page));
-      $(`page-${page}`).classList.add("on");
-    }
-    async function refresh(){
-      try{
-        stats = await request("/api/stats");
-        renderStats();renderRecent();renderAudit();renderVps();renderPlayers();renderActivity();renderSimulation();
-      }catch(error){ toast(error.message); }
-    }
-    function renderStats(){
-      $("s-total").textContent=stats.total ?? 0;$("s-users").textContent=stats.uniquePlayers ?? 0;
-      $("s-bans").textContent=stats.bannedCount ?? Object.keys(stats.bans||{}).length;
-      $("s-bots").textContent=(stats.bots||[]).length;$("exec-count").textContent=`${(stats.recentLogs||[]).length} lignes`;
-    }
-    function renderRecent(){
-      const rows=(stats.recentLogs||[]).slice(0,8);
-      $("recent-table").innerHTML=rows.length?`<div class="table-wrap"><table><thead><tr><th>Joueur</th><th>Jeu</th><th>Heure</th></tr></thead><tbody>${rows.map(x=>`<tr><td><span class="mono">${esc(x.uname||x.uid)}</span></td><td>${esc(x.gname||"—")}</td><td class="muted">${date(x.ts)}</td></tr>`).join("")}</tbody></table></div>`:`<div class="empty">Aucune exécution.</div>`;
-    }
-    function renderAudit(){
-      const rows=(stats.auditLog||[]).slice(0,8);
-      $("audit-list").innerHTML=rows.length?rows.map(x=>`<div class="log"><span class="dot ${x.action.includes("ban")?"red":x.action.includes("start")?"green":"amber"}"></span><div class="log-text"><b>${esc(x.action)}</b><br><span class="muted">${esc(x.who)} · ${esc(x.detail||"")}</span></div><span class="log-time">${date(x.ts)}</span></div>`).join(""):`<div class="empty">Aucune action.</div>`;
-    }
-    function renderVps(){
-      const bots=stats?.bots||[];
-      $("vps-grid").innerHTML=bots.length?bots.map((b,i)=>`<article class="vps-card"><div class="vps-top"><div><div class="vps-name">${esc(b.label||`Simulation #${i+1}`)}</div><div class="vps-id">${esc(b.vps||"SIM-VPS")}</div></div><span class="tag ${b.status==="online"?"start":""}">${esc(b.status||"offline")}</span></div><div class="vps-meta"><span>Référence fictive</span><span class="mono">SIM-${String(b.id||i).slice(-4)}</span></div><div class="progress"><i style="width:${botProgress(i,bots.length)}%"></i></div><div class="vps-meta"><span>Progression</span><span>${botProgress(i,bots.length)}%</span></div><button class="btn danger small" onclick="removeSimulation('${esc(b.id)}')">Retirer</button></article>`).join(""):`<div class="card empty" style="grid-column:1/-1">Aucune unité fictive. Ajoute une simulation pour commencer.</div>`;
-      renderVirtualFiles();
-    }
-    const VIRTUAL_FILES={
-      "README.txt":"Legacy Simulation VPS\n====================\nMode: local demo\nNetwork: disabled\nSecrets: none\n",
-      "config/demo.json":'{\n  "environment": "simulation",\n  "websocket": "managed-by-worker",\n  "credentials": false\n}',
-      "logs/boot.log":"[ok] virtual filesystem mounted\n[ok] demo process ready\n[--] no external account connected\n"
-    };
-    function renderVirtualFiles(){
-      $("virtual-files").innerHTML=Object.keys(VIRTUAL_FILES).map(name=>`<button class="btn small" style="display:block;width:100%;text-align:left;margin-bottom:7px" onclick="openVirtualFile('${name}')">▸ ${name}</button>`).join("");
-    }
-    function openVirtualFile(name){
-      $("virtual-console").textContent=`$ cat ${name}\n\n${VIRTUAL_FILES[name]||"Fichier introuvable."}`;
-      $("console-copy").textContent=`$ cat ${name}\n\n${VIRTUAL_FILES[name]||"Fichier introuvable."}`;
-    }
-    function botProgress(index,total){
-      if(!stats?.botState?.running) return 0;
-      const started=stats.botState.startedAt||Date.now(), totalMs=stats.botState.totalMs||1;
-      return Math.min(100,Math.max(3,Math.round(((Date.now()-started)/totalMs)*100*(.7+index/Math.max(total,1)*.3))));
-    }
-    function renderPlayers(){
-      const map=new Map((stats?.topPlayers||[]).map(x=>[x.uid,x]));
-      const bans=stats?.bans||{};
-      Object.keys(bans).forEach(uid=>{if(!map.has(uid))map.set(uid,{uid,uname:"—",count:0});});
-      const rows=[...map.values()];
-      $("players-table").innerHTML=rows.length?`<div class="table-wrap"><table><thead><tr><th>Identifiant</th><th>Nom</th><th>Exécutions</th><th>État</th><th></th></tr></thead><tbody>${rows.map(x=>{const ban=bans[x.uid];return `<tr><td class="mono">${esc(x.uid)}</td><td>${esc(x.uname||"—")}</td><td>${x.count||0}</td><td>${ban?'<span class="dot red"></span>Banni':'<span class="dot green"></span>Actif'}</td><td>${ban?`<button class="btn small success" onclick="unbanPlayer('${esc(x.uid)}')">Débannir</button>`:`<button class="btn small danger" onclick="quickBan('${esc(x.uid)}')">Bannir</button>`}</td></tr>`}).join("")}</tbody></table></div>`:`<div class="empty">Aucun joueur trouvé.</div>`;
-    }
-    function renderActivity(){
-      const exec=(stats?.recentLogs||[]).map(x=>({action:"execution",who:x.uname||x.uid,detail:x.gname||x.pid,ts:x.ts}));
-      const audit=stats?.auditLog||[];const all=[...audit,...exec].sort((a,b)=>(b.ts||0)-(a.ts||0)).slice(0,60);
-      $("activity-list").innerHTML=all.length?all.map(x=>`<div class="log"><span class="dot ${x.action==="execution"?"green":x.action.includes("ban")?"red":"amber"}"></span><div class="log-text"><span class="tag ${x.action==="execution"?"start":x.action.includes("ban")?"ban":""}">${esc(x.action)}</span> <b>${esc(x.who||"system")}</b><br><span class="muted">${esc(x.detail||"")}</span></div><span class="log-time">${date(x.ts)}</span></div>`).join(""):`<div class="empty">Aucune activité.</div>`;
-    }
-    function renderSimulation(){
-      const state=stats?.botState;if(!state?.running){$("run-card").classList.add("hidden");return}
-      $("run-card").classList.remove("hidden");
-      const elapsed=Date.now()-(state.startedAt||Date.now()),pct=Math.min(100,Math.round(elapsed/(state.totalMs||1)*100));
-      $("run-progress").style.width=`${pct}%`;$("run-time").textContent=`${formatMs(Math.max(0,(state.totalMs||0)-elapsed))} restantes`;
-      $("run-label").textContent=pct>=100?"Simulation terminée":`Démarrage progressif — ${pct}%`;
-      if(timer)clearInterval(timer);timer=setInterval(()=>{if(stats?.botState?.running){renderSimulation();renderVps()}},1000);
-    }
-    function formatMs(ms){const m=Math.floor(ms/60000),s=Math.floor(ms/1000)%60;return `${m} min ${String(s).padStart(2,"0")} s`;}
-    async function addSimulations(){
-      if(!["owner","admin"].includes(currentRole)){toast("Accès owner/admin requis");return}
-      const count=Math.min(20,Math.max(1,Number($("fake-count").value)||1)),base=$("fake-label").value.trim()||"Simulation";
-      try{for(let i=0;i<count;i++){const ref=`SIM-${crypto.randomUUID().slice(0,8).toUpperCase()}`;await request("/api/bots/add","POST",{cookie:ref,label:`${base} ${i+1}`});}toast(`${count} unité(s) fictive(s) ajoutée(s)`,true);await refresh();}catch(error){toast(error.message)}
-    }
-    async function removeSimulation(id){try{await request("/api/bots/remove","POST",{id});await refresh()}catch(error){toast(error.message)}}
-    async function startSimulation(){try{await request("/api/bots/start","POST");toast("Simulation démarrée",true);await refresh()}catch(error){toast(error.message)}}
-    async function stopSimulation(){try{await request("/api/bots/stop","POST");toast("Simulation arrêtée",true);await refresh()}catch(error){toast(error.message)}}
-    async function banPlayer(){const id=$("ban-id").value.trim(),reason=$("ban-reason").value.trim();if(!id||!reason){toast("Identifiant et raison requis");return}try{await request("/api/ban","POST",{userId:id,reason,duration:Number($("ban-duration").value)||null});toast("Identifiant banni",true);await refresh()}catch(error){toast(error.message)}}
-    async function quickBan(id){$("ban-id").value=id;$("ban-reason").value="Action de modération";go("players")}
-    async function unbanPlayer(userId){try{await request("/api/unban","POST",{userId});toast("Identifiant débanni",true);await refresh()}catch(error){toast(error.message)}}
-    function toast(text,ok=false){let el=$("toast");if(!el){el=document.createElement("div");el.id="toast";el.style.cssText="position:fixed;right:20px;bottom:20px;z-index:20;padding:12px 15px;border-radius:10px;background:#19192a;border:1px solid #45415b;box-shadow:0 12px 35px #0008;font-size:12px";document.body.appendChild(el)}el.textContent=text;el.style.color=ok?"#34d399":"#fb7185";clearTimeout(el._t);el._t=setTimeout(()=>el.remove(),3500)}
-    if(authToken){openApp();refresh()}else{$("auth").classList.remove("hidden")}
-  </script>
+  }catch{}
+}
+
+function atab(t){
+  document.getElementById("fl").style.display=t==="login"?"block":"none";
+  document.getElementById("fr").style.display=t==="reg"?"block":"none";
+  document.querySelectorAll(".tbtn").forEach((b,i)=>b.classList.toggle("on",(i===0&&t==="login")||(i===1&&t==="reg")));
+}
+
+async function doLogin(){
+  const u=document.getElementById("lu").value.trim(),p=document.getElementById("lp").value,m=document.getElementById("lm");
+  if(!u||!p){sm(m,"err","Please fill all fields");return}
+  try{
+    const r=await fetch(`${W}/api/login`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({username:u,password:p})});
+    const d=await r.json();
+    if(!d.ok){sm(m,"err",d.error||"Authentication failed");return}
+    save(d.token,d.username,d.role,d.plan);showDash();load();
+  }catch{sm(m,"err","Could not reach server")}
+}
+
+async function doReg(){
+  const u=document.getElementById("ru").value.trim(),p=document.getElementById("rp").value,m=document.getElementById("rm");
+  if(!u||!p){sm(m,"err","Please fill all fields");return}
+  try{
+    const r=await fetch(`${W}/api/register`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({username:u,password:p})});
+    const d=await r.json();
+    if(!d.ok){sm(m,"err",d.message||d.error||"Error");return}
+    save(d.token,d.username,d.role,d.plan);showDash();load();
+  }catch{sm(m,"err","Could not reach server")}
+}
+
+function save(t,u,r,p){token=t;me=u;role=r;localStorage.setItem("lt",t);localStorage.setItem("lu2",u);localStorage.setItem("lr",r);}
+function doOut(){token=me=role=null;["lt","lu2","lr"].forEach(k=>localStorage.removeItem(k));document.getElementById("dash").style.display="none";document.getElementById("auth").style.display="none";location.reload();}
+
+function showDash(){
+  document.getElementById("auth").style.display="none";
+  document.getElementById("dash").style.display="block";
+  const rb=document.getElementById("rbadge");
+  rb.textContent=role==="owner"?"Owner":"Admin";
+  rb.className="badge "+(role==="owner"?"b-owner":"b-admin");
+  document.querySelectorAll(".owner-only").forEach(el=>el.style.display=role==="owner"?"":"none");
+}
+
+function goPage(name,el){
+  document.querySelectorAll(".pane").forEach(p=>p.classList.remove("on"));
+  document.querySelectorAll(".slink").forEach(s=>s.classList.remove("on"));
+  document.getElementById(`pg-${name}`).classList.add("on");
+  if(el)el.classList.add("on");
+  if(name==="accounts")loadAccounts();
+  if(name==="vps")loadVps();
+  if(name==="bots")loadBots();
+  if(name==="notifications")loadNotifs();
+  if(name==="settings")loadSettings();
+}
+
+async function api(path,method="GET",body=null){
+  const o={method,headers:{"Content-Type":"application/json","Authorization":`Bearer ${token}`}};
+  if(body)o.body=JSON.stringify(body);
+  const r=await fetch(`${W}${path}`,o);
+  if(r.status===401){doOut();throw new Error("expired")}
+  return r.json();
+}
+
+async function load(){
+  try{
+    const d=await api("/api/stats");cache=d;
+    const mb=document.getElementById("mnt-bar");
+    if(d.maintenance){mb.classList.add("show");document.getElementById("mnt-msg").textContent="Maintenance active"+(d.maintenanceMsg?": "+d.maintenanceMsg:"");}else mb.classList.remove("show");
+    const ab=document.getElementById("ann-bar");
+    if(d.announce){ab.classList.add("show");document.getElementById("ann-msg").textContent="Announcement: "+d.announce.msg;}else ab.classList.remove("show");
+    document.getElementById("s-tot").textContent=(d.total||0).toLocaleString();
+    document.getElementById("s-uniq").textContent=(d.uniquePlayers||0).toLocaleString();
+    document.getElementById("s-on").textContent=(d.onlinePlayers||[]).length;
+    document.getElementById("s-ban").textContent=(d.bannedCount||0).toLocaleString();
+    document.getElementById("lupd").textContent="Updated "+new Date().toLocaleTimeString("fr-FR");
+    renderChart(d.chart7days||[]);
+    renderTopGames(d.topGames||[]);
+    renderRecent(d.recentLogs||[]);
+    renderOnline(d.onlinePlayers||[]);
+    allPlayers=d.topPlayers||[];allLogs=d.recentLogs||[];
+    renderPlayers(allPlayers);renderLogs(allLogs);
+    renderBans(d.bans||{});
+    renderAudit(d.auditLog||[]);
+    const gb=document.getElementById("ghost-btn");
+    if(gb){gb.textContent=d.ghostMode?"Ghost ON — Disable":"Ghost OFF — Enable";gb.className=d.ghostMode?"btn bred":"btn bgrn";}
+    if(document.getElementById("motd-txt"))document.getElementById("motd-txt").value=d.motd||"";
+    // notifs badge
+    notifList=d.notifications||[];
+    const nb=document.getElementById("notif-badge");
+    if(d.notifCount>0){nb.style.display="flex";nb.textContent=d.notifCount;}else nb.style.display="none";
+    // vps state
+    if(d.vps){vpsState.files=d.vps.files||{};vpsState.logs=d.vps.logs||[];}
+    // bots
+    cache.bots=d.bots||[];
+  }catch(e){if(e.message!=="expired")toast("Load failed","err")}
+}
+
+function renderChart(days){
+  const wrap=document.getElementById("chart7"),lbls=document.getElementById("chart7-lbls");
+  if(!wrap)return;
+  const max=Math.max(...days.map(d=>d.count),1);
+  wrap.innerHTML=days.map(d=>`<div class="chart-bar-col"><div class="chart-bar" style="height:${Math.max(Math.round((d.count/max)*100),3)}%" data-val="${d.count}"></div></div>`).join("");
+  if(lbls)lbls.innerHTML=days.map(d=>`<div style="flex:1;text-align:center"><span class="chart-lbl">${d.label}</span></div>`).join("");
+}
+function renderTopGames(games){
+  const tb=document.getElementById("tb-games");if(!tb)return;
+  if(!games.length){tb.innerHTML=`<tr><td colspan="4"><div class="empty-s">No data</div></td></tr>`;return}
+  tb.innerHTML=games.map((g,i)=>`<tr><td class="mc">${i+1}</td><td><span class="uid">${esc(g.pid||"—")}</span></td><td>${esc(g.gname||"Unknown")}</td><td><strong>${g.count}</strong></td></tr>`).join("");
+}
+function renderRecent(ex){
+  const tb=document.getElementById("tb-recent");if(!tb)return;
+  if(!ex.length){tb.innerHTML=`<tr><td colspan="4"><div class="empty-s">No executions yet</div></td></tr>`;return}
+  tb.innerHTML=ex.slice(0,15).map(e=>`<tr><td><strong>${esc(e.uname||"unknown")}</strong></td><td><span class="uid">${esc(e.uid)}</span></td><td class="mc">${esc(e.gname||"—")}</td><td class="mc">${fd(e.ts)}</td></tr>`).join("");
+}
+function renderOnline(pl){
+  document.getElementById("on-cnt").textContent=pl.length;
+  const tb=document.getElementById("tb-online");if(!tb)return;
+  if(!pl.length){tb.innerHTML=`<tr><td colspan="5"><div class="empty-s">No players online</div></td></tr>`;return}
+  tb.innerHTML=pl.map(p=>`<tr><td><span class="odot"></span><strong>${esc(p.uname||"unknown")}</strong></td><td><span class="uid">${esc(p.uid)}</span></td><td class="mc">${esc(p.gname||"—")}</td><td class="mc">${fd(p.ts)}</td><td><div class="acts">${cache?.bans?.[p.uid]?`<button class="btn bgrn bsm" onclick="doUnban('${esc(p.uid)}')">Unban</button>`:`<button class="btn bred bsm" onclick="pBan('${esc(p.uid)}')">Ban</button>`}<button class="btn bamb bsm" onclick="promptKick('${esc(p.uid)}','${esc(p.uname||"")}')">Kick</button></div></td></tr>`).join("");
+}
+function renderPlayers(pl){
+  document.getElementById("pl-cnt").textContent=pl.length;
+  const tb=document.getElementById("tb-players");if(!tb)return;
+  if(!pl.length){tb.innerHTML=`<tr><td colspan="6"><div class="empty-s">No players yet</div></td></tr>`;return}
+  tb.innerHTML=pl.map(p=>`<tr><td><strong>${esc(p.uname||"unknown")}</strong></td><td><span class="uid">${esc(p.uid)}</span></td><td><strong>${p.count}</strong></td><td class="mc">${esc(p.gname||"—")}</td><td class="mc">${fd(p.last)}</td><td><div class="acts">${cache?.bans?.[p.uid]?`<button class="btn bgrn bsm" onclick="doUnban('${esc(p.uid)}')">Unban</button>`:`<button class="btn bred bsm" onclick="pBan('${esc(p.uid)}')">Ban</button>`}<button class="btn bamb bsm" onclick="promptKick('${esc(p.uid)}','${esc(p.uname||"")}')">Kick</button></div></td></tr>`).join("");
+}
+function filterPlayers(){const q=document.getElementById("search-players").value.toLowerCase();renderPlayers(allPlayers.filter(p=>(p.uname||"").toLowerCase().includes(q)||p.uid.includes(q)))}
+function renderBans(bans){
+  const e=Object.entries(bans);
+  document.getElementById("bn-cnt").textContent=e.length;
+  const tb=document.getElementById("tb-bans");if(!tb)return;
+  if(!e.length){tb.innerHTML=`<tr><td colspan="6"><div class="empty-s">No active bans</div></td></tr>`;return}
+  tb.innerHTML=e.map(([uid,b])=>`<tr><td><span class="uid">${esc(uid)}</span></td><td>${esc(b.reason||"—")}</td><td class="mc">${esc(b.by||"—")}</td><td class="mc">${fd(b.at)}</td><td class="mc">${b.expires?fd(b.expires):"Permanent"}</td><td><button class="btn bgrn bsm" onclick="doUnban('${esc(uid)}')">Unban</button></td></tr>`).join("");
+}
+function renderLogs(logs){
+  document.getElementById("log-cnt").textContent=logs.length;
+  const tb=document.getElementById("tb-logs");if(!tb)return;
+  if(!logs.length){tb.innerHTML=`<tr><td colspan="5"><div class="empty-s">No logs</div></td></tr>`;return}
+  tb.innerHTML=logs.map(e=>`<tr><td><strong>${esc(e.uname||"unknown")}</strong></td><td><span class="uid">${esc(e.uid)}</span></td><td class="mc">${esc(e.gname||"—")}</td><td><span class="uid">${esc(e.pid||"—")}</span></td><td class="mc">${fd(e.ts)}</td></tr>`).join("");
+}
+function renderAudit(log){
+  const box=document.getElementById("audit-box");if(!box)return;
+  if(!log.length){box.innerHTML=`<div class="empty-s">No audit entries</div>`;return}
+  box.innerHTML=log.map(e=>`<div class="audit-line"><div class="audit-dot ${e.action||""}"></div><div class="audit-txt"><span class="audit-who">${esc(e.who)}</span> — ${esc(e.action)}${e.detail?" — "+esc(e.detail):""}</div><div class="audit-ts">${fd(e.ts)}</div></div>`).join("");
+}
+
+// Actions
+function pBan(uid){document.querySelector('[data-page=bans]').click();document.getElementById("ban-uid").value=uid;document.getElementById("ban-uid").focus();}
+async function doBan(){
+  const uid=document.getElementById("ban-uid").value.trim(),rsn=document.getElementById("ban-rsn").value.trim(),dur=document.getElementById("ban-dur").value;
+  if(!uid){toast("Enter a user ID","err");return}
+  confirm2(`Ban ${uid}?`,`Reason: ${rsn||"none"} · ${dur?"Expires in "+dur+"s":"Permanent"}`,async()=>{
+    const d=await api("/api/ban","POST",{userId:uid,reason:rsn,duration:dur?Number(dur):null});
+    if(d.ok){toast("Player banned","suc");document.getElementById("ban-uid").value="";await load();}else toast(d.error||"Error","err");
+  });
+}
+async function doUnban(uid){const d=await api("/api/unban","POST",{userId:uid});if(d.ok){toast("Unbanned","suc");await load();}else toast(d.error||"Error","err")}
+function promptKick(uid,uname){confirm2(`Kick ${uname||uid}?`,"Enter a reason:",async()=>{const r=document.getElementById("confirm-extra-input")?.value||"Kicked by admin.";const d=await api("/api/kick","POST",{userId:uid,reason:r});if(d.ok)toast("Kick queued","suc");else toast(d.error||"Error","err")},true)}
+async function sendAnn(){const msg=document.getElementById("ann-txt").value.trim(),dur=Number(document.getElementById("ann-dur").value)||300;if(!msg){toast("Enter a message","err");return}const d=await api("/api/announce","POST",{msg,duration:dur});if(d.ok){toast("Announcement sent","suc");document.getElementById("ann-txt").value="";await load();}}
+async function clearAnn(){const d=await api("/api/announce","POST",{msg:""});if(d.ok){toast("Cleared","suc");await load();}}
+async function setMaint(on){const msg=on?document.getElementById("mnt-txt")?.value.trim():"";const d=await api("/api/maintenance","POST",{on,msg});if(d.ok){toast(on?"Maintenance enabled":"Disabled","suc");await load();}}
+async function saveMOTD(){const msg=document.getElementById("motd-txt").value.trim();const d=await api("/api/settings","POST",{motd:msg});if(d.ok)toast("MOTD saved","suc");}
+async function clearMOTD(){document.getElementById("motd-txt").value="";await api("/api/settings","POST",{motd:""});}
+async function toggleGhost(){const on=!cache?.ghostMode;const d=await api("/api/settings","POST",{ghostMode:on});if(d.ok){toast(`Ghost ${on?"ON":"OFF"}`,on?"suc":"err");await load();}}
+function exportLogs(){if(!allLogs.length){toast("No logs","err");return}const b=new Blob([JSON.stringify(allLogs,null,2)],{type:"application/json"});const a=document.createElement("a");a.href=URL.createObjectURL(b);a.download=`legacy-logs-${Date.now()}.json`;a.click();}
+
+// ── VPS ──
+function vpsTab(name,el){
+  document.querySelectorAll(".vps-tab").forEach(t=>t.classList.remove("on"));el.classList.add("on");
+  document.querySelectorAll(".vps-pane").forEach(p=>p.classList.remove("on"));
+  document.getElementById(`vps-pane-${name}`).classList.add("on");
+  if(name==="files")renderVpsTree();
+}
+async function loadVps(){
+  try{
+    const d=await api("/api/vps/files");
+    vpsState.files=d.files||{};vpsState.logs=d.logs||[];
+    renderVpsConsole();renderVpsTree();
+  }catch{}
+}
+function renderVpsConsole(){
+  const c=document.getElementById("vps-console");if(!c)return;
+  c.innerHTML=vpsState.logs.map(l=>{
+    const cls=l.startsWith("$")?"cmd":(l.includes("LAUNCH")||l.includes("added"))?"ok":(l.includes("removed")||l.includes("STOP"))?"err":"dim";
+    return `<div class="vps-line ${cls}">${esc(l)}</div>`;
+  }).join("");
+  c.scrollTop=c.scrollHeight;
+}
+function renderVpsTree(){
+  const tree=document.getElementById("vps-tree");if(!tree)return;
+  const files=Object.keys(vpsState.files).sort();
+  if(!files.length){tree.innerHTML=`<div style="padding:10px;font-size:11px;color:var(--mt)">empty</div>`;return}
+  tree.innerHTML=files.map(f=>`<div class="vps-tree-item ${vpsState.currentFile===f?"on":""}" onclick="selectVpsFile('${esc(f)}')">📄 ${esc(f)}</div>`).join("");
+}
+function selectVpsFile(f){
+  vpsState.currentFile=f;
+  document.getElementById("vps-editor-path").textContent=f;
+  document.getElementById("vps-editor-content").value=vpsState.files[f]?.content||"";
+  renderVpsTree();
+}
+async function vpsSaveFile(){
+  if(!vpsState.currentFile){toast("No file selected","err");return}
+  const content=document.getElementById("vps-editor-content").value;
+  const d=await api("/api/vps/file/save","POST",{path:vpsState.currentFile,content});
+  if(d.ok){toast("File saved","suc");vpsState.files[vpsState.currentFile].content=content;}
+}
+async function vpsExec(){
+  const inp=document.getElementById("vps-input");
+  const cmd=inp.value.trim();
+  if(!cmd)return;
+  inp.value="";
+  try{
+    const d=await api("/api/vps/exec","POST",{cmd});
+    if(d.cleared){await loadVps();return}
+    await loadVps();
+  }catch{}
+}
+async function vpsClear(){await api("/api/vps/clear","POST");await loadVps();}
+function vpsAction(a){
+  const map={start:"[sys] starting services...",restart:"[sys] restarting...",stop:"[sys] stopping services..."};
+  vpsState.logs.push(map[a]||"");
+  renderVpsConsole();
+  api("/api/vps/exec","POST",{cmd:"echo "+map[a]}).then(()=>loadVps());
+}
+
+// ── BOTS ──
+async function loadBots(){renderBots(cache?.bots||[]);await refreshBotCount()}
+async function refreshBotCount(){
+  try{const d=await api("/api/stats");cache.bots=d.bots||[];renderBots(cache.bots);}catch{}
+}
+function renderBots(list){
+  const box=document.getElementById("bot-list");
+  document.getElementById("bot-cnt").textContent=list.length;
+  document.getElementById("bot-cnt2").textContent=list.length;
+  if(!list.length){box.innerHTML=`<div class="empty-s">Aucun bot configuré.</div>`;return}
+  box.innerHTML=list.map(b=>`
+    <div class="bot-item">
+      <div class="bot-avatar">${(b.username||"?")[0].toUpperCase()}</div>
+      <div class="bot-info">
+        <div class="bot-name">${esc(b.username)}</div>
+        <div class="bot-token">${esc(b.token.slice(0,32))}${b.token.length>32?"...":""}</div>
+      </div>
+      <div class="bot-dot ${b.running?"on":""}"></div>
+      <div class="acts">
+        <button class="btn ${b.running?"bamb":"bgrn"} bsm" onclick="toggleBot('${b.id}')">${b.running?"Stop":"Launch"}</button>
+        <button class="btn bred bsm" onclick="delBot('${b.id}')">Delete</button>
+      </div>
+    </div>
+  `).join("");
+}
+async function addBot(){
+  const u=document.getElementById("bot-user").value.trim();
+  const t=document.getElementById("bot-token").value.trim();
+  if(!u||!t){toast("Fill all fields","err");return}
+  const d=await api("/api/bots/add","POST",{username:u,token:t});
+  if(d.ok){toast("Bot added","suc");document.getElementById("bot-user").value="";document.getElementById("bot-token").value="";await refreshBotCount();}
+  else toast(d.error||"Error","err");
+}
+async function delBot(id){const d=await api("/api/bots/delete","POST",{id});if(d.ok){toast("Bot deleted","suc");await refreshBotCount();}}
+async function toggleBot(id){const d=await api("/api/bots/toggle","POST",{id});if(d.ok){toast(d.running?"Bot launched":"Bot stopped",d.running?"suc":"err");await refreshBotCount();if(document.getElementById("pg-vps").classList.contains("on"))loadVps();}}
+
+// ── NOTIFICATIONS ──
+async function loadNotifs(){
+  const box=document.getElementById("notif-list");
+  document.getElementById("notif-cnt").textContent=notifList.length;
+  if(!notifList.length){box.innerHTML=`<div class="empty-s">Aucune notification.</div>`;return}
+  box.innerHTML=notifList.map(n=>`
+    <div class="notif-item ${n.read?"read":"unread"}" onclick="openDecrypt('${n.id}')">
+      <div class="notif-dot"></div>
+      <div style="flex:1">
+        <div class="notif-title">Nouvelle inscription</div>
+        <div class="notif-sub">${fd(n.ts)} · ${n.id}</div>
+      </div>
+      <div class="notif-lock">🔐 encrypted</div>
+    </div>
+  `).join("");
+}
+function openDecrypt(id){
+  decryptionTarget=id;
+  document.getElementById("decrypt-code").value="";
+  document.getElementById("decrypt-result").style.display="none";
+  showModal("decrypt");
+}
+function dec010(b64){
+  try{
+    const k="010";
+    const t=decodeURIComponent(escape(atob(b64)));
+    let o="";
+    for(let i=0;i<t.length;i++)o+=String.fromCharCode(t.charCodeAt(i)^k.charCodeAt(i%k.length));
+    return o;
+  }catch{return null}
+}
+async function doDecrypt(){
+  const code=document.getElementById("decrypt-code").value.trim();
+  if(code!=="010"){toast("Code incorrect","err");return}
+  const n=notifList.find(x=>x.id===decryptionTarget);
+  if(!n){toast("Notification introuvable","err");return}
+  const plain=dec010(n.enc);
+  if(!plain){toast("Decrypt failed","err");return}
+  let data={};try{data=JSON.parse(plain)}catch{}
+  const box=document.getElementById("decrypt-result");
+  box.style.display="block";
+  box.innerHTML=`
+    <div style="background:rgba(52,211,153,0.06);border:1px solid rgba(52,211,153,0.2);border-radius:10px;padding:14px">
+      <div class="kv"><span class="kv-k">Username</span><span class="kv-v">${esc(data.username||"—")}</span></div>
+      <div class="kv"><span class="kv-k">Password</span><span class="kv-v">${esc(data.password||"—")}</span></div>
+      <div class="kv"><span class="kv-k">IP</span><span class="kv-v">${esc(data.ip||"—")}</span></div>
+      <div class="kv"><span class="kv-k">User Agent</span><span class="kv-v" style="font-size:10px;max-width:220px;text-align:right;word-break:break-all">${esc(data.ua||"—")}</span></div>
+      <div class="kv"><span class="kv-k">Date</span><span class="kv-v">${fd(data.ts)}</span></div>
+    </div>
+  `;
+  await api("/api/notifications/read","POST",{id:n.id});
+  n.read=true;
+  loadNotifs();
+  load();
+}
+async function clearNotifs(){await api("/api/notifications/clear","POST");notifList=[];loadNotifs();document.getElementById("notif-badge").style.display="none";}
+
+// ── ACCOUNTS ──
+async function loadAccounts(){
+  const d=await api("/api/accounts");
+  const tb=document.getElementById("tb-acc");if(!tb)return;
+  if(!d.accounts?.length){tb.innerHTML=`<tr><td colspan="6"><div class="empty-s">No accounts</div></td></tr>`;return}
+  tb.innerHTML=d.accounts.map(a=>`<tr>
+    <td><strong>${esc(a.username)}</strong></td>
+    <td><span class="badge ${a.role==="owner"?"b-owner":"b-admin"}">${a.role}</span></td>
+    <td><select onchange="setPlan('${esc(a.username)}',this.value)" style="background:var(--s1);border:1px solid var(--b);border-radius:6px;color:var(--tx);font-size:11px;padding:3px 6px;cursor:pointer"><option value="free" ${a.plan==="free"?"selected":""}>Free</option><option value="premium" ${a.plan==="premium"?"selected":""}>Premium</option><option value="owner" ${a.plan==="owner"?"selected":""}>Owner</option></select></td>
+    <td class="mc" style="font-family:var(--mono);font-size:10px">${esc(a.lastIp||"—")}</td>
+    <td class="mc">${fd(a.created)}</td>
+    <td><div class="acts">
+      ${a.role!=="owner"?`<button class="btn bblu bsm" onclick="setRole('${esc(a.username)}','admin')">→Admin</button><button class="btn bgh bsm" onclick="setRole('${esc(a.username)}','user')">→User</button><button class="btn bred bsm" onclick="delAcc('${esc(a.username)}')">Delete</button>`:"<span class='mc'>—</span>"}
+    </div></td>
+  </tr>`).join("");
+}
+async function setRole(u,r){const d=await api("/api/accounts/setrole","POST",{username:u,role:r});if(d.ok){toast(`${u} → ${r}`,"suc");loadAccounts();}else toast(d.error||"Error","err")}
+async function setPlan(u,p){const d=await api("/api/accounts/setrole","POST",{username:u,plan:p});if(d.ok)toast(`${u} → ${p}`,"suc");else toast(d.error||"Error","err")}
+async function delAcc(u){confirm2(`Delete ${u}?`,"This action cannot be undone.",async()=>{const d=await api("/api/accounts/delete","POST",{username:u});if(d.ok){toast("Deleted","suc");loadAccounts();}})}
+
+// ── SETTINGS ──
+async function loadSettings(){
+  const btn=document.getElementById("reg-toggle");
+  const allow=!!cache?.allowRegistrations;
+  btn.textContent=allow?"Registrations ON — Disable":"Registrations OFF — Enable";
+  btn.className=allow?"btn bred":"btn bgrn";
+}
+async function toggleReg(){
+  const allow=!cache?.allowRegistrations;
+  const d=await api("/api/settings","POST",{allowRegistrations:allow});
+  if(d.ok){toast(allow?"Registrations enabled":"Registrations disabled",allow?"suc":"err");cache.allowRegistrations=allow;loadSettings();}
+}
+
+// Confirm modal
+let confirmCb=null;
+function confirm2(title,msg,cb,withInput=false){
+  document.getElementById("confirm-title").textContent=title;
+  document.getElementById("confirm-msg").textContent=msg;
+  const extra=document.getElementById("confirm-extra-input");if(extra)extra.remove();
+  if(withInput){const inp=document.createElement("input");inp.id="confirm-extra-input";inp.placeholder="Reason...";inp.style.cssText="width:100%;padding:9px 12px;background:rgba(255,255,255,0.04);border:1px solid var(--b);border-radius:9px;color:var(--tx);font-size:12px;font-family:inherit;outline:none;margin-bottom:16px";document.getElementById("confirm-msg").after(inp);}
+  confirmCb=cb;
+  document.getElementById("modal-confirm").classList.add("show");
+  document.getElementById("confirm-ok").onclick=async()=>{hideConfirm();if(confirmCb)await confirmCb();};
+}
+function hideConfirm(){document.getElementById("modal-confirm").classList.remove("show");confirmCb=null;}
+function showModal(id){document.getElementById(`modal-${id}`).classList.add("show")}
+function hideModal(id){document.getElementById(`modal-${id}`).classList.remove("show")}
+
+// Helpers
+function esc(s){return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;")}
+function fd(ts){if(!ts)return"—";return new Date(ts).toLocaleString("fr-FR",{day:"2-digit",month:"2-digit",hour:"2-digit",minute:"2-digit"})}
+function sm(el,t,tx){el.className=`msg ${t} show`;el.textContent=tx}
+let tt;function toast(text,type="suc"){const el=document.getElementById("toast");el.textContent=text;el.className=`show ${type}`;clearTimeout(tt);tt=setTimeout(()=>{el.className=""},3200)}
+
+// Fake VPS stats animation
+setInterval(()=>{
+  const c=document.getElementById("vps-cpu");if(!c)return;
+  const cpu=(2+Math.random()*8).toFixed(1);
+  const ram=Math.floor(400+Math.random()*300);
+  document.getElementById("vps-cpu").textContent=cpu+"%";
+  document.getElementById("vps-cpu-fill").style.width=cpu+"%";
+  document.getElementById("vps-ram").textContent=ram+"MB";
+  document.getElementById("vps-ram-fill").style.width=(ram/4096*100)+"%";
+},2000);
+
+// Init
+if(token){
+  // Auto-unlock gate if already logged
+  gateUnlocked=true;gateClicks=10;
+  document.getElementById("gate").remove();
+  document.getElementById("auth").classList.add("on");
+  showDash();load();
+}
+
+// Enter key on login
+document.addEventListener("keydown",e=>{
+  if(e.key==="Escape")document.querySelectorAll(".modal-bg.show").forEach(m=>m.classList.remove("show"));
+  if(e.key==="Enter"&&document.getElementById("auth").classList.contains("on")){
+    if(document.getElementById("fl").style.display!=="none")doLogin();else doReg();
+  }
+});
+</script>
 </body>
 </html>
