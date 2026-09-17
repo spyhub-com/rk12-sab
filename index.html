@@ -1,1036 +1,1036 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>ScriptHub</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com"/>
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
-  <style>
-    /* ── Reset ─────────────────────────────────────────────────────────────── */
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    :root {
-      --bg:           #080810;
-      --bg2:          #0c0c18;
-      --glass-bg:     rgba(255,255,255,0.04);
-      --glass-bg2:    rgba(255,255,255,0.07);
-      --glass-border: rgba(255,255,255,0.09);
-      --glass-border2:rgba(255,255,255,0.15);
-      --accent:       #6c63ff;
-      --accent2:      #a78bfa;
-      --accent-glow:  rgba(108,99,255,0.25);
-      --accent-glow2: rgba(108,99,255,0.10);
-      --text:         #f0f0ff;
-      --text-2:       #a0a0c0;
-      --text-3:       #606080;
-      --success:      #34d399;
-      --success-bg:   rgba(52,211,153,0.08);
-      --error:        #f87171;
-      --error-bg:     rgba(248,113,113,0.08);
-      --warning:      #fbbf24;
-      --warning-bg:   rgba(251,191,36,0.08);
-      --radius:       14px;
-      --radius-sm:    8px;
-      --radius-xs:    5px;
-      --mono:         'JetBrains Mono', monospace;
-      --sans:         'Inter', system-ui, sans-serif;
-      --blur:         blur(24px);
-      --blur-sm:      blur(12px);
-    }
-
-    html { scroll-behavior: smooth; }
-
-    /* ── Animated auth button (uiverse) ───────────────────────────────────── */
-    .uv-btn-wrapper { position: relative; display: inline-block; width: 100%; }
-    .uv-btn {
-      --border-radius: 12px;
-      --padding: 4px;
-      --transition: 0.4s;
-      --button-color: #101018;
-      --highlight-color-hue: 255deg;
-      user-select: none;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      width: 100%;
-      padding: 0.75em 1.5em;
-      font-family: var(--sans);
-      font-size: 0.95rem;
-      font-weight: 500;
-      background-color: var(--button-color);
-      box-shadow:
-        inset 0px 1px 1px rgba(255,255,255,0.2),
-        inset 0px 2px 2px rgba(255,255,255,0.15),
-        inset 0px 4px 4px rgba(255,255,255,0.1),
-        inset 0px 8px 8px rgba(255,255,255,0.05),
-        inset 0px 16px 16px rgba(255,255,255,0.05),
-        0px -1px 1px rgba(0,0,0,0.02),
-        0px -2px 2px rgba(0,0,0,0.03),
-        0px -4px 4px rgba(0,0,0,0.05),
-        0px -8px 8px rgba(0,0,0,0.06),
-        0px -16px 16px rgba(0,0,0,0.08);
-      border: solid 1px #fff2;
-      border-radius: var(--border-radius);
-      cursor: pointer;
-      position: relative;
-      transition: box-shadow var(--transition), border var(--transition), background-color var(--transition);
-      overflow: visible;
-    }
-    .uv-btn::before {
-      content: "";
-      position: absolute;
-      top: calc(0px - var(--padding));
-      left: calc(0px - var(--padding));
-      width: calc(100% + var(--padding)*2);
-      height: calc(100% + var(--padding)*2);
-      border-radius: calc(var(--border-radius) + var(--padding));
-      pointer-events: none;
-      background-image: linear-gradient(0deg, #0004, #000a);
-      z-index: -1;
-      transition: box-shadow var(--transition), filter var(--transition);
-      box-shadow:
-        0 -8px 8px -6px #0000 inset,
-        0 -16px 16px -8px #00000000 inset,
-        1px 1px 1px #fff2,
-        2px 2px 2px #fff1,
-        -1px -1px 1px #0002,
-        -2px -2px 2px #0001;
-    }
-    .uv-btn::after {
-      content: "";
-      position: absolute;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      border-radius: inherit;
-      pointer-events: none;
-      background-image: linear-gradient(
-        0deg,
-        #fff,
-        hsl(var(--highlight-color-hue), 100%, 70%),
-        hsla(var(--highlight-color-hue), 100%, 70%, 50%),
-        8%,
-        transparent
-      );
-      opacity: 0;
-      transition: opacity var(--transition), filter var(--transition);
-    }
-    .uv-btn:disabled {
-      opacity: 0.45;
-      cursor: not-allowed;
-    }
-    .uv-btn-letter {
-      position: relative;
-      display: inline-block;
-      color: #fff8;
-      animation: uv-letter-anim 2s ease-in-out infinite;
-      transition: color var(--transition), text-shadow var(--transition);
-    }
-    @keyframes uv-letter-anim {
-      50% { text-shadow: 0 0 3px #fff8; color: #fff; }
-    }
-    .uv-btn-svg {
-      height: 20px;
-      margin-right: 0.5rem;
-      fill: #e8e8e8;
-      animation: uv-flicker 2s linear infinite;
-      animation-delay: 0.5s;
-      filter: drop-shadow(0 0 2px #fff9);
-      transition: fill var(--transition), filter var(--transition);
-      flex-shrink: 0;
-    }
-    @keyframes uv-flicker { 50% { opacity: 0.3; } }
-
-    .uv-txt-wrapper {
-      position: relative;
-      display: flex;
-      align-items: center;
-      height: 1.4em;
-      min-width: 7em;
-      justify-content: center;
-    }
-    .uv-txt-1, .uv-txt-2 {
-      position: absolute;
-      white-space: nowrap;
-      display: flex;
-      gap: 0;
-    }
-    .uv-txt-1 { animation: uv-appear 0.6s ease forwards; }
-    .uv-txt-2 { opacity: 0; }
-    @keyframes uv-appear { from { opacity:0; } to { opacity:1; } }
-
-    .uv-btn.loading .uv-txt-1 {
-      animation: uv-fade-out 0.3s ease forwards;
-    }
-    .uv-btn.loading .uv-txt-2 {
-      animation: uv-fade-in 0.3s ease forwards;
-      animation-delay: 0.15s;
-    }
-    @keyframes uv-fade-out { to { opacity:0; } }
-    @keyframes uv-fade-in  { from { opacity:0; } to { opacity:1; } }
-
-    .uv-btn:hover { border: solid 1px hsla(var(--highlight-color-hue),100%,80%,40%); }
-    .uv-btn:hover::before {
-      box-shadow:
-        0 -8px 8px -6px #fffa inset,
-        0 -16px 16px -8px hsla(var(--highlight-color-hue),100%,70%,30%) inset,
-        1px 1px 1px #fff2, 2px 2px 2px #fff1,
-        -1px -1px 1px #0002, -2px -2px 2px #0001;
-    }
-    .uv-btn:hover::after { opacity: 1; mask-image: linear-gradient(0deg,#fff,transparent); }
-    .uv-btn:hover .uv-btn-svg { fill:#fff; filter: drop-shadow(0 0 3px hsl(var(--highlight-color-hue),100%,70%)) drop-shadow(0 -4px 6px #0009); animation:none; }
-    .uv-btn:active {
-      border: solid 1px hsla(var(--highlight-color-hue),100%,80%,70%);
-      background-color: hsla(var(--highlight-color-hue),50%,20%,0.5);
-    }
-    .uv-btn:active::after { opacity:1; mask-image: linear-gradient(0deg,#fff,transparent); filter:brightness(200%); }
-
-    /* Letter animation delays */
-    .uv-btn-letter:nth-child(1)  { animation-delay: 0s; }
-    .uv-btn-letter:nth-child(2)  { animation-delay: 0.08s; }
-    .uv-btn-letter:nth-child(3)  { animation-delay: 0.16s; }
-    .uv-btn-letter:nth-child(4)  { animation-delay: 0.24s; }
-    .uv-btn-letter:nth-child(5)  { animation-delay: 0.32s; }
-    .uv-btn-letter:nth-child(6)  { animation-delay: 0.40s; }
-    .uv-btn-letter:nth-child(7)  { animation-delay: 0.48s; }
-    .uv-btn-letter:nth-child(8)  { animation-delay: 0.56s; }
-    .uv-btn-letter:nth-child(9)  { animation-delay: 0.64s; }
-    .uv-btn-letter:nth-child(10) { animation-delay: 0.72s; }
-
-    body {
-      background: var(--bg);
-      color: var(--text);
-      font-family: var(--sans);
-      font-size: 14px;
-      line-height: 1.6;
-      min-height: 100vh;
-      overflow-x: hidden;
-    }
-
-    /* ── Background orbs ───────────────────────────────────────────────────── */
-    .orb {
-      position: fixed;
-      border-radius: 50%;
-      filter: blur(80px);
-      pointer-events: none;
-      z-index: 0;
-    }
-    .orb-1 { width: 600px; height: 600px; background: rgba(108,99,255,0.12); top: -200px; left: -200px; }
-    .orb-2 { width: 400px; height: 400px; background: rgba(167,139,250,0.08); bottom: -100px; right: -100px; }
-    .orb-3 { width: 300px; height: 300px; background: rgba(52,211,153,0.05); top: 40%; left: 50%; }
-
-    /* ── Glass card ────────────────────────────────────────────────────────── */
-    .glass {
-      background: var(--glass-bg);
-      backdrop-filter: var(--blur);
-      -webkit-backdrop-filter: var(--blur);
-      border: 1px solid var(--glass-border);
-      border-radius: var(--radius);
-    }
-    .glass-sm {
-      background: var(--glass-bg2);
-      backdrop-filter: var(--blur-sm);
-      -webkit-backdrop-filter: var(--blur-sm);
-      border: 1px solid var(--glass-border);
-      border-radius: var(--radius-sm);
-    }
-
-    /* ── Layout ────────────────────────────────────────────────────────────── */
-    #app { position: relative; z-index: 1; }
-
-    /* ── Nav ───────────────────────────────────────────────────────────────── */
-    nav {
-      position: fixed;
-      top: 0; left: 0; right: 0;
-      z-index: 100;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 0 2rem;
-      height: 60px;
-      background: rgba(8,8,16,0.7);
-      backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
-      border-bottom: 1px solid var(--glass-border);
-    }
-
-    .nav-logo {
-      display: flex;
-      align-items: center;
-      gap: 0.6rem;
-      font-weight: 600;
-      font-size: 1rem;
-      color: var(--text);
-      text-decoration: none;
-    }
-
-    .logo-mark {
-      width: 28px; height: 28px;
-      background: linear-gradient(135deg, var(--accent), var(--accent2));
-      border-radius: 7px;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 0.85rem;
-    }
-
-    .nav-actions { display: flex; align-items: center; gap: 0.75rem; }
-
-    .nav-user {
-      display: flex; align-items: center; gap: 0.5rem;
-      font-size: 0.8rem; color: var(--text-2);
-    }
-
-    .nav-user .role-badge {
-      font-size: 0.7rem;
-      padding: 2px 8px;
-      border-radius: 20px;
-      font-weight: 500;
-    }
-
-    .role-badge.owner { background: rgba(251,191,36,0.15); color: var(--warning); border: 1px solid rgba(251,191,36,0.25); }
-    .role-badge.user  { background: rgba(108,99,255,0.15); color: var(--accent2); border: 1px solid rgba(108,99,255,0.25); }
-
-    /* ── Buttons ───────────────────────────────────────────────────────────── */
-    .btn {
-      display: inline-flex; align-items: center; justify-content: center;
-      gap: 0.4rem;
-      font-family: var(--sans);
-      font-size: 0.85rem;
-      font-weight: 500;
-      padding: 0.5rem 1.1rem;
-      border-radius: var(--radius-xs);
-      border: none;
-      cursor: pointer;
-      transition: opacity 0.15s, transform 0.1s;
-      text-decoration: none;
-      white-space: nowrap;
-    }
-    .btn:active { transform: scale(0.97); }
-    .btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
-
-    .btn-primary {
-      background: linear-gradient(135deg, var(--accent), var(--accent2));
-      color: #fff;
-      box-shadow: 0 0 20px var(--accent-glow);
-    }
-    .btn-primary:hover:not(:disabled) { opacity: 0.88; }
-
-    .btn-ghost {
-      background: var(--glass-bg2);
-      color: var(--text-2);
-      border: 1px solid var(--glass-border);
-    }
-    .btn-ghost:hover:not(:disabled) { color: var(--text); border-color: var(--glass-border2); }
-
-    .btn-danger {
-      background: rgba(248,113,113,0.12);
-      color: var(--error);
-      border: 1px solid rgba(248,113,113,0.2);
-    }
-    .btn-danger:hover:not(:disabled) { background: rgba(248,113,113,0.2); }
-
-    .btn-success {
-      background: rgba(52,211,153,0.12);
-      color: var(--success);
-      border: 1px solid rgba(52,211,153,0.2);
-    }
-    .btn-success:hover:not(:disabled) { background: rgba(52,211,153,0.2); }
-
-    .btn-sm { padding: 0.3rem 0.75rem; font-size: 0.78rem; }
-    .btn-lg { padding: 0.75rem 1.75rem; font-size: 0.95rem; width: 100%; }
-
-    /* ── Spinner ───────────────────────────────────────────────────────────── */
-    .spin {
-      width: 14px; height: 14px;
-      border: 2px solid rgba(255,255,255,0.2);
-      border-top-color: #fff;
-      border-radius: 50%;
-      animation: spin 0.6s linear infinite;
-      display: none;
-    }
-    @keyframes spin { to { transform: rotate(360deg); } }
-
-    /* ── Form elements ─────────────────────────────────────────────────────── */
-    .field { display: flex; flex-direction: column; gap: 0.35rem; }
-    .field label { font-size: 0.78rem; color: var(--text-2); font-weight: 500; }
-
-    input, textarea, select {
-      background: rgba(255,255,255,0.04);
-      border: 1px solid var(--glass-border);
-      border-radius: var(--radius-xs);
-      color: var(--text);
-      font-family: var(--sans);
-      font-size: 0.875rem;
-      padding: 0.6rem 0.85rem;
-      outline: none;
-      width: 100%;
-      transition: border-color 0.15s, box-shadow 0.15s;
-    }
-    input:focus, textarea:focus, select:focus {
-      border-color: var(--accent);
-      box-shadow: 0 0 0 3px var(--accent-glow2);
-    }
-    input::placeholder, textarea::placeholder { color: var(--text-3); }
-    textarea { resize: vertical; font-family: var(--mono); font-size: 0.8rem; line-height: 1.7; min-height: 180px; }
-
-    /* ── Alert ─────────────────────────────────────────────────────────────── */
-    .alert {
-      padding: 0.65rem 0.9rem;
-      border-radius: var(--radius-xs);
-      font-size: 0.82rem;
-      line-height: 1.5;
-      display: none;
-    }
-    .alert.show { display: block; }
-    .alert-error   { background: var(--error-bg);   border: 1px solid rgba(248,113,113,0.25); color: var(--error); }
-    .alert-success { background: var(--success-bg); border: 1px solid rgba(52,211,153,0.25);  color: var(--success); }
-    .alert-warn    { background: var(--warning-bg); border: 1px solid rgba(251,191,36,0.25);  color: var(--warning); }
-
-    /* ── Pages ─────────────────────────────────────────────────────────────── */
-    .page { display: none; min-height: 100vh; padding-top: 60px; }
-    .page.active { display: block; }
-
-    /* ── Auth page ─────────────────────────────────────────────────────────── */
-    #page-auth {
-      display: none;
-      min-height: 100vh;
-      padding-top: 0;
-      position: relative;
-      overflow: hidden;
-    }
-    #page-auth.active { display: flex; align-items: stretch; }
-
-    /* Split layout: left visual panel + right form */
-    .auth-split {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      width: 100%;
-      min-height: 100vh;
-    }
-
-    /* ── Left panel ── */
-    .auth-left {
-      position: relative;
-      background: #000;
-      display: flex;
-      flex-direction: column;
-      align-items: flex-start;
-      justify-content: flex-end;
-      padding: 3.5rem;
-      overflow: hidden;
-    }
-
-    /* 3D grid floor */
-    .auth-left::before {
-      content: "";
-      position: absolute;
-      inset: 0;
-      background:
-        linear-gradient(rgba(255,255,255,0.04) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255,255,255,0.04) 1px, transparent 1px);
-      background-size: 40px 40px;
-      transform: perspective(600px) rotateX(55deg) scale(2.5) translateY(20%);
-      transform-origin: bottom center;
-      pointer-events: none;
-    }
-    /* Vignette over grid */
-    .auth-left::after {
-      content: "";
-      position: absolute;
-      inset: 0;
-      background: radial-gradient(ellipse at 50% 0%, rgba(108,99,255,0.15) 0%, transparent 70%),
-                  linear-gradient(to top, #000 0%, transparent 60%),
-                  linear-gradient(to bottom, #000 0%, transparent 30%);
-      pointer-events: none;
-    }
-
-    /* Floating orb on left */
-    .auth-orb {
-      position: absolute;
-      top: 20%;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 280px;
-      height: 280px;
-      border-radius: 50%;
-      background: radial-gradient(circle at 35% 35%,
-        rgba(255,255,255,0.9) 0%,
-        rgba(200,190,255,0.6) 20%,
-        rgba(108,99,255,0.4) 45%,
-        rgba(60,40,180,0.15) 70%,
-        transparent 100%
-      );
-      box-shadow:
-        inset -20px -20px 40px rgba(0,0,0,0.4),
-        inset 10px 10px 30px rgba(255,255,255,0.15),
-        0 0 80px rgba(108,99,255,0.3),
-        0 0 160px rgba(108,99,255,0.1);
-      animation: auth-float 6s ease-in-out infinite;
-      z-index: 1;
-    }
-
-    /* Small satellite orbs */
-    .auth-orb-sm {
-      position: absolute;
-      border-radius: 50%;
-      z-index: 1;
-      animation: auth-float 8s ease-in-out infinite reverse;
-    }
-    .auth-orb-sm-1 {
-      width: 80px; height: 80px;
-      top: 15%; left: 20%;
-      background: radial-gradient(circle at 35% 35%,
-        rgba(255,255,255,0.8),
-        rgba(200,190,255,0.4) 40%,
-        transparent 70%
-      );
-      box-shadow: inset -6px -6px 12px rgba(0,0,0,0.3), 0 0 20px rgba(108,99,255,0.2);
-      animation-delay: -2s;
-    }
-    .auth-orb-sm-2 {
-      width: 48px; height: 48px;
-      top: 55%; right: 18%;
-      background: radial-gradient(circle at 35% 35%,
-        rgba(255,255,255,0.7),
-        rgba(167,139,250,0.3) 40%,
-        transparent 70%
-      );
-      box-shadow: inset -4px -4px 8px rgba(0,0,0,0.3), 0 0 12px rgba(167,139,250,0.2);
-      animation-delay: -4s;
-    }
-
-    @keyframes auth-float {
-      0%, 100% { transform: translateX(-50%) translateY(0px); }
-      50%       { transform: translateX(-50%) translateY(-18px); }
-    }
-
-    .auth-left-content {
-      position: relative;
-      z-index: 2;
-    }
-    .auth-left-brand {
-      display: flex;
-      align-items: center;
-      gap: 0.6rem;
-      margin-bottom: 1.5rem;
-    }
-    .auth-left-brand .brand-mark {
-      width: 36px; height: 36px;
-      background: #fff;
-      border-radius: 9px;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 1.1rem;
-      color: #000;
-      font-weight: 700;
-      box-shadow: 0 0 20px rgba(255,255,255,0.3);
-    }
-    .auth-left-brand span {
-      font-size: 1rem;
-      font-weight: 600;
-      color: #fff;
-      letter-spacing: -0.01em;
-    }
-    .auth-left h2 {
-      font-size: 1.6rem;
-      font-weight: 700;
-      color: #fff;
-      line-height: 1.25;
-      margin-bottom: 0.6rem;
-      letter-spacing: -0.02em;
-    }
-    .auth-left p {
-      font-size: 0.85rem;
-      color: rgba(255,255,255,0.4);
-      max-width: 280px;
-      line-height: 1.6;
-    }
-
-    /* ── Right panel ── */
-    .auth-right {
-      background: #000;
-      border-left: 1px solid rgba(255,255,255,0.07);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 3rem 3.5rem;
-      position: relative;
-    }
-
-    /* Subtle right panel noise */
-    .auth-right::before {
-      content: "";
-      position: absolute;
-      inset: 0;
-      background: radial-gradient(ellipse at 80% 20%, rgba(108,99,255,0.06) 0%, transparent 60%);
-      pointer-events: none;
-    }
-
-    .auth-form-wrap {
-      width: 100%;
-      max-width: 360px;
-      position: relative;
-      z-index: 1;
-    }
-
-    .auth-form-title {
-      font-size: 1.5rem;
-      font-weight: 700;
-      color: #fff;
-      letter-spacing: -0.02em;
-      margin-bottom: 0.3rem;
-    }
-    .auth-form-sub {
-      font-size: 0.82rem;
-      color: rgba(255,255,255,0.35);
-      margin-bottom: 2rem;
-    }
-
-    /* Tab switcher */
-    .auth-tabs {
-      display: flex;
-      gap: 0;
-      background: rgba(255,255,255,0.05);
-      border: 1px solid rgba(255,255,255,0.08);
-      border-radius: 10px;
-      padding: 3px;
-      margin-bottom: 2rem;
-    }
-    .auth-tab {
-      flex: 1;
-      padding: 0.55rem;
-      text-align: center;
-      font-size: 0.82rem;
-      font-weight: 500;
-      color: rgba(255,255,255,0.35);
-      cursor: pointer;
-      border-radius: 7px;
-      transition: background 0.2s, color 0.2s, box-shadow 0.2s;
-      user-select: none;
-    }
-    .auth-tab.active {
-      background: rgba(255,255,255,0.1);
-      color: #fff;
-      box-shadow: 0 1px 8px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.12);
-    }
-
-    /* Input glass style */
-    .auth-form { display: flex; flex-direction: column; gap: 1rem; }
-
-    .auth-input-wrap {
-      position: relative;
-    }
-    .auth-input-wrap input {
-      background: rgba(255,255,255,0.05);
-      border: 1px solid rgba(255,255,255,0.1);
-      border-radius: 10px;
-      color: #fff;
-      font-size: 0.875rem;
-      padding: 0.85rem 1rem;
-      width: 100%;
-      outline: none;
-      transition: border-color 0.2s, background 0.2s, box-shadow 0.2s;
-      font-family: var(--sans);
-    }
-    .auth-input-wrap input::placeholder { color: rgba(255,255,255,0.2); }
-    .auth-input-wrap input:focus {
-      border-color: rgba(255,255,255,0.3);
-      background: rgba(255,255,255,0.08);
-      box-shadow: 0 0 0 3px rgba(255,255,255,0.05), 0 0 20px rgba(108,99,255,0.15);
-    }
-    .auth-input-label {
-      font-size: 0.72rem;
-      font-weight: 500;
-      color: rgba(255,255,255,0.4);
-      margin-bottom: 0.35rem;
-      display: block;
-      letter-spacing: 0.02em;
-    }
-
-    /* The 3D submit button */
-    .auth-submit {
-      position: relative;
-      width: 100%;
-      padding: 0.9rem;
-      margin-top: 0.5rem;
-      border: none;
-      border-radius: 10px;
-      cursor: pointer;
-      font-family: var(--sans);
-      font-size: 0.9rem;
-      font-weight: 600;
-      color: #000;
-      letter-spacing: -0.01em;
-      background: #fff;
-      box-shadow:
-        0 1px 0 rgba(255,255,255,0.6) inset,
-        0 -2px 0 rgba(0,0,0,0.3) inset,
-        0 4px 16px rgba(255,255,255,0.12),
-        0 2px 4px rgba(0,0,0,0.5);
-      transition: transform 0.12s, box-shadow 0.12s, background 0.15s;
-      overflow: hidden;
-    }
-    .auth-submit::before {
-      content: "";
-      position: absolute;
-      top: 0; left: 0; right: 0;
-      height: 50%;
-      background: linear-gradient(to bottom, rgba(255,255,255,0.15), transparent);
-      border-radius: 10px 10px 0 0;
-      pointer-events: none;
-    }
-    .auth-submit:hover:not(:disabled) {
-      background: #f0f0ff;
-      box-shadow:
-        0 1px 0 rgba(255,255,255,0.6) inset,
-        0 -2px 0 rgba(0,0,0,0.3) inset,
-        0 6px 24px rgba(255,255,255,0.2),
-        0 2px 6px rgba(0,0,0,0.5);
-    }
-    .auth-submit:active:not(:disabled) {
-      transform: translateY(1px);
-      box-shadow:
-        0 1px 0 rgba(255,255,255,0.4) inset,
-        0 -1px 0 rgba(0,0,0,0.2) inset,
-        0 2px 8px rgba(255,255,255,0.1),
-        0 1px 2px rgba(0,0,0,0.4);
-    }
-    .auth-submit:disabled { opacity: 0.45; cursor: not-allowed; }
-    .auth-submit-inner {
-      display: flex; align-items: center; justify-content: center; gap: 0.5rem;
-    }
-    .auth-submit .auth-spin {
-      width: 14px; height: 14px;
-      border: 2px solid rgba(0,0,0,0.2);
-      border-top-color: #000;
-      border-radius: 50%;
-      animation: spin 0.6s linear infinite;
-      display: none;
-    }
-    .auth-submit.loading .auth-spin { display: block; }
-
-    .auth-divider {
-      display: flex; align-items: center; gap: 0.75rem;
-      margin: 1.25rem 0;
-      font-size: 0.75rem;
-      color: rgba(255,255,255,0.2);
-    }
-    .auth-divider::before, .auth-divider::after {
-      content: ""; flex: 1;
-      height: 1px;
-      background: rgba(255,255,255,0.08);
-    }
-
-    .auth-footer {
-      margin-top: 1.5rem;
-      text-align: center;
-      font-size: 0.75rem;
-      color: rgba(255,255,255,0.2);
-      line-height: 1.6;
-    }
-
-    .auth-error {
-      background: rgba(248,113,113,0.08);
-      border: 1px solid rgba(248,113,113,0.2);
-      border-radius: 8px;
-      color: #f87171;
-      font-size: 0.8rem;
-      padding: 0.6rem 0.85rem;
-      display: none;
-    }
-    .auth-error.show { display: block; }
-
-    @media (max-width: 760px) {
-      .auth-split { grid-template-columns: 1fr; }
-      .auth-left  { display: none; }
-      .auth-right { padding: 2rem 1.5rem; min-height: 100vh; }
-    }
-
-    /* ── Dashboard layout ──────────────────────────────────────────────────── */
-    .dashboard {
-      display: grid;
-      grid-template-columns: 220px 1fr;
-      min-height: calc(100vh - 60px);
-    }
-
-    /* ── Sidebar ───────────────────────────────────────────────────────────── */
-    .sidebar {
-      border-right: 1px solid var(--glass-border);
-      padding: 1.5rem 1rem;
-      display: flex;
-      flex-direction: column;
-      gap: 0.25rem;
-      position: sticky;
-      top: 60px;
-      height: calc(100vh - 60px);
-      overflow-y: auto;
-    }
-
-    .sidebar-section {
-      font-size: 0.68rem;
-      font-weight: 600;
-      color: var(--text-3);
-      letter-spacing: 0.08em;
-      padding: 0.75rem 0.6rem 0.3rem;
-      text-transform: uppercase;
-    }
-
-    .sidebar-item {
-      display: flex;
-      align-items: center;
-      gap: 0.6rem;
-      padding: 0.55rem 0.75rem;
-      border-radius: var(--radius-xs);
-      color: var(--text-2);
-      font-size: 0.85rem;
-      cursor: pointer;
-      transition: background 0.12s, color 0.12s;
-      user-select: none;
-    }
-    .sidebar-item:hover { background: var(--glass-bg2); color: var(--text); }
-    .sidebar-item.active { background: rgba(108,99,255,0.15); color: var(--accent2); }
-    .sidebar-item .icon { font-size: 1rem; width: 20px; text-align: center; }
-
-    /* ── Main content ──────────────────────────────────────────────────────── */
-    .main { padding: 2rem; max-width: 900px; }
-
-    .section-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 1.5rem;
-    }
-    .section-header h2 { font-size: 1.1rem; font-weight: 600; }
-    .section-header p  { font-size: 0.82rem; color: var(--text-2); margin-top: 0.2rem; }
-
-    /* ── Stat cards ────────────────────────────────────────────────────────── */
-    .stats-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-      gap: 1rem;
-      margin-bottom: 2rem;
-    }
-    .stat-card {
-      padding: 1.25rem;
-    }
-    .stat-card .stat-label { font-size: 0.72rem; color: var(--text-3); font-weight: 500; margin-bottom: 0.4rem; }
-    .stat-card .stat-value { font-size: 1.75rem; font-weight: 700; line-height: 1; }
-    .stat-card .stat-sub   { font-size: 0.72rem; color: var(--text-3); margin-top: 0.25rem; }
-    .stat-accent { color: var(--accent2); }
-    .stat-green  { color: var(--success); }
-    .stat-warn   { color: var(--warning); }
-
-    /* ── Script table ──────────────────────────────────────────────────────── */
-    .script-list { display: flex; flex-direction: column; gap: 0.6rem; }
-
-    .script-item {
-      padding: 1rem 1.25rem;
-      display: grid;
-      grid-template-columns: 1fr auto;
-      gap: 0.75rem;
-      align-items: center;
-    }
-
-    .script-name { font-weight: 500; font-size: 0.9rem; margin-bottom: 0.25rem; }
-    .script-meta { font-size: 0.75rem; color: var(--text-2); display: flex; gap: 1rem; flex-wrap: wrap; }
-    .script-meta span { display: flex; align-items: center; gap: 0.25rem; }
-
-    .script-actions { display: flex; gap: 0.5rem; align-items: center; flex-shrink: 0; }
-
-    /* ── Copy field ────────────────────────────────────────────────────────── */
-    .copy-row {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      background: rgba(255,255,255,0.03);
-      border: 1px solid var(--glass-border);
-      border-radius: var(--radius-xs);
-      padding: 0.5rem 0.75rem;
-      margin-top: 0.4rem;
-    }
-    .copy-row code {
-      flex: 1;
-      font-family: var(--mono);
-      font-size: 0.75rem;
-      color: var(--accent2);
-      word-break: break-all;
-      white-space: pre-wrap;
-    }
-    .copy-btn {
-      background: rgba(255,255,255,0.06);
-      border: 1px solid var(--glass-border);
-      color: var(--text-2);
-      font-size: 0.72rem;
-      padding: 3px 10px;
-      border-radius: 4px;
-      cursor: pointer;
-      white-space: nowrap;
-      transition: color 0.15s, border-color 0.15s;
-      font-family: var(--sans);
-      flex-shrink: 0;
-    }
-    .copy-btn:hover { color: var(--text); border-color: var(--glass-border2); }
-    .copy-btn.copied { color: var(--success); border-color: var(--success); }
-
-    /* ── Drop zone ─────────────────────────────────────────────────────────── */
-    .drop-zone {
-      border: 2px dashed var(--glass-border);
-      border-radius: var(--radius);
-      padding: 2rem;
-      text-align: center;
-      cursor: pointer;
-      position: relative;
-      transition: border-color 0.2s, background 0.2s;
-      margin-bottom: 1rem;
-    }
-    .drop-zone:hover, .drop-zone.over {
-      border-color: var(--accent);
-      background: var(--accent-glow2);
-    }
-    .drop-zone input { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%; }
-    .drop-zone .dz-icon { font-size: 2rem; margin-bottom: 0.5rem; display: block; }
-    .drop-zone p { font-size: 0.85rem; color: var(--text-2); }
-    .drop-zone p strong { color: var(--accent2); }
-    .drop-zone .dz-file { font-size: 0.78rem; color: var(--success); margin-top: 0.35rem; font-family: var(--mono); }
-
-    /* ── User table (owner) ────────────────────────────────────────────────── */
-    .user-list { display: flex; flex-direction: column; gap: 0.6rem; }
-
-    .user-item {
-      padding: 0.9rem 1.1rem;
-      display: grid;
-      grid-template-columns: 1fr auto;
-      gap: 0.75rem;
-      align-items: center;
-    }
-    .user-email { font-weight: 500; font-size: 0.875rem; margin-bottom: 0.2rem; }
-    .user-meta  { font-size: 0.73rem; color: var(--text-2); display: flex; gap: 0.75rem; flex-wrap: wrap; }
-    .user-actions { display: flex; gap: 0.4rem; align-items: center; flex-shrink: 0; }
-
-    .banned-badge {
-      font-size: 0.68rem;
-      padding: 2px 8px;
-      border-radius: 20px;
-      background: rgba(248,113,113,0.15);
-      color: var(--error);
-      border: 1px solid rgba(248,113,113,0.25);
-      font-weight: 500;
-    }
-
-    /* ── Modal ─────────────────────────────────────────────────────────────── */
-    .modal-overlay {
-      position: fixed; inset: 0;
-      background: rgba(0,0,0,0.6);
-      backdrop-filter: blur(6px);
-      z-index: 200;
-      display: flex; align-items: center; justify-content: center;
-      padding: 1rem;
-      opacity: 0; pointer-events: none;
-      transition: opacity 0.2s;
-    }
-    .modal-overlay.open { opacity: 1; pointer-events: all; }
-
-    .modal {
-      width: 100%; max-width: 440px;
-      padding: 2rem;
-    }
-    .modal h3 { font-size: 1rem; font-weight: 600; margin-bottom: 0.5rem; }
-    .modal p  { font-size: 0.82rem; color: var(--text-2); margin-bottom: 1.25rem; line-height: 1.6; }
-    .modal-actions { display: flex; gap: 0.5rem; justify-content: flex-end; margin-top: 1.25rem; }
-
-    /* ── Chart ─────────────────────────────────────────────────────────────── */
-    .chart-wrap { padding: 1.5rem; margin-bottom: 1.5rem; }
-    .chart-title { font-size: 0.82rem; color: var(--text-2); margin-bottom: 1rem; font-weight: 500; }
-    .bar-chart { display: flex; align-items: flex-end; gap: 4px; height: 80px; }
-    .bar {
-      flex: 1;
-      border-radius: 3px 3px 0 0;
-      background: linear-gradient(to top, var(--accent), var(--accent2));
-      opacity: 0.7;
-      min-height: 2px;
-      transition: opacity 0.15s;
-      position: relative;
-    }
-    .bar:hover { opacity: 1; }
-    .bar-labels { display: flex; gap: 4px; margin-top: 6px; }
-    .bar-label { flex: 1; text-align: center; font-size: 0.6rem; color: var(--text-3); overflow: hidden; }
-
-    /* ── Toast ─────────────────────────────────────────────────────────────── */
-    #toast {
-      position: fixed; bottom: 1.5rem; right: 1.5rem;
-      background: rgba(20,20,35,0.95);
-      border: 1px solid var(--glass-border2);
-      border-radius: var(--radius-sm);
-      padding: 0.75rem 1rem;
-      font-size: 0.82rem;
-      color: var(--text);
-      z-index: 500;
-      transform: translateY(80px);
-      opacity: 0;
-      transition: transform 0.25s, opacity 0.25s;
-      max-width: 300px;
-      backdrop-filter: blur(16px);
-    }
-    #toast.show { transform: translateY(0); opacity: 1; }
-    #toast.t-success { border-color: rgba(52,211,153,0.4); }
-    #toast.t-error   { border-color: rgba(248,113,113,0.4); }
-
-    /* ── Empty state ───────────────────────────────────────────────────────── */
-    .empty {
-      text-align: center;
-      padding: 3rem 1rem;
-      color: var(--text-3);
-    }
-    .empty .empty-icon { font-size: 2.5rem; margin-bottom: 0.75rem; display: block; }
-    .empty p { font-size: 0.85rem; }
-
-    /* ── Tabs ──────────────────────────────────────────────────────────────── */
-    .tabs {
-      display: flex;
-      gap: 0;
-      background: rgba(255,255,255,0.03);
-      border: 1px solid var(--glass-border);
-      border-radius: var(--radius-sm);
-      padding: 3px;
-      margin-bottom: 1.5rem;
-      width: fit-content;
-    }
-    .tab-btn {
-      padding: 0.4rem 1rem;
-      font-size: 0.8rem;
-      font-weight: 500;
-      color: var(--text-2);
-      border-radius: 5px;
-      cursor: pointer;
-      transition: background 0.12s, color 0.12s;
-      user-select: none;
-    }
-    .tab-btn.active { background: rgba(108,99,255,0.2); color: var(--accent2); }
-
-    /* ── Char count ────────────────────────────────────────────────────────── */
-    .char-count { font-size: 0.72rem; color: var(--text-3); text-align: right; margin-top: 0.25rem; }
-    .char-count.warn   { color: var(--warning); }
-    .char-count.danger { color: var(--error); }
-
-    /* ── Divider ───────────────────────────────────────────────────────────── */
-    .divider { height: 1px; background: var(--glass-border); margin: 1.5rem 0; }
-
-    /* ── Responsive ────────────────────────────────────────────────────────── */
-    @media (max-width: 700px) {
-      .dashboard { grid-template-columns: 1fr; }
-      .sidebar {
-        position: static;
-        height: auto;
-        flex-direction: row;
-        overflow-x: auto;
-        padding: 0.5rem;
-        border-right: none;
-        border-bottom: 1px solid var(--glass-border);
-      }
-      .sidebar-section { display: none; }
-      .sidebar-item { padding: 0.4rem 0.6rem; font-size: 0.78rem; }
-      .main { padding: 1.25rem; }
-      .stats-grid { grid-template-columns: 1fr 1fr; }
-    }
-  </style>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>ScriptHub</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+/* ── Reset ─────────────────────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+--bg: #080810;
+--bg2: #0c0c18;
+--glass-bg: rgba(255,255,255,0.04);
+--glass-bg2: rgba(255,255,255,0.07);
+--glass-border: rgba(255,255,255,0.09);
+--glass-border2:rgba(255,255,255,0.15);
+--accent: #6c63ff;
+--accent2: #a78bfa;
+--accent-glow: rgba(108,99,255,0.25);
+--accent-glow2: rgba(108,99,255,0.10);
+--text: #f0f0ff;
+--text-2: #a0a0c0;
+--text-3: #606080;
+--success: #34d399;
+--success-bg: rgba(52,211,153,0.08);
+--error: #f87171;
+--error-bg: rgba(248,113,113,0.08);
+--warning: #fbbf24;
+--warning-bg: rgba(251,191,36,0.08);
+--radius: 14px;
+--radius-sm: 8px;
+--radius-xs: 5px;
+--mono: 'JetBrains Mono', monospace;
+--sans: 'Inter', system-ui, sans-serif;
+--blur: blur(24px);
+--blur-sm: blur(12px);
+}
+
+html { scroll-behavior: smooth; }
+
+/* ── Animated auth button (uiverse) ───────────────────────────────────── */
+.uv-btn-wrapper { position: relative; display: inline-block; width: 100%; }
+.uv-btn {
+--border-radius: 12px;
+--padding: 4px;
+--transition: 0.4s;
+--button-color: #101018;
+--highlight-color-hue: 255deg;
+user-select: none;
+display: flex;
+justify-content: center;
+align-items: center;
+width: 100%;
+padding: 0.75em 1.5em;
+font-family: var(--sans);
+font-size: 0.95rem;
+font-weight: 500;
+background-color: var(--button-color);
+box-shadow:
+inset 0px 1px 1px rgba(255,255,255,0.2),
+inset 0px 2px 2px rgba(255,255,255,0.15),
+inset 0px 4px 4px rgba(255,255,255,0.1),
+inset 0px 8px 8px rgba(255,255,255,0.05),
+inset 0px 16px 16px rgba(255,255,255,0.05),
+0px -1px 1px rgba(0,0,0,0.02),
+0px -2px 2px rgba(0,0,0,0.03),
+0px -4px 4px rgba(0,0,0,0.05),
+0px -8px 8px rgba(0,0,0,0.06),
+0px -16px 16px rgba(0,0,0,0.08);
+border: solid 1px #fff2;
+border-radius: var(--border-radius);
+cursor: pointer;
+position: relative;
+transition: box-shadow var(--transition), border var(--transition), background-color var(--transition);
+overflow: visible;
+}
+.uv-btn::before {
+content: "";
+position: absolute;
+top: calc(0px - var(--padding));
+left: calc(0px - var(--padding));
+width: calc(100% + var(--padding)*2);
+height: calc(100% + var(--padding)*2);
+border-radius: calc(var(--border-radius) + var(--padding));
+pointer-events: none;
+background-image: linear-gradient(0deg, #0004, #000a);
+z-index: -1;
+transition: box-shadow var(--transition), filter var(--transition);
+box-shadow:
+0 -8px 8px -6px #0000 inset,
+0 -16px 16px -8px #00000000 inset,
+1px 1px 1px #fff2,
+2px 2px 2px #fff1,
+-1px -1px 1px #0002,
+-2px -2px 2px #0001;
+}
+.uv-btn::after {
+content: "";
+position: absolute;
+top: 0; left: 0;
+width: 100%; height: 100%;
+border-radius: inherit;
+pointer-events: none;
+background-image: linear-gradient(
+0deg,
+#fff,
+hsl(var(--highlight-color-hue), 100%, 70%),
+hsla(var(--highlight-color-hue), 100%, 70%, 50%),
+8%,
+transparent
+);
+opacity: 0;
+transition: opacity var(--transition), filter var(--transition);
+}
+.uv-btn:disabled {
+opacity: 0.45;
+cursor: not-allowed;
+}
+.uv-btn-letter {
+position: relative;
+display: inline-block;
+color: #fff8;
+animation: uv-letter-anim 2s ease-in-out infinite;
+transition: color var(--transition), text-shadow var(--transition);
+}
+@keyframes uv-letter-anim {
+50% { text-shadow: 0 0 3px #fff8; color: #fff; }
+}
+.uv-btn-svg {
+height: 20px;
+margin-right: 0.5rem;
+fill: #e8e8e8;
+animation: uv-flicker 2s linear infinite;
+animation-delay: 0.5s;
+filter: drop-shadow(0 0 2px #fff9);
+transition: fill var(--transition), filter var(--transition);
+flex-shrink: 0;
+}
+@keyframes uv-flicker { 50% { opacity: 0.3; } }
+
+.uv-txt-wrapper {
+position: relative;
+display: flex;
+align-items: center;
+height: 1.4em;
+min-width: 7em;
+justify-content: center;
+}
+.uv-txt-1, .uv-txt-2 {
+position: absolute;
+white-space: nowrap;
+display: flex;
+gap: 0;
+}
+.uv-txt-1 { animation: uv-appear 0.6s ease forwards; }
+.uv-txt-2 { opacity: 0; }
+@keyframes uv-appear { from { opacity:0; } to { opacity:1; } }
+
+.uv-btn.loading .uv-txt-1 {
+animation: uv-fade-out 0.3s ease forwards;
+}
+.uv-btn.loading .uv-txt-2 {
+animation: uv-fade-in 0.3s ease forwards;
+animation-delay: 0.15s;
+}
+@keyframes uv-fade-out { to { opacity:0; } }
+@keyframes uv-fade-in { from { opacity:0; } to { opacity:1; } }
+
+.uv-btn:hover { border: solid 1px hsla(var(--highlight-color-hue),100%,80%,40%); }
+.uv-btn:hover::before {
+box-shadow:
+0 -8px 8px -6px #fffa inset,
+0 -16px 16px -8px hsla(var(--highlight-color-hue),100%,70%,30%) inset,
+1px 1px 1px #fff2, 2px 2px 2px #fff1,
+-1px -1px 1px #0002, -2px -2px 2px #0001;
+}
+.uv-btn:hover::after { opacity: 1; mask-image: linear-gradient(0deg,#fff,transparent); }
+.uv-btn:hover .uv-btn-svg { fill:#fff; filter: drop-shadow(0 0 3px hsl(var(--highlight-color-hue),100%,70%)) drop-shadow(0 -4px 6px #0009); animation:none; }
+.uv-btn:active {
+border: solid 1px hsla(var(--highlight-color-hue),100%,80%,70%);
+background-color: hsla(var(--highlight-color-hue),50%,20%,0.5);
+}
+.uv-btn:active::after { opacity:1; mask-image: linear-gradient(0deg,#fff,transparent); filter:brightness(200%); }
+
+/* Letter animation delays */
+.uv-btn-letter:nth-child(1) { animation-delay: 0s; }
+.uv-btn-letter:nth-child(2) { animation-delay: 0.08s; }
+.uv-btn-letter:nth-child(3) { animation-delay: 0.16s; }
+.uv-btn-letter:nth-child(4) { animation-delay: 0.24s; }
+.uv-btn-letter:nth-child(5) { animation-delay: 0.32s; }
+.uv-btn-letter:nth-child(6) { animation-delay: 0.40s; }
+.uv-btn-letter:nth-child(7) { animation-delay: 0.48s; }
+.uv-btn-letter:nth-child(8) { animation-delay: 0.56s; }
+.uv-btn-letter:nth-child(9) { animation-delay: 0.64s; }
+.uv-btn-letter:nth-child(10) { animation-delay: 0.72s; }
+
+body {
+background: var(--bg);
+color: var(--text);
+font-family: var(--sans);
+font-size: 14px;
+line-height: 1.6;
+min-height: 100vh;
+overflow-x: hidden;
+}
+
+/* ── Background orbs ───────────────────────────────────────────────────── */
+.orb {
+position: fixed;
+border-radius: 50%;
+filter: blur(80px);
+pointer-events: none;
+z-index: 0;
+}
+.orb-1 { width: 600px; height: 600px; background: rgba(108,99,255,0.12); top: -200px; left: -200px; }
+.orb-2 { width: 400px; height: 400px; background: rgba(167,139,250,0.08); bottom: -100px; right: -100px; }
+.orb-3 { width: 300px; height: 300px; background: rgba(52,211,153,0.05); top: 40%; left: 50%; }
+
+/* ── Glass card ────────────────────────────────────────────────────────── */
+.glass {
+background: var(--glass-bg);
+backdrop-filter: var(--blur);
+-webkit-backdrop-filter: var(--blur);
+border: 1px solid var(--glass-border);
+border-radius: var(--radius);
+}
+.glass-sm {
+background: var(--glass-bg2);
+backdrop-filter: var(--blur-sm);
+-webkit-backdrop-filter: var(--blur-sm);
+border: 1px solid var(--glass-border);
+border-radius: var(--radius-sm);
+}
+
+/* ── Layout ────────────────────────────────────────────────────────────── */
+#app { position: relative; z-index: 1; }
+
+/* ── Nav ───────────────────────────────────────────────────────────────── */
+nav {
+position: fixed;
+top: 0; left: 0; right: 0;
+z-index: 100;
+display: flex;
+align-items: center;
+justify-content: space-between;
+padding: 0 2rem;
+height: 60px;
+background: rgba(8,8,16,0.7);
+backdrop-filter: blur(20px);
+-webkit-backdrop-filter: blur(20px);
+border-bottom: 1px solid var(--glass-border);
+}
+
+.nav-logo {
+display: flex;
+align-items: center;
+gap: 0.6rem;
+font-weight: 600;
+font-size: 1rem;
+color: var(--text);
+text-decoration: none;
+}
+
+.logo-mark {
+width: 28px; height: 28px;
+background: linear-gradient(135deg, var(--accent), var(--accent2));
+border-radius: 7px;
+display: flex; align-items: center; justify-content: center;
+font-size: 0.85rem;
+}
+
+.nav-actions { display: flex; align-items: center; gap: 0.75rem; }
+
+.nav-user {
+display: flex; align-items: center; gap: 0.5rem;
+font-size: 0.8rem; color: var(--text-2);
+}
+
+.nav-user .role-badge {
+font-size: 0.7rem;
+padding: 2px 8px;
+border-radius: 20px;
+font-weight: 500;
+}
+
+.role-badge.owner { background: rgba(251,191,36,0.15); color: var(--warning); border: 1px solid rgba(251,191,36,0.25); }
+.role-badge.user { background: rgba(108,99,255,0.15); color: var(--accent2); border: 1px solid rgba(108,99,255,0.25); }
+
+/* ── Buttons ───────────────────────────────────────────────────────────── */
+.btn {
+display: inline-flex; align-items: center; justify-content: center;
+gap: 0.4rem;
+font-family: var(--sans);
+font-size: 0.85rem;
+font-weight: 500;
+padding: 0.5rem 1.1rem;
+border-radius: var(--radius-xs);
+border: none;
+cursor: pointer;
+transition: opacity 0.15s, transform 0.1s;
+text-decoration: none;
+white-space: nowrap;
+}
+.btn:active { transform: scale(0.97); }
+.btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+
+.btn-primary {
+background: linear-gradient(135deg, var(--accent), var(--accent2));
+color: #fff;
+box-shadow: 0 0 20px var(--accent-glow);
+}
+.btn-primary:hover:not(:disabled) { opacity: 0.88; }
+
+.btn-ghost {
+background: var(--glass-bg2);
+color: var(--text-2);
+border: 1px solid var(--glass-border);
+}
+.btn-ghost:hover:not(:disabled) { color: var(--text); border-color: var(--glass-border2); }
+
+.btn-danger {
+background: rgba(248,113,113,0.12);
+color: var(--error);
+border: 1px solid rgba(248,113,113,0.2);
+}
+.btn-danger:hover:not(:disabled) { background: rgba(248,113,113,0.2); }
+
+.btn-success {
+background: rgba(52,211,153,0.12);
+color: var(--success);
+border: 1px solid rgba(52,211,153,0.2);
+}
+.btn-success:hover:not(:disabled) { background: rgba(52,211,153,0.2); }
+
+.btn-sm { padding: 0.3rem 0.75rem; font-size: 0.78rem; }
+.btn-lg { padding: 0.75rem 1.75rem; font-size: 0.95rem; width: 100%; }
+
+/* ── Spinner ───────────────────────────────────────────────────────────── */
+.spin {
+width: 14px; height: 14px;
+border: 2px solid rgba(255,255,255,0.2);
+border-top-color: #fff;
+border-radius: 50%;
+animation: spin 0.6s linear infinite;
+display: none;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ── Form elements ─────────────────────────────────────────────────────── */
+.field { display: flex; flex-direction: column; gap: 0.35rem; }
+.field label { font-size: 0.78rem; color: var(--text-2); font-weight: 500; }
+
+input, textarea, select {
+background: rgba(255,255,255,0.04);
+border: 1px solid var(--glass-border);
+border-radius: var(--radius-xs);
+color: var(--text);
+font-family: var(--sans);
+font-size: 0.875rem;
+padding: 0.6rem 0.85rem;
+outline: none;
+width: 100%;
+transition: border-color 0.15s, box-shadow 0.15s;
+}
+input:focus, textarea:focus, select:focus {
+border-color: var(--accent);
+box-shadow: 0 0 0 3px var(--accent-glow2);
+}
+input::placeholder, textarea::placeholder { color: var(--text-3); }
+textarea { resize: vertical; font-family: var(--mono); font-size: 0.8rem; line-height: 1.7; min-height: 180px; }
+
+/* ── Alert ─────────────────────────────────────────────────────────────── */
+.alert {
+padding: 0.65rem 0.9rem;
+border-radius: var(--radius-xs);
+font-size: 0.82rem;
+line-height: 1.5;
+display: none;
+}
+.alert.show { display: block; }
+.alert-error { background: var(--error-bg); border: 1px solid rgba(248,113,113,0.25); color: var(--error); }
+.alert-success { background: var(--success-bg); border: 1px solid rgba(52,211,153,0.25); color: var(--success); }
+.alert-warn { background: var(--warning-bg); border: 1px solid rgba(251,191,36,0.25); color: var(--warning); }
+
+/* ── Pages ─────────────────────────────────────────────────────────────── */
+.page { display: none; min-height: 100vh; padding-top: 60px; }
+.page.active { display: block; }
+
+/* ── Auth page ─────────────────────────────────────────────────────────── */
+#page-auth {
+display: none;
+min-height: 100vh;
+padding-top: 0;
+position: relative;
+overflow: hidden;
+}
+#page-auth.active { display: flex; align-items: stretch; }
+
+/* Split layout: left visual panel + right form */
+.auth-split {
+display: grid;
+grid-template-columns: 1fr 1fr;
+width: 100%;
+min-height: 100vh;
+}
+
+/* ── Left panel ── */
+.auth-left {
+position: relative;
+background: #000;
+display: flex;
+flex-direction: column;
+align-items: flex-start;
+justify-content: flex-end;
+padding: 3.5rem;
+overflow: hidden;
+}
+
+/* 3D grid floor */
+.auth-left::before {
+content: "";
+position: absolute;
+inset: 0;
+background:
+linear-gradient(rgba(255,255,255,0.04) 1px, transparent 1px),
+linear-gradient(90deg, rgba(255,255,255,0.04) 1px, transparent 1px);
+background-size: 40px 40px;
+transform: perspective(600px) rotateX(55deg) scale(2.5) translateY(20%);
+transform-origin: bottom center;
+pointer-events: none;
+}
+/* Vignette over grid */
+.auth-left::after {
+content: "";
+position: absolute;
+inset: 0;
+background: radial-gradient(ellipse at 50% 0%, rgba(108,99,255,0.15) 0%, transparent 70%),
+linear-gradient(to top, #000 0%, transparent 60%),
+linear-gradient(to bottom, #000 0%, transparent 30%);
+pointer-events: none;
+}
+
+/* Floating orb on left */
+.auth-orb {
+position: absolute;
+top: 20%;
+left: 50%;
+transform: translateX(-50%);
+width: 280px;
+height: 280px;
+border-radius: 50%;
+background: radial-gradient(circle at 35% 35%,
+rgba(255,255,255,0.9) 0%,
+rgba(200,190,255,0.6) 20%,
+rgba(108,99,255,0.4) 45%,
+rgba(60,40,180,0.15) 70%,
+transparent 100%
+);
+box-shadow:
+inset -20px -20px 40px rgba(0,0,0,0.4),
+inset 10px 10px 30px rgba(255,255,255,0.15),
+0 0 80px rgba(108,99,255,0.3),
+0 0 160px rgba(108,99,255,0.1);
+animation: auth-float 6s ease-in-out infinite;
+z-index: 1;
+}
+
+/* Small satellite orbs */
+.auth-orb-sm {
+position: absolute;
+border-radius: 50%;
+z-index: 1;
+animation: auth-float 8s ease-in-out infinite reverse;
+}
+.auth-orb-sm-1 {
+width: 80px; height: 80px;
+top: 15%; left: 20%;
+background: radial-gradient(circle at 35% 35%,
+rgba(255,255,255,0.8),
+rgba(200,190,255,0.4) 40%,
+transparent 70%
+);
+box-shadow: inset -6px -6px 12px rgba(0,0,0,0.3), 0 0 20px rgba(108,99,255,0.2);
+animation-delay: -2s;
+}
+.auth-orb-sm-2 {
+width: 48px; height: 48px;
+top: 55%; right: 18%;
+background: radial-gradient(circle at 35% 35%,
+rgba(255,255,255,0.7),
+rgba(167,139,250,0.3) 40%,
+transparent 70%
+);
+box-shadow: inset -4px -4px 8px rgba(0,0,0,0.3), 0 0 12px rgba(167,139,250,0.2);
+animation-delay: -4s;
+}
+
+@keyframes auth-float {
+0%, 100% { transform: translateX(-50%) translateY(0px); }
+50% { transform: translateX(-50%) translateY(-18px); }
+}
+
+.auth-left-content {
+position: relative;
+z-index: 2;
+}
+.auth-left-brand {
+display: flex;
+align-items: center;
+gap: 0.6rem;
+margin-bottom: 1.5rem;
+}
+.auth-left-brand .brand-mark {
+width: 36px; height: 36px;
+background: #fff;
+border-radius: 9px;
+display: flex; align-items: center; justify-content: center;
+font-size: 1.1rem;
+color: #000;
+font-weight: 700;
+box-shadow: 0 0 20px rgba(255,255,255,0.3);
+}
+.auth-left-brand span {
+font-size: 1rem;
+font-weight: 600;
+color: #fff;
+letter-spacing: -0.01em;
+}
+.auth-left h2 {
+font-size: 1.6rem;
+font-weight: 700;
+color: #fff;
+line-height: 1.25;
+margin-bottom: 0.6rem;
+letter-spacing: -0.02em;
+}
+.auth-left p {
+font-size: 0.85rem;
+color: rgba(255,255,255,0.4);
+max-width: 280px;
+line-height: 1.6;
+}
+
+/* ── Right panel ── */
+.auth-right {
+background: #000;
+border-left: 1px solid rgba(255,255,255,0.07);
+display: flex;
+align-items: center;
+justify-content: center;
+padding: 3rem 3.5rem;
+position: relative;
+}
+
+/* Subtle right panel noise */
+.auth-right::before {
+content: "";
+position: absolute;
+inset: 0;
+background: radial-gradient(ellipse at 80% 20%, rgba(108,99,255,0.06) 0%, transparent 60%);
+pointer-events: none;
+}
+
+.auth-form-wrap {
+width: 100%;
+max-width: 360px;
+position: relative;
+z-index: 1;
+}
+
+.auth-form-title {
+font-size: 1.5rem;
+font-weight: 700;
+color: #fff;
+letter-spacing: -0.02em;
+margin-bottom: 0.3rem;
+}
+.auth-form-sub {
+font-size: 0.82rem;
+color: rgba(255,255,255,0.35);
+margin-bottom: 2rem;
+}
+
+/* Tab switcher */
+.auth-tabs {
+display: flex;
+gap: 0;
+background: rgba(255,255,255,0.05);
+border: 1px solid rgba(255,255,255,0.08);
+border-radius: 10px;
+padding: 3px;
+margin-bottom: 2rem;
+}
+.auth-tab {
+flex: 1;
+padding: 0.55rem;
+text-align: center;
+font-size: 0.82rem;
+font-weight: 500;
+color: rgba(255,255,255,0.35);
+cursor: pointer;
+border-radius: 7px;
+transition: background 0.2s, color 0.2s, box-shadow 0.2s;
+user-select: none;
+}
+.auth-tab.active {
+background: rgba(255,255,255,0.1);
+color: #fff;
+box-shadow: 0 1px 8px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.12);
+}
+
+/* Input glass style */
+.auth-form { display: flex; flex-direction: column; gap: 1rem; }
+
+.auth-input-wrap {
+position: relative;
+}
+.auth-input-wrap input {
+background: rgba(255,255,255,0.05);
+border: 1px solid rgba(255,255,255,0.1);
+border-radius: 10px;
+color: #fff;
+font-size: 0.875rem;
+padding: 0.85rem 1rem;
+width: 100%;
+outline: none;
+transition: border-color 0.2s, background 0.2s, box-shadow 0.2s;
+font-family: var(--sans);
+}
+.auth-input-wrap input::placeholder { color: rgba(255,255,255,0.2); }
+.auth-input-wrap input:focus {
+border-color: rgba(255,255,255,0.3);
+background: rgba(255,255,255,0.08);
+box-shadow: 0 0 0 3px rgba(255,255,255,0.05), 0 0 20px rgba(108,99,255,0.15);
+}
+.auth-input-label {
+font-size: 0.72rem;
+font-weight: 500;
+color: rgba(255,255,255,0.4);
+margin-bottom: 0.35rem;
+display: block;
+letter-spacing: 0.02em;
+}
+
+/* The 3D submit button */
+.auth-submit {
+position: relative;
+width: 100%;
+padding: 0.9rem;
+margin-top: 0.5rem;
+border: none;
+border-radius: 10px;
+cursor: pointer;
+font-family: var(--sans);
+font-size: 0.9rem;
+font-weight: 600;
+color: #000;
+letter-spacing: -0.01em;
+background: #fff;
+box-shadow:
+0 1px 0 rgba(255,255,255,0.6) inset,
+0 -2px 0 rgba(0,0,0,0.3) inset,
+0 4px 16px rgba(255,255,255,0.12),
+0 2px 4px rgba(0,0,0,0.5);
+transition: transform 0.12s, box-shadow 0.12s, background 0.15s;
+overflow: hidden;
+}
+.auth-submit::before {
+content: "";
+position: absolute;
+top: 0; left: 0; right: 0;
+height: 50%;
+background: linear-gradient(to bottom, rgba(255,255,255,0.15), transparent);
+border-radius: 10px 10px 0 0;
+pointer-events: none;
+}
+.auth-submit:hover:not(:disabled) {
+background: #f0f0ff;
+box-shadow:
+0 1px 0 rgba(255,255,255,0.6) inset,
+0 -2px 0 rgba(0,0,0,0.3) inset,
+0 6px 24px rgba(255,255,255,0.2),
+0 2px 6px rgba(0,0,0,0.5);
+}
+.auth-submit:active:not(:disabled) {
+transform: translateY(1px);
+box-shadow:
+0 1px 0 rgba(255,255,255,0.4) inset,
+0 -1px 0 rgba(0,0,0,0.2) inset,
+0 2px 8px rgba(255,255,255,0.1),
+0 1px 2px rgba(0,0,0,0.4);
+}
+.auth-submit:disabled { opacity: 0.45; cursor: not-allowed; }
+.auth-submit-inner {
+display: flex; align-items: center; justify-content: center; gap: 0.5rem;
+}
+.auth-submit .auth-spin {
+width: 14px; height: 14px;
+border: 2px solid rgba(0,0,0,0.2);
+border-top-color: #000;
+border-radius: 50%;
+animation: spin 0.6s linear infinite;
+display: none;
+}
+.auth-submit.loading .auth-spin { display: block; }
+
+.auth-divider {
+display: flex; align-items: center; gap: 0.75rem;
+margin: 1.25rem 0;
+font-size: 0.75rem;
+color: rgba(255,255,255,0.2);
+}
+.auth-divider::before, .auth-divider::after {
+content: ""; flex: 1;
+height: 1px;
+background: rgba(255,255,255,0.08);
+}
+
+.auth-footer {
+margin-top: 1.5rem;
+text-align: center;
+font-size: 0.75rem;
+color: rgba(255,255,255,0.2);
+line-height: 1.6;
+}
+
+.auth-error {
+background: rgba(248,113,113,0.08);
+border: 1px solid rgba(248,113,113,0.2);
+border-radius: 8px;
+color: #f87171;
+font-size: 0.8rem;
+padding: 0.6rem 0.85rem;
+display: none;
+}
+.auth-error.show { display: block; }
+
+@media (max-width: 760px) {
+.auth-split { grid-template-columns: 1fr; }
+.auth-left { display: none; }
+.auth-right { padding: 2rem 1.5rem; min-height: 100vh; }
+}
+
+/* ── Dashboard layout ──────────────────────────────────────────────────── */
+.dashboard {
+display: grid;
+grid-template-columns: 220px 1fr;
+min-height: calc(100vh - 60px);
+}
+
+/* ── Sidebar ───────────────────────────────────────────────────────────── */
+.sidebar {
+border-right: 1px solid var(--glass-border);
+padding: 1.5rem 1rem;
+display: flex;
+flex-direction: column;
+gap: 0.25rem;
+position: sticky;
+top: 60px;
+height: calc(100vh - 60px);
+overflow-y: auto;
+}
+
+.sidebar-section {
+font-size: 0.68rem;
+font-weight: 600;
+color: var(--text-3);
+letter-spacing: 0.08em;
+padding: 0.75rem 0.6rem 0.3rem;
+text-transform: uppercase;
+}
+
+.sidebar-item {
+display: flex;
+align-items: center;
+gap: 0.6rem;
+padding: 0.55rem 0.75rem;
+border-radius: var(--radius-xs);
+color: var(--text-2);
+font-size: 0.85rem;
+cursor: pointer;
+transition: background 0.12s, color 0.12s;
+user-select: none;
+}
+.sidebar-item:hover { background: var(--glass-bg2); color: var(--text); }
+.sidebar-item.active { background: rgba(108,99,255,0.15); color: var(--accent2); }
+.sidebar-item .icon { font-size: 1rem; width: 20px; text-align: center; }
+
+/* ── Main content ──────────────────────────────────────────────────────── */
+.main { padding: 2rem; max-width: 900px; }
+
+.section-header {
+display: flex;
+align-items: center;
+justify-content: space-between;
+margin-bottom: 1.5rem;
+}
+.section-header h2 { font-size: 1.1rem; font-weight: 600; }
+.section-header p { font-size: 0.82rem; color: var(--text-2); margin-top: 0.2rem; }
+
+/* ── Stat cards ────────────────────────────────────────────────────────── */
+.stats-grid {
+display: grid;
+grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+gap: 1rem;
+margin-bottom: 2rem;
+}
+.stat-card {
+padding: 1.25rem;
+}
+.stat-card .stat-label { font-size: 0.72rem; color: var(--text-3); font-weight: 500; margin-bottom: 0.4rem; }
+.stat-card .stat-value { font-size: 1.75rem; font-weight: 700; line-height: 1; }
+.stat-card .stat-sub { font-size: 0.72rem; color: var(--text-3); margin-top: 0.25rem; }
+.stat-accent { color: var(--accent2); }
+.stat-green { color: var(--success); }
+.stat-warn { color: var(--warning); }
+
+/* ── Script table ──────────────────────────────────────────────────────── */
+.script-list { display: flex; flex-direction: column; gap: 0.6rem; }
+
+.script-item {
+padding: 1rem 1.25rem;
+display: grid;
+grid-template-columns: 1fr auto;
+gap: 0.75rem;
+align-items: center;
+}
+
+.script-name { font-weight: 500; font-size: 0.9rem; margin-bottom: 0.25rem; }
+.script-meta { font-size: 0.75rem; color: var(--text-2); display: flex; gap: 1rem; flex-wrap: wrap; }
+.script-meta span { display: flex; align-items: center; gap: 0.25rem; }
+
+.script-actions { display: flex; gap: 0.5rem; align-items: center; flex-shrink: 0; }
+
+/* ── Copy field ────────────────────────────────────────────────────────── */
+.copy-row {
+display: flex;
+align-items: center;
+gap: 0.5rem;
+background: rgba(255,255,255,0.03);
+border: 1px solid var(--glass-border);
+border-radius: var(--radius-xs);
+padding: 0.5rem 0.75rem;
+margin-top: 0.4rem;
+}
+.copy-row code {
+flex: 1;
+font-family: var(--mono);
+font-size: 0.75rem;
+color: var(--accent2);
+word-break: break-all;
+white-space: pre-wrap;
+}
+.copy-btn {
+background: rgba(255,255,255,0.06);
+border: 1px solid var(--glass-border);
+color: var(--text-2);
+font-size: 0.72rem;
+padding: 3px 10px;
+border-radius: 4px;
+cursor: pointer;
+white-space: nowrap;
+transition: color 0.15s, border-color 0.15s;
+font-family: var(--sans);
+flex-shrink: 0;
+}
+.copy-btn:hover { color: var(--text); border-color: var(--glass-border2); }
+.copy-btn.copied { color: var(--success); border-color: var(--success); }
+
+/* ── Drop zone ─────────────────────────────────────────────────────────── */
+.drop-zone {
+border: 2px dashed var(--glass-border);
+border-radius: var(--radius);
+padding: 2rem;
+text-align: center;
+cursor: pointer;
+position: relative;
+transition: border-color 0.2s, background 0.2s;
+margin-bottom: 1rem;
+}
+.drop-zone:hover, .drop-zone.over {
+border-color: var(--accent);
+background: var(--accent-glow2);
+}
+.drop-zone input { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%; }
+.drop-zone .dz-icon { font-size: 2rem; margin-bottom: 0.5rem; display: block; }
+.drop-zone p { font-size: 0.85rem; color: var(--text-2); }
+.drop-zone p strong { color: var(--accent2); }
+.drop-zone .dz-file { font-size: 0.78rem; color: var(--success); margin-top: 0.35rem; font-family: var(--mono); }
+
+/* ── User table (owner) ────────────────────────────────────────────────── */
+.user-list { display: flex; flex-direction: column; gap: 0.6rem; }
+
+.user-item {
+padding: 0.9rem 1.1rem;
+display: grid;
+grid-template-columns: 1fr auto;
+gap: 0.75rem;
+align-items: center;
+}
+.user-email { font-weight: 500; font-size: 0.875rem; margin-bottom: 0.2rem; }
+.user-meta { font-size: 0.73rem; color: var(--text-2); display: flex; gap: 0.75rem; flex-wrap: wrap; }
+.user-actions { display: flex; gap: 0.4rem; align-items: center; flex-shrink: 0; }
+
+.banned-badge {
+font-size: 0.68rem;
+padding: 2px 8px;
+border-radius: 20px;
+background: rgba(248,113,113,0.15);
+color: var(--error);
+border: 1px solid rgba(248,113,113,0.25);
+font-weight: 500;
+}
+
+/* ── Modal ─────────────────────────────────────────────────────────────── */
+.modal-overlay {
+position: fixed; inset: 0;
+background: rgba(0,0,0,0.6);
+backdrop-filter: blur(6px);
+z-index: 200;
+display: flex; align-items: center; justify-content: center;
+padding: 1rem;
+opacity: 0; pointer-events: none;
+transition: opacity 0.2s;
+}
+.modal-overlay.open { opacity: 1; pointer-events: all; }
+
+.modal {
+width: 100%; max-width: 440px;
+padding: 2rem;
+}
+.modal h3 { font-size: 1rem; font-weight: 600; margin-bottom: 0.5rem; }
+.modal p { font-size: 0.82rem; color: var(--text-2); margin-bottom: 1.25rem; line-height: 1.6; }
+.modal-actions { display: flex; gap: 0.5rem; justify-content: flex-end; margin-top: 1.25rem; }
+
+/* ── Chart ─────────────────────────────────────────────────────────────── */
+.chart-wrap { padding: 1.5rem; margin-bottom: 1.5rem; }
+.chart-title { font-size: 0.82rem; color: var(--text-2); margin-bottom: 1rem; font-weight: 500; }
+.bar-chart { display: flex; align-items: flex-end; gap: 4px; height: 80px; }
+.bar {
+flex: 1;
+border-radius: 3px 3px 0 0;
+background: linear-gradient(to top, var(--accent), var(--accent2));
+opacity: 0.7;
+min-height: 2px;
+transition: opacity 0.15s;
+position: relative;
+}
+.bar:hover { opacity: 1; }
+.bar-labels { display: flex; gap: 4px; margin-top: 6px; }
+.bar-label { flex: 1; text-align: center; font-size: 0.6rem; color: var(--text-3); overflow: hidden; }
+
+/* ── Toast ─────────────────────────────────────────────────────────────── */
+#toast {
+position: fixed; bottom: 1.5rem; right: 1.5rem;
+background: rgba(20,20,35,0.95);
+border: 1px solid var(--glass-border2);
+border-radius: var(--radius-sm);
+padding: 0.75rem 1rem;
+font-size: 0.82rem;
+color: var(--text);
+z-index: 500;
+transform: translateY(80px);
+opacity: 0;
+transition: transform 0.25s, opacity 0.25s;
+max-width: 300px;
+backdrop-filter: blur(16px);
+}
+#toast.show { transform: translateY(0); opacity: 1; }
+#toast.t-success { border-color: rgba(52,211,153,0.4); }
+#toast.t-error { border-color: rgba(248,113,113,0.4); }
+
+/* ── Empty state ───────────────────────────────────────────────────────── */
+.empty {
+text-align: center;
+padding: 3rem 1rem;
+color: var(--text-3);
+}
+.empty .empty-icon { font-size: 2.5rem; margin-bottom: 0.75rem; display: block; }
+.empty p { font-size: 0.85rem; }
+
+/* ── Tabs ──────────────────────────────────────────────────────────────── */
+.tabs {
+display: flex;
+gap: 0;
+background: rgba(255,255,255,0.03);
+border: 1px solid var(--glass-border);
+border-radius: var(--radius-sm);
+padding: 3px;
+margin-bottom: 1.5rem;
+width: fit-content;
+}
+.tab-btn {
+padding: 0.4rem 1rem;
+font-size: 0.8rem;
+font-weight: 500;
+color: var(--text-2);
+border-radius: 5px;
+cursor: pointer;
+transition: background 0.12s, color 0.12s;
+user-select: none;
+}
+.tab-btn.active { background: rgba(108,99,255,0.2); color: var(--accent2); }
+
+/* ── Char count ────────────────────────────────────────────────────────── */
+.char-count { font-size: 0.72rem; color: var(--text-3); text-align: right; margin-top: 0.25rem; }
+.char-count.warn { color: var(--warning); }
+.char-count.danger { color: var(--error); }
+
+/* ── Divider ───────────────────────────────────────────────────────────── */
+.divider { height: 1px; background: var(--glass-border); margin: 1.5rem 0; }
+
+/* ── Responsive ────────────────────────────────────────────────────────── */
+@media (max-width: 700px) {
+.dashboard { grid-template-columns: 1fr; }
+.sidebar {
+position: static;
+height: auto;
+flex-direction: row;
+overflow-x: auto;
+padding: 0.5rem;
+border-right: none;
+border-bottom: 1px solid var(--glass-border);
+}
+.sidebar-section { display: none; }
+.sidebar-item { padding: 0.4rem 0.6rem; font-size: 0.78rem; }
+.main { padding: 1.25rem; }
+.stats-grid { grid-template-columns: 1fr 1fr; }
+}
+</style>
 </head>
 <body>
 
@@ -1041,256 +1041,256 @@
 
 <div id="app">
 
-  <!-- Nav -->
-  <nav id="nav" style="display:none;">
-    <a class="nav-logo" href="#">
-      <div class="logo-mark">&#9889;</div>
-      ScriptHub
-    </a>
-    <div class="nav-actions">
-      <div class="nav-user" id="nav-user"></div>
-      <button class="btn btn-ghost btn-sm" onclick="logout()">Sign out</button>
-    </div>
-  </nav>
+<!-- Nav -->
+<nav id="nav" style="display:none;">
+<a class="nav-logo" href="#">
+<div class="logo-mark">&#9889;</div>
+ScriptHub
+</a>
+<div class="nav-actions">
+<div class="nav-user" id="nav-user"></div>
+<button class="btn btn-ghost btn-sm" onclick="logout()">Sign out</button>
+</div>
+</nav>
 
-  <!-- AUTH PAGE -->
-  <div id="page-auth" class="page active">
-    <div class="auth-split">
+<!-- AUTH PAGE -->
+<div id="page-auth" class="page active">
+<div class="auth-split">
 
-      <!-- Left visual panel -->
-      <div class="auth-left">
-        <div class="auth-orb"></div>
-        <div class="auth-orb-sm auth-orb-sm-1"></div>
-        <div class="auth-orb-sm auth-orb-sm-2"></div>
-        <div class="auth-left-content">
-          <div class="auth-left-brand">
-            <div class="brand-mark">S</div>
-            <span>ScriptHub</span>
-          </div>
-          <h2>Host scripts.<br/>Execute anywhere.</h2>
-          <p>Upload your Lua scripts once. Execute them instantly inside any Roblox game via a single loadstring.</p>
-        </div>
-      </div>
+<!-- Left visual panel -->
+<div class="auth-left">
+<div class="auth-orb"></div>
+<div class="auth-orb-sm auth-orb-sm-1"></div>
+<div class="auth-orb-sm auth-orb-sm-2"></div>
+<div class="auth-left-content">
+<div class="auth-left-brand">
+<div class="brand-mark">S</div>
+<span>ScriptHub</span>
+</div>
+<h2>Host scripts.<br/>Execute anywhere.</h2>
+<p>Upload your Lua scripts once. Execute them instantly inside any Roblox game via a single loadstring.</p>
+</div>
+</div>
 
-      <!-- Right form panel -->
-      <div class="auth-right">
-        <div style="position:absolute;top:1.75rem;right:2rem;display:flex;align-items:center;gap:0.4rem;font-size:0.72rem;font-weight:500;color:rgba(255,255,255,0.35);letter-spacing:0.04em;">
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="opacity:0.6;"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-          Protect Lua
-        </div>
-        <div class="auth-form-wrap">
+<!-- Right form panel -->
+<div class="auth-right">
+<div style="position:absolute;top:1.75rem;right:2rem;display:flex;align-items:center;gap:0.4rem;font-size:0.72rem;font-weight:500;color:rgba(255,255,255,0.35);letter-spacing:0.04em;">
+<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="opacity:0.6;"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+Protect Lua
+</div>
+<div class="auth-form-wrap">
 
-          <div class="auth-form-title" id="auth-title">Welcome back</div>
-          <div class="auth-form-sub" id="auth-sub">Sign in to access your scripts.</div>
+<div class="auth-form-title" id="auth-title">Welcome back</div>
+<div class="auth-form-sub" id="auth-sub">Sign in to access your scripts.</div>
 
-          <div class="auth-tabs">
-            <div class="auth-tab active" onclick="switchAuthTab('login')">Sign in</div>
-            <div class="auth-tab" onclick="switchAuthTab('register')">Create account</div>
-          </div>
+<div class="auth-tabs">
+<div class="auth-tab active" onclick="switchAuthTab('login')">Sign in</div>
+<div class="auth-tab" onclick="switchAuthTab('register')">Create account</div>
+</div>
 
-          <!-- Login -->
-          <div id="form-login" class="auth-form">
-            <div class="auth-error" id="login-error"></div>
-            <div>
-              <label class="auth-input-label">Email address</label>
-              <div class="auth-input-wrap">
-                <input type="email" id="login-email" placeholder="you@example.com" autocomplete="email"/>
-              </div>
-            </div>
-            <div>
-              <label class="auth-input-label">Password</label>
-              <div class="auth-input-wrap">
-                <input type="password" id="login-password" placeholder="••••••••" autocomplete="current-password"/>
-              </div>
-            </div>
-            <button class="auth-submit" onclick="doLogin()" id="login-btn">
-              <div class="auth-submit-inner">
-                <div class="auth-spin"></div>
-                <span id="login-btn-text">Sign in</span>
-              </div>
-            </button>
-          </div>
+<!-- Login -->
+<div id="form-login" class="auth-form">
+<div class="auth-error" id="login-error"></div>
+<div>
+<label class="auth-input-label">Email address</label>
+<div class="auth-input-wrap">
+<input type="email" id="login-email" placeholder="you@example.com" autocomplete="email"/>
+</div>
+</div>
+<div>
+<label class="auth-input-label">Password</label>
+<div class="auth-input-wrap">
+<input type="password" id="login-password" placeholder="••••••••" autocomplete="current-password"/>
+</div>
+</div>
+<button class="auth-submit" onclick="doLogin()" id="login-btn">
+<div class="auth-submit-inner">
+<div class="auth-spin"></div>
+<span id="login-btn-text">Sign in</span>
+</div>
+</button>
+</div>
 
-          <!-- Register -->
-          <div id="form-register" class="auth-form" style="display:none;">
-            <div class="auth-error" id="register-error"></div>
-            <div>
-              <label class="auth-input-label">Email address</label>
-              <div class="auth-input-wrap">
-                <input type="email" id="reg-email" placeholder="you@example.com" autocomplete="email"/>
-              </div>
-            </div>
-            <div>
-              <label class="auth-input-label">Password</label>
-              <div class="auth-input-wrap">
-                <input type="password" id="reg-password" placeholder="Min. 8 characters" autocomplete="new-password"/>
-              </div>
-            </div>
-            <div>
-              <label class="auth-input-label">Confirm password</label>
-              <div class="auth-input-wrap">
-                <input type="password" id="reg-password2" placeholder="Repeat your password" autocomplete="new-password"/>
-              </div>
-            </div>
-            <button class="auth-submit" onclick="doRegister()" id="register-btn">
-              <div class="auth-submit-inner">
-                <div class="auth-spin"></div>
-                <span id="register-btn-text">Create account</span>
-              </div>
-            </button>
-          </div>
+<!-- Register -->
+<div id="form-register" class="auth-form" style="display:none;">
+<div class="auth-error" id="register-error"></div>
+<div>
+<label class="auth-input-label">Email address</label>
+<div class="auth-input-wrap">
+<input type="email" id="reg-email" placeholder="you@example.com" autocomplete="email"/>
+</div>
+</div>
+<div>
+<label class="auth-input-label">Password</label>
+<div class="auth-input-wrap">
+<input type="password" id="reg-password" placeholder="Min. 8 characters" autocomplete="new-password"/>
+</div>
+</div>
+<div>
+<label class="auth-input-label">Confirm password</label>
+<div class="auth-input-wrap">
+<input type="password" id="reg-password2" placeholder="Repeat your password" autocomplete="new-password"/>
+</div>
+</div>
+<button class="auth-submit" onclick="doRegister()" id="register-btn">
+<div class="auth-submit-inner">
+<div class="auth-spin"></div>
+<span id="register-btn-text">Create account</span>
+</div>
+</button>
+</div>
 
-          <div class="auth-footer">
-            Scripts are stored securely and served exclusively to Roblox clients.
-          </div>
+<div class="auth-footer">
+Scripts are stored securely and served exclusively to Roblox clients.
+</div>
 
-        </div>
-      </div>
-    </div>
-  </div>
+</div>
+</div>
+</div>
+</div>
 
-  <!-- DASHBOARD PAGE -->
-  <div id="page-dashboard" class="page">
-    <div class="dashboard">
+<!-- DASHBOARD PAGE -->
+<div id="page-dashboard" class="page">
+<div class="dashboard">
 
-      <!-- Sidebar -->
-      <aside class="sidebar" id="sidebar">
-        <div class="sidebar-section">Scripts</div>
-        <div class="sidebar-item active" onclick="showView('upload')" id="nav-upload">
-          <span class="icon">&#8679;</span> Upload
-        </div>
-        <div class="sidebar-item" onclick="showView('my-scripts')" id="nav-my-scripts">
-          <span class="icon">&#9776;</span> My scripts
-        </div>
+<!-- Sidebar -->
+<aside class="sidebar" id="sidebar">
+<div class="sidebar-section">Scripts</div>
+<div class="sidebar-item active" onclick="showView('upload')" id="nav-upload">
+<span class="icon">&#8679;</span> Upload
+</div>
+<div class="sidebar-item" onclick="showView('my-scripts')" id="nav-my-scripts">
+<span class="icon">&#9776;</span> My scripts
+</div>
 
-        <div class="sidebar-section" id="owner-section" style="display:none;">Owner</div>
-        <div class="sidebar-item" onclick="showView('owner-users')" id="nav-owner-users" style="display:none;">
-          <span class="icon">&#9817;</span> Users
-        </div>
-        <div class="sidebar-item" onclick="showView('owner-scripts')" id="nav-owner-scripts" style="display:none;">
-          <span class="icon">&#9783;</span> All scripts
-        </div>
-        <div class="sidebar-item" onclick="showView('owner-stats')" id="nav-owner-stats" style="display:none;">
-          <span class="icon">&#9636;</span> Statistics
-        </div>
-      </aside>
+<div class="sidebar-section" id="owner-section" style="display:none;">Owner</div>
+<div class="sidebar-item" onclick="showView('owner-users')" id="nav-owner-users" style="display:none;">
+<span class="icon">&#9817;</span> Users
+</div>
+<div class="sidebar-item" onclick="showView('owner-scripts')" id="nav-owner-scripts" style="display:none;">
+<span class="icon">&#9783;</span> All scripts
+</div>
+<div class="sidebar-item" onclick="showView('owner-stats')" id="nav-owner-stats" style="display:none;">
+<span class="icon">&#9636;</span> Statistics
+</div>
+</aside>
 
-      <!-- Main content -->
-      <main class="main">
+<!-- Main content -->
+<main class="main">
 
-        <!-- VIEW: Upload -->
-        <div id="view-upload">
-          <div class="section-header">
-            <div>
-              <h2>Upload a script</h2>
-              <p>Your script will be hosted and served exclusively to Roblox clients.</p>
-            </div>
-          </div>
+<!-- VIEW: Upload -->
+<div id="view-upload">
+<div class="section-header">
+<div>
+<h2>Upload a script</h2>
+<p>Your script will be hosted and served exclusively to Roblox clients.</p>
+</div>
+</div>
 
-          <div class="alert alert-error" id="upload-error"></div>
-          <div class="alert alert-success" id="upload-success" style="display:none;"></div>
+<div class="alert alert-error" id="upload-error"></div>
+<div class="alert alert-success" id="upload-success" style="display:none;"></div>
 
-          <div class="glass" style="padding:1.5rem; margin-bottom:1rem;">
-            <div class="field" style="margin-bottom:1rem;">
-              <label>Script name <span style="color:var(--text-3)">(optional)</span></label>
-              <input type="text" id="script-name" placeholder="My awesome script" maxlength="64"/>
-            </div>
+<div class="glass" style="padding:1.5rem; margin-bottom:1rem;">
+<div class="field" style="margin-bottom:1rem;">
+<label>Script name <span style="color:var(--text-3)">(optional)</span></label>
+<input type="text" id="script-name" placeholder="My awesome script" maxlength="64"/>
+</div>
 
-            <div class="drop-zone" id="drop-zone">
-              <input type="file" id="file-input" accept=".lua,.txt" onchange="handleFile(event)"/>
-              <span class="dz-icon">&#128196;</span>
-              <p><strong>Click or drag</strong> a .lua file here</p>
-              <div class="dz-file" id="dz-file"></div>
-            </div>
+<div class="drop-zone" id="drop-zone">
+<input type="file" id="file-input" accept=".lua,.txt" onchange="handleFile(event)"/>
+<span class="dz-icon">&#128196;</span>
+<p><strong>Click or drag</strong> a .lua file here</p>
+<div class="dz-file" id="dz-file"></div>
+</div>
 
-            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.4rem;">
-              <label style="font-size:0.78rem;color:var(--text-2);font-weight:500;">Or paste your script</label>
-              <button class="btn btn-ghost btn-sm" onclick="clearEditor()">Clear</button>
-            </div>
-            <textarea id="script-editor" placeholder="-- Lua code here&#10;print('Hello from Roblox!')" spellcheck="false" oninput="updateCharCount()"></textarea>
-            <div class="char-count" id="char-count">0 characters</div>
+<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.4rem;">
+<label style="font-size:0.78rem;color:var(--text-2);font-weight:500;">Or paste your script</label>
+<button class="btn btn-ghost btn-sm" onclick="clearEditor()">Clear</button>
+</div>
+<textarea id="script-editor" placeholder="-- Lua code here&#10;print('Hello from Roblox!')" spellcheck="false" oninput="updateCharCount()"></textarea>
+<div class="char-count" id="char-count">0 characters</div>
 
-            <button class="btn btn-primary btn-lg" style="margin-top:1.25rem;" onclick="doUpload()" id="upload-btn">
-              <div class="spin" id="upload-spin"></div>
-              <span id="upload-btn-text">Upload script</span>
-            </button>
-          </div>
+<button class="btn btn-primary btn-lg" style="margin-top:1.25rem;" onclick="doUpload()" id="upload-btn">
+<div class="spin" id="upload-spin"></div>
+<span id="upload-btn-text">Upload script</span>
+</button>
+</div>
 
-          <!-- Result -->
-          <div class="glass" id="upload-result" style="display:none;padding:1.5rem;">
-            <div style="font-size:0.78rem;font-weight:600;color:var(--success);display:flex;align-items:center;gap:0.4rem;margin-bottom:1.25rem;">
-              &#10003; Script uploaded successfully
-            </div>
-            <div style="display:flex;flex-direction:column;gap:0.75rem;">
-              <div>
-                <div style="font-size:0.72rem;color:var(--text-3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:0.3rem;">Script URL</div>
-                <div class="copy-row">
-                  <code id="res-url"></code>
-                  <button class="copy-btn" onclick="copyText('res-url', this)">Copy</button>
-                </div>
-              </div>
-              <div>
-                <div style="font-size:0.72rem;color:var(--text-3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:0.3rem;">Loadstring</div>
-                <div class="copy-row">
-                  <code id="res-loadstring"></code>
-                  <button class="copy-btn" onclick="copyText('res-loadstring', this)">Copy</button>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
+<!-- Result -->
+<div class="glass" id="upload-result" style="display:none;padding:1.5rem;">
+<div style="font-size:0.78rem;font-weight:600;color:var(--success);display:flex;align-items:center;gap:0.4rem;margin-bottom:1.25rem;">
+&#10003; Script uploaded successfully
+</div>
+<div style="display:flex;flex-direction:column;gap:0.75rem;">
+<div>
+<div style="font-size:0.72rem;color:var(--text-3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:0.3rem;">Script URL</div>
+<div class="copy-row">
+<code id="res-url"></code>
+<button class="copy-btn" onclick="copyText('res-url', this)">Copy</button>
+</div>
+</div>
+<div>
+<div style="font-size:0.72rem;color:var(--text-3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:0.3rem;">Loadstring</div>
+<div class="copy-row">
+<code id="res-loadstring"></code>
+<button class="copy-btn" onclick="copyText('res-loadstring', this)">Copy</button>
+</div>
+</div>
+</div>
+</div>
+</div>
 
-        <!-- VIEW: My scripts -->
-        <div id="view-my-scripts" style="display:none;">
-          <div class="section-header">
-            <div><h2>My scripts</h2><p>All scripts you've uploaded.</p></div>
-            <button class="btn btn-primary btn-sm" onclick="showView('upload')">New upload</button>
-          </div>
-          <div id="my-scripts-list"></div>
-        </div>
+<!-- VIEW: My scripts -->
+<div id="view-my-scripts" style="display:none;">
+<div class="section-header">
+<div><h2>My scripts</h2><p>All scripts you've uploaded.</p></div>
+<button class="btn btn-primary btn-sm" onclick="showView('upload')">New upload</button>
+</div>
+<div id="my-scripts-list"></div>
+</div>
 
-        <!-- VIEW: Owner — Users -->
-        <div id="view-owner-users" style="display:none;">
-          <div class="section-header">
-            <div><h2>Users</h2><p>All registered accounts.</p></div>
-            <button class="btn btn-ghost btn-sm" onclick="loadOwnerUsers()">&#8635; Refresh</button>
-          </div>
-          <div id="owner-users-list"></div>
-        </div>
+<!-- VIEW: Owner — Users -->
+<div id="view-owner-users" style="display:none;">
+<div class="section-header">
+<div><h2>Users</h2><p>All registered accounts.</p></div>
+<button class="btn btn-ghost btn-sm" onclick="loadOwnerUsers()">&#8635; Refresh</button>
+</div>
+<div id="owner-users-list"></div>
+</div>
 
-        <!-- VIEW: Owner — All scripts -->
-        <div id="view-owner-scripts" style="display:none;">
-          <div class="section-header">
-            <div><h2>All scripts</h2><p>Every script on the platform.</p></div>
-            <button class="btn btn-ghost btn-sm" onclick="loadOwnerScripts()">&#8635; Refresh</button>
-          </div>
-          <div id="owner-scripts-list"></div>
-        </div>
+<!-- VIEW: Owner — All scripts -->
+<div id="view-owner-scripts" style="display:none;">
+<div class="section-header">
+<div><h2>All scripts</h2><p>Every script on the platform.</p></div>
+<button class="btn btn-ghost btn-sm" onclick="loadOwnerScripts()">&#8635; Refresh</button>
+</div>
+<div id="owner-scripts-list"></div>
+</div>
 
-        <!-- VIEW: Owner — Stats -->
-        <div id="view-owner-stats" style="display:none;">
-          <div class="section-header">
-            <div><h2>Statistics</h2><p>Platform overview.</p></div>
-            <button class="btn btn-ghost btn-sm" onclick="loadStats()">&#8635; Refresh</button>
-          </div>
+<!-- VIEW: Owner — Stats -->
+<div id="view-owner-stats" style="display:none;">
+<div class="section-header">
+<div><h2>Statistics</h2><p>Platform overview.</p></div>
+<button class="btn btn-ghost btn-sm" onclick="loadStats()">&#8635; Refresh</button>
+</div>
 
-          <div class="stats-grid" id="stats-grid"></div>
+<div class="stats-grid" id="stats-grid"></div>
 
-          <div class="glass chart-wrap" id="chart-wrap" style="display:none;">
-            <div class="chart-title">Daily requests — last 14 days</div>
-            <div class="bar-chart" id="bar-chart"></div>
-            <div class="bar-labels" id="bar-labels"></div>
-          </div>
+<div class="glass chart-wrap" id="chart-wrap" style="display:none;">
+<div class="chart-title">Daily requests — last 14 days</div>
+<div class="bar-chart" id="bar-chart"></div>
+<div class="bar-labels" id="bar-labels"></div>
+</div>
 
-          <div style="margin-top:1.5rem;">
-            <div style="font-size:0.82rem;font-weight:500;color:var(--text-2);margin-bottom:0.75rem;">Top scripts by views</div>
-            <div id="top-scripts-list"></div>
-          </div>
-        </div>
+<div style="margin-top:1.5rem;">
+<div style="font-size:0.82rem;font-weight:500;color:var(--text-2);margin-bottom:0.75rem;">Top scripts by views</div>
+<div id="top-scripts-list"></div>
+</div>
+</div>
 
-      </main>
-    </div>
-  </div>
+</main>
+</div>
+</div>
 
 </div>
 
@@ -1299,552 +1299,552 @@
 
 <!-- Ban modal -->
 <div class="modal-overlay" id="modal-ban">
-  <div class="glass modal">
-    <h3>Ban user</h3>
-    <p>Choose a ban duration. Leave empty for a permanent ban.</p>
-    <div class="field" style="margin-bottom:0.75rem;">
-      <label>Duration (days) — leave empty for permanent</label>
-      <input type="number" id="ban-days" placeholder="e.g. 7" min="1"/>
-    </div>
-    <div class="field" style="margin-bottom:0;">
-      <label>Reason <span style="color:var(--text-3)">(optional)</span></label>
-      <input type="text" id="ban-reason" placeholder="Rule violation..."/>
-    </div>
-    <div class="modal-actions">
-      <button class="btn btn-ghost btn-sm" onclick="closeModal('modal-ban')">Cancel</button>
-      <button class="btn btn-danger btn-sm" onclick="confirmBan()">Ban user</button>
-    </div>
-  </div>
+<div class="glass modal">
+<h3>Ban user</h3>
+<p>Choose a ban duration. Leave empty for a permanent ban.</p>
+<div class="field" style="margin-bottom:0.75rem;">
+<label>Duration (days) — leave empty for permanent</label>
+<input type="number" id="ban-days" placeholder="e.g. 7" min="1"/>
+</div>
+<div class="field" style="margin-bottom:0;">
+<label>Reason <span style="color:var(--text-3)">(optional)</span></label>
+<input type="text" id="ban-reason" placeholder="Rule violation..."/>
+</div>
+<div class="modal-actions">
+<button class="btn btn-ghost btn-sm" onclick="closeModal('modal-ban')">Cancel</button>
+<button class="btn btn-danger btn-sm" onclick="confirmBan()">Ban user</button>
+</div>
+</div>
 </div>
 
 <!-- IP modal -->
 <div class="modal-overlay" id="modal-ip">
-  <div class="glass modal">
-    <h3>View IP address</h3>
-    <p>Enter your owner password to reveal this user's IP address and login history.</p>
-    <div class="field">
-      <label>Your password</label>
-      <input type="password" id="ip-password" placeholder="••••••••"/>
-    </div>
-    <div class="alert alert-error" id="ip-error" style="margin-top:0.75rem;"></div>
-    <div id="ip-result" style="display:none;margin-top:1rem;">
-      <div style="font-size:0.72rem;color:var(--text-3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:0.4rem;">Last IP</div>
-      <div class="copy-row" style="margin-bottom:0.75rem;">
-        <code id="ip-last"></code>
-        <button class="copy-btn" onclick="copyText('ip-last',this)">Copy</button>
-      </div>
-      <div style="font-size:0.72rem;color:var(--text-3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:0.4rem;">Login history</div>
-      <div id="ip-history" style="display:flex;flex-direction:column;gap:0.35rem;"></div>
-    </div>
-    <div class="modal-actions">
-      <button class="btn btn-ghost btn-sm" onclick="closeModal('modal-ip')">Close</button>
-      <button class="btn btn-primary btn-sm" onclick="confirmIPReveal()" id="ip-reveal-btn">Reveal</button>
-    </div>
-  </div>
+<div class="glass modal">
+<h3>View IP address</h3>
+<p>Enter your owner password to reveal this user's IP address and login history.</p>
+<div class="field">
+<label>Your password</label>
+<input type="password" id="ip-password" placeholder="••••••••"/>
+</div>
+<div class="alert alert-error" id="ip-error" style="margin-top:0.75rem;"></div>
+<div id="ip-result" style="display:none;margin-top:1rem;">
+<div style="font-size:0.72rem;color:var(--text-3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:0.4rem;">Last IP</div>
+<div class="copy-row" style="margin-bottom:0.75rem;">
+<code id="ip-last"></code>
+<button class="copy-btn" onclick="copyText('ip-last',this)">Copy</button>
+</div>
+<div style="font-size:0.72rem;color:var(--text-3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:0.4rem;">Login history</div>
+<div id="ip-history" style="display:flex;flex-direction:column;gap:0.35rem;"></div>
+</div>
+<div class="modal-actions">
+<button class="btn btn-ghost btn-sm" onclick="closeModal('modal-ip')">Close</button>
+<button class="btn btn-primary btn-sm" onclick="confirmIPReveal()" id="ip-reveal-btn">Reveal</button>
+</div>
+</div>
 </div>
 
 <script>
-  // ── Config ──────────────────────────────────────────────────────────────────
-  // Remplace cette URL par l'URL de ton Worker Cloudflare
-  const WORKER_URL = "https://TON-WORKER.workers.dev";
+// ── Config ──────────────────────────────────────────────────────────────────
+// Remplace cette URL par l'URL de ton Worker Cloudflare
+const WORKER_URL = "https://spyhub.spyuhq.workers.dev/";
 
-  // ── State ───────────────────────────────────────────────────────────────────
-  let token = localStorage.getItem("sh_token") || null;
-  let currentUser = null;
-  let currentBanTarget = null;
-  let currentIPTarget = null;
+// ── State ───────────────────────────────────────────────────────────────────
+let token = localStorage.getItem("sh_token") || null;
+let currentUser = null;
+let currentBanTarget = null;
+let currentIPTarget = null;
 
-  // ── API ─────────────────────────────────────────────────────────────────────
-  async function api(path, options = {}) {
-    const headers = { "Content-Type": "application/json", ...(options.headers || {}) };
-    if (token) headers["Authorization"] = `Bearer ${token}`;
-    const res = await fetch(WORKER_URL + path, { ...options, headers });
-    const data = await res.json().catch(() => ({}));
-    return { ok: res.ok, status: res.status, data };
-  }
+// ── API ─────────────────────────────────────────────────────────────────────
+async function api(path, options = {}) {
+const headers = { "Content-Type": "application/json", ...(options.headers || {}) };
+if (token) headers["Authorization"] = `Bearer ${token}`;
+const res = await fetch(WORKER_URL + path, { ...options, headers });
+const data = await res.json().catch(() => ({}));
+return { ok: res.ok, status: res.status, data };
+}
 
-  // ── Auth ────────────────────────────────────────────────────────────────────
-  function switchAuthTab(tab) {
-    document.querySelectorAll(".auth-tab").forEach((t, i) => t.classList.toggle("active", i === (tab === "login" ? 0 : 1)));
-    document.getElementById("form-login").style.display    = tab === "login"    ? "flex" : "none";
-    document.getElementById("form-register").style.display = tab === "register" ? "flex" : "none";
-    document.getElementById("auth-title").textContent = tab === "login" ? "Welcome back" : "Create an account";
-    document.getElementById("auth-sub").textContent   = tab === "login" ? "Sign in to access your scripts." : "Get started — it only takes a few seconds.";
-    document.getElementById("login-error").classList.remove("show");
-    document.getElementById("register-error").classList.remove("show");
-  }
+// ── Auth ────────────────────────────────────────────────────────────────────
+function switchAuthTab(tab) {
+document.querySelectorAll(".auth-tab").forEach((t, i) => t.classList.toggle("active", i === (tab === "login" ? 0 : 1)));
+document.getElementById("form-login").style.display = tab === "login" ? "flex" : "none";
+document.getElementById("form-register").style.display = tab === "register" ? "flex" : "none";
+document.getElementById("auth-title").textContent = tab === "login" ? "Welcome back" : "Create an account";
+document.getElementById("auth-sub").textContent = tab === "login" ? "Sign in to access your scripts." : "Get started — it only takes a few seconds.";
+document.getElementById("login-error").classList.remove("show");
+document.getElementById("register-error").classList.remove("show");
+}
 
-  async function doLogin() {
-    const email    = document.getElementById("login-email").value.trim();
-    const password = document.getElementById("login-password").value;
-    const errEl    = document.getElementById("login-error");
-    errEl.classList.remove("show");
-    if (!email || !password) { showAlert(errEl, "Email and password required."); return; }
-    setLoading("login", true);
-    try {
-      const { ok, data } = await api("/api/login", { method: "POST", body: JSON.stringify({ email, password }) });
-      if (!ok) { showAlert(errEl, data.error || "Login failed."); return; }
-      token = data.token;
-      localStorage.setItem("sh_token", token);
-      await initDashboard(data);
-    } catch { showAlert(errEl, "Cannot reach the server. Check your connection."); }
-    finally { setLoading("login", false); }
-  }
+async function doLogin() {
+const email = document.getElementById("login-email").value.trim();
+const password = document.getElementById("login-password").value;
+const errEl = document.getElementById("login-error");
+errEl.classList.remove("show");
+if (!email || !password) { showAlert(errEl, "Email and password required."); return; }
+setLoading("login", true);
+try {
+const { ok, data } = await api("/api/login", { method: "POST", body: JSON.stringify({ email, password }) });
+if (!ok) { showAlert(errEl, data.error || "Login failed."); return; }
+token = data.token;
+localStorage.setItem("sh_token", token);
+await initDashboard(data);
+} catch { showAlert(errEl, "Cannot reach the server. Check your connection."); }
+finally { setLoading("login", false); }
+}
 
-  async function doRegister() {
-    const email    = document.getElementById("reg-email").value.trim();
-    const password = document.getElementById("reg-password").value;
-    const password2= document.getElementById("reg-password2").value;
-    const errEl    = document.getElementById("register-error");
-    errEl.classList.remove("show");
-    if (!email || !password) { showAlert(errEl, "Email and password required."); return; }
-    if (password !== password2) { showAlert(errEl, "Passwords do not match."); return; }
-    if (password.length < 8) { showAlert(errEl, "Password must be at least 8 characters."); return; }
-    setLoading("register", true);
-    try {
-      const { ok, data } = await api("/api/register", { method: "POST", body: JSON.stringify({ email, password }) });
-      if (!ok) { showAlert(errEl, data.error || "Registration failed."); return; }
-      token = data.token;
-      localStorage.setItem("sh_token", token);
-      await initDashboard(data);
-    } catch { showAlert(errEl, "Cannot reach the server. Check your connection."); }
-    finally { setLoading("register", false); }
-  }
+async function doRegister() {
+const email = document.getElementById("reg-email").value.trim();
+const password = document.getElementById("reg-password").value;
+const password2= document.getElementById("reg-password2").value;
+const errEl = document.getElementById("register-error");
+errEl.classList.remove("show");
+if (!email || !password) { showAlert(errEl, "Email and password required."); return; }
+if (password !== password2) { showAlert(errEl, "Passwords do not match."); return; }
+if (password.length < 8) { showAlert(errEl, "Password must be at least 8 characters."); return; }
+setLoading("register", true);
+try {
+const { ok, data } = await api("/api/register", { method: "POST", body: JSON.stringify({ email, password }) });
+if (!ok) { showAlert(errEl, data.error || "Registration failed."); return; }
+token = data.token;
+localStorage.setItem("sh_token", token);
+await initDashboard(data);
+} catch { showAlert(errEl, "Cannot reach the server. Check your connection."); }
+finally { setLoading("register", false); }
+}
 
-  async function initDashboard(authData) {
-    const { ok, data } = await api("/api/me");
-    if (!ok) { logout(); return; }
-    currentUser = data;
+async function initDashboard(authData) {
+const { ok, data } = await api("/api/me");
+if (!ok) { logout(); return; }
+currentUser = data;
 
-    // Nav
-    document.getElementById("nav").style.display = "flex";
-    document.getElementById("nav-user").innerHTML = `
-      <span>${data.email}</span>
-      <span class="role-badge ${data.role}">${data.role}</span>
-    `;
+// Nav
+document.getElementById("nav").style.display = "flex";
+document.getElementById("nav-user").innerHTML = `
+<span>${data.email}</span>
+<span class="role-badge ${data.role}">${data.role}</span>
+`;
 
-    // Owner nav items
-    if (data.role === "owner") {
-      document.getElementById("owner-section").style.display   = "block";
-      document.getElementById("nav-owner-users").style.display  = "flex";
-      document.getElementById("nav-owner-scripts").style.display= "flex";
-      document.getElementById("nav-owner-stats").style.display  = "flex";
-    }
+// Owner nav items
+if (data.role === "owner") {
+document.getElementById("owner-section").style.display = "block";
+document.getElementById("nav-owner-users").style.display = "flex";
+document.getElementById("nav-owner-scripts").style.display= "flex";
+document.getElementById("nav-owner-stats").style.display = "flex";
+}
 
-    showPage("dashboard");
-    showView("upload");
-  }
+showPage("dashboard");
+showView("upload");
+}
 
-  function logout() {
-    token = null; currentUser = null;
-    localStorage.removeItem("sh_token");
-    document.getElementById("nav").style.display = "none";
-    showPage("auth");
-  }
+function logout() {
+token = null; currentUser = null;
+localStorage.removeItem("sh_token");
+document.getElementById("nav").style.display = "none";
+showPage("auth");
+}
 
-  // ── Upload ──────────────────────────────────────────────────────────────────
-  const dz = document.getElementById("drop-zone");
-  dz.addEventListener("dragover",  e => { e.preventDefault(); dz.classList.add("over"); });
-  dz.addEventListener("dragleave", () => dz.classList.remove("over"));
-  dz.addEventListener("drop", e => {
-    e.preventDefault(); dz.classList.remove("over");
-    const f = e.dataTransfer.files[0]; if (f) readFile(f);
-  });
+// ── Upload ──────────────────────────────────────────────────────────────────
+const dz = document.getElementById("drop-zone");
+dz.addEventListener("dragover", e => { e.preventDefault(); dz.classList.add("over"); });
+dz.addEventListener("dragleave", () => dz.classList.remove("over"));
+dz.addEventListener("drop", e => {
+e.preventDefault(); dz.classList.remove("over");
+const f = e.dataTransfer.files[0]; if (f) readFile(f);
+});
 
-  function handleFile(e) { const f = e.target.files[0]; if (f) readFile(f); }
+function handleFile(e) { const f = e.target.files[0]; if (f) readFile(f); }
 
-  function readFile(file) {
-    if (!file.name.match(/\.(lua|txt)$/i)) { toast("Only .lua and .txt files are accepted.", "error"); return; }
-    const r = new FileReader();
-    r.onload = ev => {
-      document.getElementById("script-editor").value = ev.target.result;
-      document.getElementById("dz-file").textContent  = file.name;
-      updateCharCount();
-    };
-    r.readAsText(file);
-  }
+function readFile(file) {
+if (!file.name.match(/\.(lua|txt)$/i)) { toast("Only .lua and .txt files are accepted.", "error"); return; }
+const r = new FileReader();
+r.onload = ev => {
+document.getElementById("script-editor").value = ev.target.result;
+document.getElementById("dz-file").textContent = file.name;
+updateCharCount();
+};
+r.readAsText(file);
+}
 
-  function clearEditor() {
-    document.getElementById("script-editor").value = "";
-    document.getElementById("dz-file").textContent  = "";
-    document.getElementById("char-count").textContent = "0 characters";
-    document.getElementById("char-count").className   = "char-count";
-    document.getElementById("upload-result").style.display = "none";
-  }
+function clearEditor() {
+document.getElementById("script-editor").value = "";
+document.getElementById("dz-file").textContent = "";
+document.getElementById("char-count").textContent = "0 characters";
+document.getElementById("char-count").className = "char-count";
+document.getElementById("upload-result").style.display = "none";
+}
 
-  function updateCharCount() {
-    const len = document.getElementById("script-editor").value.length;
-    const el  = document.getElementById("char-count");
-    el.textContent = len.toLocaleString("en-US") + " characters";
-    el.className   = "char-count" + (len > 450000 ? " danger" : len > 350000 ? " warn" : "");
-  }
+function updateCharCount() {
+const len = document.getElementById("script-editor").value.length;
+const el = document.getElementById("char-count");
+el.textContent = len.toLocaleString("en-US") + " characters";
+el.className = "char-count" + (len > 450000 ? " danger" : len > 350000 ? " warn" : "");
+}
 
-  async function doUpload() {
-    const script = document.getElementById("script-editor").value;
-    const name   = document.getElementById("script-name").value.trim();
-    const errEl  = document.getElementById("upload-error");
-    const succEl = document.getElementById("upload-success");
-    errEl.classList.remove("show");
-    succEl.style.display = "none";
-    document.getElementById("upload-result").style.display = "none";
+async function doUpload() {
+const script = document.getElementById("script-editor").value;
+const name = document.getElementById("script-name").value.trim();
+const errEl = document.getElementById("upload-error");
+const succEl = document.getElementById("upload-success");
+errEl.classList.remove("show");
+succEl.style.display = "none";
+document.getElementById("upload-result").style.display = "none";
 
-    if (!script.trim()) { showAlert(errEl, "Script content is empty."); return; }
-    if (script.length > 500000) { showAlert(errEl, "Script is too large (max 500KB)."); return; }
+if (!script.trim()) { showAlert(errEl, "Script content is empty."); return; }
+if (script.length > 500000) { showAlert(errEl, "Script is too large (max 500KB)."); return; }
 
-    setLoading("upload", true);
-    try {
-      const { ok, data } = await api("/api/scripts", { method: "POST", body: JSON.stringify({ script, name: name || undefined }) });
-      if (!ok) { showAlert(errEl, data.error || "Upload failed."); return; }
-      document.getElementById("res-url").textContent        = data.url;
-      document.getElementById("res-loadstring").textContent = data.loadstring;
-      document.getElementById("upload-result").style.display = "block";
-      toast("Script uploaded successfully.", "success");
-    } catch { showAlert(errEl, "Cannot reach the server."); }
-    finally { setLoading("upload", false); }
-  }
+setLoading("upload", true);
+try {
+const { ok, data } = await api("/api/scripts", { method: "POST", body: JSON.stringify({ script, name: name || undefined }) });
+if (!ok) { showAlert(errEl, data.error || "Upload failed."); return; }
+document.getElementById("res-url").textContent = data.url;
+document.getElementById("res-loadstring").textContent = data.loadstring;
+document.getElementById("upload-result").style.display = "block";
+toast("Script uploaded successfully.", "success");
+} catch { showAlert(errEl, "Cannot reach the server."); }
+finally { setLoading("upload", false); }
+}
 
-  // ── My scripts ──────────────────────────────────────────────────────────────
-  async function loadMyScripts() {
-    const el = document.getElementById("my-scripts-list");
-    el.innerHTML = `<div class="empty"><span class="empty-icon">&#8987;</span><p>Loading...</p></div>`;
-    const { ok, data } = await api("/api/scripts");
-    if (!ok) { el.innerHTML = `<div class="empty"><p>Failed to load scripts.</p></div>`; return; }
-    if (!data.scripts.length) {
-      el.innerHTML = `<div class="empty"><span class="empty-icon">&#128196;</span><p>No scripts yet. Upload your first one.</p></div>`;
-      return;
-    }
-    el.innerHTML = "";
-    const list = document.createElement("div"); list.className = "script-list";
-    data.scripts.forEach(s => {
-      const item = document.createElement("div");
-      item.className = "glass script-item";
-      item.innerHTML = `
-        <div>
-          <div class="script-name">${esc(s.name)}</div>
-          <div class="script-meta">
-            <span>&#128065; ${s.views} views</span>
-            <span>&#128196; ${(s.size/1000).toFixed(1)}KB</span>
-            <span>&#128337; ${fmtDate(s.uploadedAt)}</span>
-          </div>
-          <div class="copy-row" style="margin-top:0.5rem;">
-            <code id="ls-${s.id}">${esc(s.loadstring)}</code>
-            <button class="copy-btn" onclick="copyText('ls-${s.id}',this)">Copy</button>
-          </div>
-        </div>
-        <div class="script-actions">
-          <button class="btn btn-danger btn-sm" onclick="deleteScript('${s.id}')">Delete</button>
-        </div>
-      `;
-      list.appendChild(item);
-    });
-    el.appendChild(list);
-  }
+// ── My scripts ──────────────────────────────────────────────────────────────
+async function loadMyScripts() {
+const el = document.getElementById("my-scripts-list");
+el.innerHTML = `<div class="empty"><span class="empty-icon">&#8987;</span><p>Loading...</p></div>`;
+const { ok, data } = await api("/api/scripts");
+if (!ok) { el.innerHTML = `<div class="empty"><p>Failed to load scripts.</p></div>`; return; }
+if (!data.scripts.length) {
+el.innerHTML = `<div class="empty"><span class="empty-icon">&#128196;</span><p>No scripts yet. Upload your first one.</p></div>`;
+return;
+}
+el.innerHTML = "";
+const list = document.createElement("div"); list.className = "script-list";
+data.scripts.forEach(s => {
+const item = document.createElement("div");
+item.className = "glass script-item";
+item.innerHTML = `
+<div>
+<div class="script-name">${esc(s.name)}</div>
+<div class="script-meta">
+<span>&#128065; ${s.views} views</span>
+<span>&#128196; ${(s.size/1000).toFixed(1)}KB</span>
+<span>&#128337; ${fmtDate(s.uploadedAt)}</span>
+</div>
+<div class="copy-row" style="margin-top:0.5rem;">
+<code id="ls-${s.id}">${esc(s.loadstring)}</code>
+<button class="copy-btn" onclick="copyText('ls-${s.id}',this)">Copy</button>
+</div>
+</div>
+<div class="script-actions">
+<button class="btn btn-danger btn-sm" onclick="deleteScript('${s.id}')">Delete</button>
+</div>
+`;
+list.appendChild(item);
+});
+el.appendChild(list);
+}
 
-  async function deleteScript(id) {
-    if (!confirm("Delete this script? This cannot be undone.")) return;
-    const { ok, data } = await api(`/api/scripts/${id}`, { method: "DELETE" });
-    if (ok) { toast("Script deleted."); loadMyScripts(); }
-    else toast(data.error || "Failed to delete.", "error");
-  }
+async function deleteScript(id) {
+if (!confirm("Delete this script? This cannot be undone.")) return;
+const { ok, data } = await api(`/api/scripts/${id}`, { method: "DELETE" });
+if (ok) { toast("Script deleted."); loadMyScripts(); }
+else toast(data.error || "Failed to delete.", "error");
+}
 
-  // ── Owner: users ────────────────────────────────────────────────────────────
-  async function loadOwnerUsers() {
-    const el = document.getElementById("owner-users-list");
-    el.innerHTML = `<div class="empty"><p>Loading...</p></div>`;
-    const { ok, data } = await api("/api/owner/users");
-    if (!ok) { el.innerHTML = `<div class="empty"><p>Failed to load users.</p></div>`; return; }
-    if (!data.users.length) {
-      el.innerHTML = `<div class="empty"><span class="empty-icon">&#9817;</span><p>No users yet.</p></div>`;
-      return;
-    }
-    el.innerHTML = "";
-    const list = document.createElement("div"); list.className = "user-list";
-    data.users.forEach(u => {
-      const item = document.createElement("div");
-      item.className = "glass user-item";
-      const banLabel = u.banned
-        ? `<span class="banned-badge">${u.banExpiry ? "Temp ban" : "Banned"}</span>`
-        : "";
-      item.innerHTML = `
-        <div>
-          <div class="user-email">${esc(u.email)} ${banLabel} <span class="role-badge ${u.role}" style="font-size:0.65rem;padding:1px 6px;">${u.role}</span></div>
-          <div class="user-meta">
-            <span>&#128196; ${u.scriptCount} scripts</span>
-            <span>&#128337; Joined ${fmtDate(u.createdAt)}</span>
-            ${u.lastLogin ? `<span>Last login ${fmtDate(u.lastLogin)}</span>` : ""}
-            ${u.banned && u.banExpiry ? `<span style="color:var(--warning)">Until ${fmtDate(u.banExpiry)}</span>` : ""}
-            ${u.banReason ? `<span style="color:var(--error)">Reason: ${esc(u.banReason)}</span>` : ""}
-          </div>
-        </div>
-        <div class="user-actions">
-          ${u.role !== "owner" ? `
-            ${u.banned
-              ? `<button class="btn btn-success btn-sm" onclick="unbanUser('${u.id}')">Unban</button>`
-              : `<button class="btn btn-danger btn-sm" onclick="openBanModal('${u.id}')">Ban</button>`
-            }
-          ` : ""}
-          <button class="btn btn-ghost btn-sm" onclick="openIPModal('${u.id}')">View IP</button>
-        </div>
-      `;
-      list.appendChild(item);
-    });
-    el.appendChild(list);
-  }
+// ── Owner: users ────────────────────────────────────────────────────────────
+async function loadOwnerUsers() {
+const el = document.getElementById("owner-users-list");
+el.innerHTML = `<div class="empty"><p>Loading...</p></div>`;
+const { ok, data } = await api("/api/owner/users");
+if (!ok) { el.innerHTML = `<div class="empty"><p>Failed to load users.</p></div>`; return; }
+if (!data.users.length) {
+el.innerHTML = `<div class="empty"><span class="empty-icon">&#9817;</span><p>No users yet.</p></div>`;
+return;
+}
+el.innerHTML = "";
+const list = document.createElement("div"); list.className = "user-list";
+data.users.forEach(u => {
+const item = document.createElement("div");
+item.className = "glass user-item";
+const banLabel = u.banned
+? `<span class="banned-badge">${u.banExpiry ? "Temp ban" : "Banned"}</span>`
+: "";
+item.innerHTML = `
+<div>
+<div class="user-email">${esc(u.email)} ${banLabel} <span class="role-badge ${u.role}" style="font-size:0.65rem;padding:1px 6px;">${u.role}</span></div>
+<div class="user-meta">
+<span>&#128196; ${u.scriptCount} scripts</span>
+<span>&#128337; Joined ${fmtDate(u.createdAt)}</span>
+${u.lastLogin ? `<span>Last login ${fmtDate(u.lastLogin)}</span>` : ""}
+${u.banned && u.banExpiry ? `<span style="color:var(--warning)">Until ${fmtDate(u.banExpiry)}</span>` : ""}
+${u.banReason ? `<span style="color:var(--error)">Reason: ${esc(u.banReason)}</span>` : ""}
+</div>
+</div>
+<div class="user-actions">
+${u.role !== "owner" ? `
+${u.banned
+? `<button class="btn btn-success btn-sm" onclick="unbanUser('${u.id}')">Unban</button>`
+: `<button class="btn btn-danger btn-sm" onclick="openBanModal('${u.id}')">Ban</button>`
+}
+` : ""}
+<button class="btn btn-ghost btn-sm" onclick="openIPModal('${u.id}')">View IP</button>
+</div>
+`;
+list.appendChild(item);
+});
+el.appendChild(list);
+}
 
-  // ── Owner: all scripts ──────────────────────────────────────────────────────
-  async function loadOwnerScripts() {
-    const el = document.getElementById("owner-scripts-list");
-    el.innerHTML = `<div class="empty"><p>Loading...</p></div>`;
-    const { ok, data } = await api("/api/owner/scripts");
-    if (!ok) { el.innerHTML = `<div class="empty"><p>Failed to load.</p></div>`; return; }
-    if (!data.scripts.length) {
-      el.innerHTML = `<div class="empty"><span class="empty-icon">&#128196;</span><p>No scripts on the platform yet.</p></div>`;
-      return;
-    }
-    el.innerHTML = "";
-    const list = document.createElement("div"); list.className = "script-list";
-    data.scripts.forEach(s => {
-      const item = document.createElement("div");
-      item.className = "glass script-item";
-      item.innerHTML = `
-        <div>
-          <div class="script-name">${esc(s.name)}</div>
-          <div class="script-meta">
-            <span>&#128065; ${s.views} views</span>
-            <span>&#128196; ${(s.size/1000).toFixed(1)}KB</span>
-            <span>&#9817; ${esc(s.ownerEmail)}</span>
-            <span>&#128337; ${fmtDate(s.uploadedAt)}</span>
-          </div>
-        </div>
-        <div class="script-actions">
-          <button class="btn btn-danger btn-sm" onclick="deleteScript('${s.id}')">Delete</button>
-        </div>
-      `;
-      list.appendChild(item);
-    });
-    el.appendChild(list);
-  }
+// ── Owner: all scripts ──────────────────────────────────────────────────────
+async function loadOwnerScripts() {
+const el = document.getElementById("owner-scripts-list");
+el.innerHTML = `<div class="empty"><p>Loading...</p></div>`;
+const { ok, data } = await api("/api/owner/scripts");
+if (!ok) { el.innerHTML = `<div class="empty"><p>Failed to load.</p></div>`; return; }
+if (!data.scripts.length) {
+el.innerHTML = `<div class="empty"><span class="empty-icon">&#128196;</span><p>No scripts on the platform yet.</p></div>`;
+return;
+}
+el.innerHTML = "";
+const list = document.createElement("div"); list.className = "script-list";
+data.scripts.forEach(s => {
+const item = document.createElement("div");
+item.className = "glass script-item";
+item.innerHTML = `
+<div>
+<div class="script-name">${esc(s.name)}</div>
+<div class="script-meta">
+<span>&#128065; ${s.views} views</span>
+<span>&#128196; ${(s.size/1000).toFixed(1)}KB</span>
+<span>&#9817; ${esc(s.ownerEmail)}</span>
+<span>&#128337; ${fmtDate(s.uploadedAt)}</span>
+</div>
+</div>
+<div class="script-actions">
+<button class="btn btn-danger btn-sm" onclick="deleteScript('${s.id}')">Delete</button>
+</div>
+`;
+list.appendChild(item);
+});
+el.appendChild(list);
+}
 
-  // ── Owner: stats ────────────────────────────────────────────────────────────
-  async function loadStats() {
-    const { ok, data } = await api("/api/owner/stats");
-    if (!ok) { toast("Failed to load stats.", "error"); return; }
+// ── Owner: stats ────────────────────────────────────────────────────────────
+async function loadStats() {
+const { ok, data } = await api("/api/owner/stats");
+if (!ok) { toast("Failed to load stats.", "error"); return; }
 
-    document.getElementById("stats-grid").innerHTML = `
-      <div class="glass stat-card">
-        <div class="stat-label">Total users</div>
-        <div class="stat-value stat-accent">${data.totalUsers}</div>
-        <div class="stat-sub">${data.bannedUsers} banned</div>
-      </div>
-      <div class="glass stat-card">
-        <div class="stat-label">Total scripts</div>
-        <div class="stat-value stat-green">${data.totalScripts}</div>
-      </div>
-      <div class="glass stat-card">
-        <div class="stat-label">Total uploads</div>
-        <div class="stat-value">${data.totalUploads}</div>
-      </div>
-      <div class="glass stat-card">
-        <div class="stat-label">Script executions</div>
-        <div class="stat-value stat-accent">${data.totalRequests}</div>
-      </div>
-    `;
+document.getElementById("stats-grid").innerHTML = `
+<div class="glass stat-card">
+<div class="stat-label">Total users</div>
+<div class="stat-value stat-accent">${data.totalUsers}</div>
+<div class="stat-sub">${data.bannedUsers} banned</div>
+</div>
+<div class="glass stat-card">
+<div class="stat-label">Total scripts</div>
+<div class="stat-value stat-green">${data.totalScripts}</div>
+</div>
+<div class="glass stat-card">
+<div class="stat-label">Total uploads</div>
+<div class="stat-value">${data.totalUploads}</div>
+</div>
+<div class="glass stat-card">
+<div class="stat-label">Script executions</div>
+<div class="stat-value stat-accent">${data.totalRequests}</div>
+</div>
+`;
 
-    // Bar chart — last 14 days
-    const daily = data.dailyRequests || {};
-    const days  = [];
-    for (let i = 13; i >= 0; i--) {
-      const d = new Date(); d.setDate(d.getDate() - i);
-      days.push(d.toISOString().slice(0, 10));
-    }
-    const vals = days.map(d => daily[d] || 0);
-    const max  = Math.max(...vals, 1);
+// Bar chart — last 14 days
+const daily = data.dailyRequests || {};
+const days = [];
+for (let i = 13; i >= 0; i--) {
+const d = new Date(); d.setDate(d.getDate() - i);
+days.push(d.toISOString().slice(0, 10));
+}
+const vals = days.map(d => daily[d] || 0);
+const max = Math.max(...vals, 1);
 
-    if (vals.some(v => v > 0)) {
-      document.getElementById("chart-wrap").style.display = "block";
-      document.getElementById("bar-chart").innerHTML = vals
-        .map(v => `<div class="bar" style="height:${Math.max(2, (v/max)*80)}px;" title="${v} requests"></div>`)
-        .join("");
-      document.getElementById("bar-labels").innerHTML = days
-        .map(d => `<div class="bar-label">${d.slice(5)}</div>`)
-        .join("");
-    }
+if (vals.some(v => v > 0)) {
+document.getElementById("chart-wrap").style.display = "block";
+document.getElementById("bar-chart").innerHTML = vals
+.map(v => `<div class="bar" style="height:${Math.max(2, (v/max)*80)}px;" title="${v} requests"></div>`)
+.join("");
+document.getElementById("bar-labels").innerHTML = days
+.map(d => `<div class="bar-label">${d.slice(5)}</div>`)
+.join("");
+}
 
-    // Top scripts
-    const tsl = document.getElementById("top-scripts-list");
-    if (!data.topScripts.length) {
-      tsl.innerHTML = `<div class="empty"><p>No script executions yet.</p></div>`;
-    } else {
-      tsl.innerHTML = "";
-      const list = document.createElement("div"); list.className = "script-list";
-      data.topScripts.forEach((s, i) => {
-        const item = document.createElement("div");
-        item.className = "glass-sm";
-        item.style.cssText = "padding:0.75rem 1rem;display:flex;align-items:center;gap:1rem;";
-        item.innerHTML = `
-          <div style="font-size:1.1rem;font-weight:700;color:var(--text-3);width:24px;text-align:center;">${i+1}</div>
-          <div style="flex:1;">
-            <div style="font-weight:500;font-size:0.875rem;">${esc(s.name)}</div>
-            <div style="font-size:0.73rem;color:var(--text-2);">${s.id}</div>
-          </div>
-          <div style="font-size:0.82rem;color:var(--accent2);font-weight:600;">&#128065; ${s.views}</div>
-        `;
-        list.appendChild(item);
-      });
-      tsl.appendChild(list);
-    }
-  }
+// Top scripts
+const tsl = document.getElementById("top-scripts-list");
+if (!data.topScripts.length) {
+tsl.innerHTML = `<div class="empty"><p>No script executions yet.</p></div>`;
+} else {
+tsl.innerHTML = "";
+const list = document.createElement("div"); list.className = "script-list";
+data.topScripts.forEach((s, i) => {
+const item = document.createElement("div");
+item.className = "glass-sm";
+item.style.cssText = "padding:0.75rem 1rem;display:flex;align-items:center;gap:1rem;";
+item.innerHTML = `
+<div style="font-size:1.1rem;font-weight:700;color:var(--text-3);width:24px;text-align:center;">${i+1}</div>
+<div style="flex:1;">
+<div style="font-weight:500;font-size:0.875rem;">${esc(s.name)}</div>
+<div style="font-size:0.73rem;color:var(--text-2);">${s.id}</div>
+</div>
+<div style="font-size:0.82rem;color:var(--accent2);font-weight:600;">&#128065; ${s.views}</div>
+`;
+list.appendChild(item);
+});
+tsl.appendChild(list);
+}
+}
 
-  // ── Ban ─────────────────────────────────────────────────────────────────────
-  function openBanModal(userId) {
-    currentBanTarget = userId;
-    document.getElementById("ban-days").value = "";
-    document.getElementById("ban-reason").value = "";
-    openModal("modal-ban");
-  }
+// ── Ban ─────────────────────────────────────────────────────────────────────
+function openBanModal(userId) {
+currentBanTarget = userId;
+document.getElementById("ban-days").value = "";
+document.getElementById("ban-reason").value = "";
+openModal("modal-ban");
+}
 
-  async function confirmBan() {
-    const days   = parseInt(document.getElementById("ban-days").value) || null;
-    const reason = document.getElementById("ban-reason").value.trim() || null;
-    const { ok, data } = await api(`/api/owner/ban/${currentBanTarget}`, {
-      method: "POST",
-      body: JSON.stringify({ durationDays: days, reason }),
-    });
-    if (ok) { toast(data.message, "success"); closeModal("modal-ban"); loadOwnerUsers(); }
-    else toast(data.error || "Failed to ban.", "error");
-  }
+async function confirmBan() {
+const days = parseInt(document.getElementById("ban-days").value) || null;
+const reason = document.getElementById("ban-reason").value.trim() || null;
+const { ok, data } = await api(`/api/owner/ban/${currentBanTarget}`, {
+method: "POST",
+body: JSON.stringify({ durationDays: days, reason }),
+});
+if (ok) { toast(data.message, "success"); closeModal("modal-ban"); loadOwnerUsers(); }
+else toast(data.error || "Failed to ban.", "error");
+}
 
-  async function unbanUser(userId) {
-    const { ok, data } = await api(`/api/owner/unban/${userId}`, { method: "POST", body: "{}" });
-    if (ok) { toast("User unbanned."); loadOwnerUsers(); }
-    else toast(data.error || "Failed to unban.", "error");
-  }
+async function unbanUser(userId) {
+const { ok, data } = await api(`/api/owner/unban/${userId}`, { method: "POST", body: "{}" });
+if (ok) { toast("User unbanned."); loadOwnerUsers(); }
+else toast(data.error || "Failed to unban.", "error");
+}
 
-  // ── IP reveal ───────────────────────────────────────────────────────────────
-  function openIPModal(userId) {
-    currentIPTarget = userId;
-    document.getElementById("ip-password").value = "";
-    document.getElementById("ip-error").classList.remove("show");
-    document.getElementById("ip-result").style.display = "none";
-    openModal("modal-ip");
-  }
+// ── IP reveal ───────────────────────────────────────────────────────────────
+function openIPModal(userId) {
+currentIPTarget = userId;
+document.getElementById("ip-password").value = "";
+document.getElementById("ip-error").classList.remove("show");
+document.getElementById("ip-result").style.display = "none";
+openModal("modal-ip");
+}
 
-  async function confirmIPReveal() {
-    const password = document.getElementById("ip-password").value;
-    const errEl    = document.getElementById("ip-error");
-    errEl.classList.remove("show");
-    if (!password) { showAlert(errEl, "Password required."); return; }
+async function confirmIPReveal() {
+const password = document.getElementById("ip-password").value;
+const errEl = document.getElementById("ip-error");
+errEl.classList.remove("show");
+if (!password) { showAlert(errEl, "Password required."); return; }
 
-    const btn = document.getElementById("ip-reveal-btn");
-    btn.disabled = true;
-    try {
-      const { ok, data } = await api(`/api/owner/ip/${currentIPTarget}`, {
-        method: "POST",
-        body: JSON.stringify({ password }),
-      });
-      if (!ok) { showAlert(errEl, data.error || "Failed."); return; }
+const btn = document.getElementById("ip-reveal-btn");
+btn.disabled = true;
+try {
+const { ok, data } = await api(`/api/owner/ip/${currentIPTarget}`, {
+method: "POST",
+body: JSON.stringify({ password }),
+});
+if (!ok) { showAlert(errEl, data.error || "Failed."); return; }
 
-      document.getElementById("ip-last").textContent = data.lastIp;
-      const hist = document.getElementById("ip-history");
-      hist.innerHTML = (data.history || []).map(h =>
-        `<div class="copy-row" style="margin:0;">
-           <code style="font-size:0.72rem;">${esc(h.ip)} <span style="color:var(--text-3);">&mdash; ${fmtDate(h.at)}</span></code>
-         </div>`
-      ).join("") || `<div style="color:var(--text-3);font-size:0.78rem;">No history available.</div>`;
+document.getElementById("ip-last").textContent = data.lastIp;
+const hist = document.getElementById("ip-history");
+hist.innerHTML = (data.history || []).map(h =>
+`<div class="copy-row" style="margin:0;">
+<code style="font-size:0.72rem;">${esc(h.ip)} <span style="color:var(--text-3);">&mdash; ${fmtDate(h.at)}</span></code>
+</div>`
+).join("") || `<div style="color:var(--text-3);font-size:0.78rem;">No history available.</div>`;
 
-      document.getElementById("ip-result").style.display = "block";
-    } finally { btn.disabled = false; }
-  }
+document.getElementById("ip-result").style.display = "block";
+} finally { btn.disabled = false; }
+}
 
-  // ── Navigation ──────────────────────────────────────────────────────────────
-  const views = ["upload","my-scripts","owner-users","owner-scripts","owner-stats"];
+// ── Navigation ──────────────────────────────────────────────────────────────
+const views = ["upload","my-scripts","owner-users","owner-scripts","owner-stats"];
 
-  function showView(view) {
-    views.forEach(v => {
-      document.getElementById(`view-${v}`).style.display = v === view ? "block" : "none";
-      const nav = document.getElementById(`nav-${v}`);
-      if (nav) nav.classList.toggle("active", v === view);
-    });
-    if (view === "my-scripts")     loadMyScripts();
-    if (view === "owner-users")    loadOwnerUsers();
-    if (view === "owner-scripts")  loadOwnerScripts();
-    if (view === "owner-stats")    loadStats();
-  }
+function showView(view) {
+views.forEach(v => {
+document.getElementById(`view-${v}`).style.display = v === view ? "block" : "none";
+const nav = document.getElementById(`nav-${v}`);
+if (nav) nav.classList.toggle("active", v === view);
+});
+if (view === "my-scripts") loadMyScripts();
+if (view === "owner-users") loadOwnerUsers();
+if (view === "owner-scripts") loadOwnerScripts();
+if (view === "owner-stats") loadStats();
+}
 
-  function showPage(name) {
-    document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
-    document.getElementById(`page-${name}`).classList.add("active");
-  }
+function showPage(name) {
+document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
+document.getElementById(`page-${name}`).classList.add("active");
+}
 
-  // ── Modal ───────────────────────────────────────────────────────────────────
-  function openModal(id)  { document.getElementById(id).classList.add("open"); }
-  function closeModal(id) { document.getElementById(id).classList.remove("open"); }
-  document.querySelectorAll(".modal-overlay").forEach(m => {
-    m.addEventListener("click", e => { if (e.target === m) m.classList.remove("open"); });
-  });
+// ── Modal ───────────────────────────────────────────────────────────────────
+function openModal(id) { document.getElementById(id).classList.add("open"); }
+function closeModal(id) { document.getElementById(id).classList.remove("open"); }
+document.querySelectorAll(".modal-overlay").forEach(m => {
+m.addEventListener("click", e => { if (e.target === m) m.classList.remove("open"); });
+});
 
-  // ── Utilities ───────────────────────────────────────────────────────────────
-  function esc(str) {
-    return String(str ?? "")
-      .replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")
-      .replace(/"/g,"&quot;");
-  }
+// ── Utilities ───────────────────────────────────────────────────────────────
+function esc(str) {
+return String(str ?? "")
+.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")
+.replace(/"/g,"&quot;");
+}
 
-  function fmtDate(iso) {
-    if (!iso) return "—";
-    return new Date(iso).toLocaleDateString("en-US", { month:"short", day:"numeric", year:"numeric" });
-  }
+function fmtDate(iso) {
+if (!iso) return "—";
+return new Date(iso).toLocaleDateString("en-US", { month:"short", day:"numeric", year:"numeric" });
+}
 
-  function showAlert(el, msg) {
-    el.textContent = msg;
-    el.classList.add("show");
-    el.style.display = "block";
-  }
+function showAlert(el, msg) {
+el.textContent = msg;
+el.classList.add("show");
+el.style.display = "block";
+}
 
-  function setLoading(key, on) {
-    const btn = document.getElementById(`${key}-btn`);
-    if (!btn) return;
-    btn.disabled = on;
-    if (key === "login" || key === "register") {
-      const spin = btn.querySelector(".auth-spin");
-      const txt  = document.getElementById(`${key}-btn-text`);
-      if (spin) spin.style.display = on ? "block" : "none";
-      if (txt)  txt.textContent = on ? "Loading..." : (key === "login" ? "Sign in" : "Create account");
-      return;
-    }
-    const spin = document.getElementById(`${key}-spin`);
-    const txt  = document.getElementById(`${key}-btn-text`);
-    if (spin) spin.style.display = on ? "block" : "none";
-    if (txt)  txt.textContent = on ? "Uploading..." : "Upload script";
-  }
+function setLoading(key, on) {
+const btn = document.getElementById(`${key}-btn`);
+if (!btn) return;
+btn.disabled = on;
+if (key === "login" || key === "register") {
+const spin = btn.querySelector(".auth-spin");
+const txt = document.getElementById(`${key}-btn-text`);
+if (spin) spin.style.display = on ? "block" : "none";
+if (txt) txt.textContent = on ? "Loading..." : (key === "login" ? "Sign in" : "Create account");
+return;
+}
+const spin = document.getElementById(`${key}-spin`);
+const txt = document.getElementById(`${key}-btn-text`);
+if (spin) spin.style.display = on ? "block" : "none";
+if (txt) txt.textContent = on ? "Uploading..." : "Upload script";
+}
 
-  let toastTimer;
-  function toast(msg, type = "success") {
-    const el = document.getElementById("toast");
-    el.textContent = msg;
-    el.className = `show t-${type}`;
-    clearTimeout(toastTimer);
-    toastTimer = setTimeout(() => el.classList.remove("show"), 3000);
-  }
+let toastTimer;
+function toast(msg, type = "success") {
+const el = document.getElementById("toast");
+el.textContent = msg;
+el.className = `show t-${type}`;
+clearTimeout(toastTimer);
+toastTimer = setTimeout(() => el.classList.remove("show"), 3000);
+}
 
-  function copyText(id, btn) {
-    const text = document.getElementById(id).textContent;
-    navigator.clipboard.writeText(text).then(() => {
-      btn.textContent = "Copied";
-      btn.classList.add("copied");
-      setTimeout(() => { btn.textContent = "Copy"; btn.classList.remove("copied"); }, 2000);
-    });
-  }
+function copyText(id, btn) {
+const text = document.getElementById(id).textContent;
+navigator.clipboard.writeText(text).then(() => {
+btn.textContent = "Copied";
+btn.classList.add("copied");
+setTimeout(() => { btn.textContent = "Copy"; btn.classList.remove("copied"); }, 2000);
+});
+}
 
-  // Enter key on auth forms
-  document.getElementById("login-password").addEventListener("keydown",  e => { if (e.key==="Enter") doLogin(); });
-  document.getElementById("reg-password2").addEventListener("keydown",   e => { if (e.key==="Enter") doRegister(); });
-  document.getElementById("ip-password").addEventListener("keydown",     e => { if (e.key==="Enter") confirmIPReveal(); });
+// Enter key on auth forms
+document.getElementById("login-password").addEventListener("keydown", e => { if (e.key==="Enter") doLogin(); });
+document.getElementById("reg-password2").addEventListener("keydown", e => { if (e.key==="Enter") doRegister(); });
+document.getElementById("ip-password").addEventListener("keydown", e => { if (e.key==="Enter") confirmIPReveal(); });
 
-  // ── Auto-login ──────────────────────────────────────────────────────────────
-  if (token) {
-    initDashboard({}).catch(() => logout());
-  }
+// ── Auto-login ──────────────────────────────────────────────────────────────
+if (token) {
+initDashboard({}).catch(() => logout());
+}
 </script>
 </body>
 </html>
