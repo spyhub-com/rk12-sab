@@ -1,375 +1,126 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>SpyHub Agent</title>
+<!doctype html>
+<html lang="fr"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SpyHub Loader</title>
 <style>
-  :root{
-    --bordeaux:#4338ca; --rose:#6366f1; --cuivre:#8b5cf6;
-    --bg:#000000; --panel:rgba(255,255,255,0.04); --border:rgba(255,255,255,0.08);
-    --text:#f5f5f7; --muted:#8a8a92; --danger:#e0556f;
-  }
-  *{box-sizing:border-box;margin:0;padding:0;}
-  html,body{height:100%;}
-  body{
-    font-family:ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;
-    color:var(--text); background:var(--bg); overflow:hidden;
-  }
-  .bg{
-    position:fixed; inset:0; z-index:-1; background:var(--bg);
-  }
-  .bg::before{
-    content:""; position:absolute; inset:-20%;
-    background:radial-gradient(circle at 20% 10%, var(--bordeaux), transparent 35%),
-               radial-gradient(circle at 90% 85%, var(--cuivre), transparent 30%);
-    filter:blur(110px) saturate(1.2); opacity:0.22;
-    animation:drift 20s ease-in-out infinite alternate;
-  }
-  @keyframes drift{0%{transform:translate(0,0) scale(1);}100%{transform:translate(3%,-2%) scale(1.05);}}
-  .glass{
-    background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.12); border-radius:22px;
-    backdrop-filter:blur(30px) saturate(1.8); -webkit-backdrop-filter:blur(30px) saturate(1.8);
-    box-shadow:0 8px 32px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.08);
-  }
-  .aurora{
-    background:linear-gradient(90deg,var(--bordeaux),var(--rose),var(--cuivre),var(--rose),var(--bordeaux));
-    background-size:300% auto; -webkit-background-clip:text; background-clip:text; color:transparent;
-    animation:aurora 8s linear infinite;
-  }
-  @keyframes aurora{0%{background-position:0% 50%;}100%{background-position:300% 50%;}}
+*{box-sizing:border-box}
+body{margin:0;background:#07090d;color:#e6edf3;font-family:system-ui,sans-serif;padding:16px;max-width:760px;margin:auto}
+h1{font-size:22px;margin:8px 0 16px;color:#00ffc6}
+.card{background:#0f141b;border:1px solid #1d2733;border-radius:12px;padding:14px;margin-bottom:14px}
+input,textarea{width:100%;background:#0a0e14;color:#e6edf3;border:1px solid #1d2733;border-radius:8px;padding:10px;font-size:14px;margin-bottom:8px}
+textarea{height:240px;font-family:ui-monospace,Consolas,monospace;font-size:12px;resize:vertical}
+button{background:#00ffc6;color:#04120d;border:0;border-radius:8px;padding:9px 14px;font-weight:700;cursor:pointer;font-size:14px}
+button.sec{background:#1d2733;color:#e6edf3}
+button.del{background:#3a1218;color:#ff6b7a}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.code{background:#0a0e14;border:1px dashed #00ffc6;border-radius:8px;padding:10px;font-family:ui-monospace,Consolas,monospace;font-size:12px;word-break:break-all;margin:8px 0}
+.item{border-top:1px solid #1d2733;padding:10px 0}
+.item:first-child{border-top:0}
+.muted{color:#7d8a99;font-size:12px}
+#msg{color:#ff6b7a;font-size:13px;min-height:18px}
+.hide{display:none}
+</style></head><body>
+<h1>SpyHub Loader</h1>
 
-  /* ---------- Navbar (écran login) ---------- */
-  #navbar{
-    position:fixed;top:0;left:0;right:0;z-index:10;
-    display:flex;align-items:center;justify-content:space-between;
-    padding:calc(16px + env(safe-area-inset-top,0px)) 24px 16px;
-  }
-  #navbar .brand{font-weight:700;font-size:0.95rem;letter-spacing:-0.01em;}
-  #navbar .brand span{color:var(--muted);font-weight:400;}
-  #navbar .navlinks{display:flex;align-items:center;gap:18px;}
-  #navbar .navlinks a{color:var(--muted);text-decoration:none;font-size:0.8rem;font-weight:500;}
-  #navbar .discord-btn{
-    display:flex;align-items:center;gap:6px;background:rgba(255,255,255,0.06);
-    border:1px solid rgba(255,255,255,0.1);color:var(--text);padding:8px 14px;
-    border-radius:10px;font-size:0.78rem;font-weight:600;text-decoration:none;
-  }
-  #navbar .dot{width:7px;height:7px;border-radius:50%;background:#3fd67f;box-shadow:0 0 8px #3fd67f;}
+<div id="login" class="card">
+  <div class="muted" style="margin-bottom:8px">Mot de passe admin</div>
+  <input id="pw" type="password" placeholder="Mot de passe">
+  <button id="go">Connexion</button>
+</div>
 
-  /* ---------- Auth screen ---------- */
-  #auth{height:100vh;height:100dvh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;}
-  #auth .card{
-    width:100%;max-width:320px;padding:26px 22px;position:relative;overflow:hidden;
-  }
-  #auth .card::before{
-    content:"";position:absolute;top:-40px;left:-40px;width:160px;height:160px;border-radius:50%;
-    background:radial-gradient(circle, var(--cuivre), transparent 70%);
-    filter:blur(30px);opacity:0.5;pointer-events:none;
-  }
-  #auth .card > *{position:relative;}
-  #auth h1{font-size:1.25rem;font-weight:700;margin-bottom:4px;letter-spacing:-0.02em;}
-  #auth p.sub{color:var(--muted);font-size:0.78rem;margin-bottom:18px;}
-  .tabs{display:flex;gap:2px;background:rgba(255,255,255,0.04);padding:3px;border-radius:10px;margin-bottom:18px;border:1px solid rgba(255,255,255,0.06);}
-  .tabs button{flex:1;padding:7px;border:none;background:transparent;color:var(--muted);border-radius:8px;font-size:0.78rem;font-weight:500;cursor:pointer;transition:all .2s;}
-  .tabs button.active{background:rgba(255,255,255,0.08);color:var(--text);}
-  label{display:block;font-size:0.7rem;color:var(--muted);margin:12px 0 6px;font-weight:500;letter-spacing:.01em;}
-  input{
-    width:100%;padding:11px 13px;border-radius:10px;border:1px solid rgba(255,255,255,0.08);
-    background:rgba(255,255,255,0.03);color:var(--text);font-size:0.88rem;outline:none;transition:border-color .15s;
-  }
-  input:focus{border-color:var(--rose);}
-  .error{color:var(--danger);font-size:0.76rem;margin-top:10px;min-height:1em;text-align:center;}
-  .terms{color:var(--muted);font-size:0.68rem;text-align:center;margin-top:16px;line-height:1.5;}
-  .terms a{color:var(--rose);text-decoration:none;}
-  .switch-link{text-align:center;font-size:0.78rem;color:var(--muted);margin-top:16px;}
-  .switch-link a{color:var(--text);font-weight:600;text-decoration:none;cursor:pointer;}
-
-  /* ---------- Bouton principal ---------- */
-  .btn-wrapper{margin-top:20px;}
-  .btn{
-    width:100%; padding:13px; border:none; border-radius:12px; font-size:0.92rem; font-weight:600;
-    font-family:inherit; color:#fff; background:var(--rose); cursor:pointer;
-    transition:background .15s, transform .1s;
-    -webkit-tap-highlight-color:transparent;
-  }
-  .btn:hover{background:var(--cuivre);}
-  .btn:active{transform:scale(0.97);}
-
-  /* ---------- Chat screen : sidebar + main ---------- */
-  #chat{height:100vh;height:100dvh;display:none;}
-  .app{display:flex;height:100%;width:100%;position:relative;}
-
-  #sidebar{
-    position:fixed; top:10px; bottom:10px; left:10px; width:250px; z-index:20;
-    padding:20px 14px; display:flex; flex-direction:column;
-    transform:translateX(-115%); transition:transform .3s ease;
-  }
-  #sidebar.open{transform:translateX(0);}
-  #sidebar h2{font-size:1.05rem;font-weight:700;margin-bottom:2px;}
-  #sidebar .tagline{font-size:0.72rem;color:var(--muted);margin-bottom:20px;}
-  #sidebar label.side-label{font-size:0.7rem;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;margin-bottom:6px;display:block;}
-  #modelSelect{
-    width:100%; background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);color:var(--text);
-    padding:10px 10px;border-radius:12px;font-size:0.78rem;outline:none;margin-bottom:20px;
-  }
-  #sidebar .who{font-size:0.78rem;color:var(--muted);margin-bottom:10px;word-break:break-all;}
-  #sidebar .spacer{flex:1;}
-  #sidebar button.logout{
-    background:rgba(224,85,111,0.12);border:1px solid rgba(224,85,111,0.3);color:var(--danger);
-    padding:10px;border-radius:12px;cursor:pointer;font-size:0.82rem;font-weight:600;
-  }
-  #sidebarBackdrop{position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:15;opacity:0;pointer-events:none;transition:opacity .3s;}
-  #sidebarBackdrop.open{opacity:1;pointer-events:auto;}
-
-  .main{display:flex;flex-direction:column;height:100%;width:100%;padding:14px;}
-  header.top{display:flex;align-items:center;gap:12px;padding:12px 16px;margin-bottom:12px;}
-  #menuBtn{background:none;border:none;color:var(--text);font-size:1.3rem;cursor:pointer;line-height:1;}
-  header.top .apptitle{font-weight:700;font-size:1rem;}
-  #messages{flex:1;overflow-y:auto;padding:8px 4px;display:flex;flex-direction:column;gap:12px;}
-  .msg{max-width:80%;padding:12px 16px;border-radius:18px;font-size:0.92rem;line-height:1.45;white-space:pre-wrap;word-break:break-word;}
-  .msg.user{align-self:flex-end;background:linear-gradient(135deg,var(--bordeaux),var(--rose));border-bottom-right-radius:5px;}
-  .msg.assistant{align-self:flex-start;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-bottom-left-radius:5px;}
-  .msg.file{display:flex;align-items:center;gap:10px;}
-  .msg.file a{color:var(--cuivre);text-decoration:none;font-weight:600;}
-  .composer{display:flex;gap:8px;padding:12px;margin-top:8px;align-items:flex-end;}
-  .composer textarea{
-    flex:1;resize:none;max-height:140px;padding:12px 14px;border-radius:16px;border:1px solid rgba(255,255,255,0.1);
-    background:rgba(0,0,0,0.35);color:var(--text);font-size:0.92rem;font-family:inherit;outline:none;
-  }
-  .composer textarea:focus{border-color:var(--cuivre);}
-  .iconbtn{
-    width:44px;height:44px;flex-shrink:0;border:1px solid rgba(255,255,255,0.1);border-radius:16px;
-    background:rgba(255,255,255,0.05);color:var(--muted);cursor:pointer;font-size:1.1rem;
-  }
-  .composer button.send{
-    padding:0 20px;height:44px;border:none;border-radius:16px;color:#fff;font-weight:600;
-    background:linear-gradient(135deg,var(--bordeaux),var(--cuivre));cursor:pointer;
-  }
-  #attachedName{font-size:0.75rem;color:var(--cuivre);padding:0 12px;}
-</style>
-</head>
-<body>
-<div class="bg"></div>
-
-<nav id="navbar">
-  <div class="brand">SpyHub <span>Agent</span></div>
-  <div class="navlinks">
-    <span class="dot" title="Statut: en ligne"></span>
-    <a href="#" class="discord-btn">Discord</a>
+<div id="app" class="hide">
+  <div class="card">
+    <input id="name" placeholder="Nom du script (ex : Scanner v5)" maxlength="60">
+    <textarea id="code" placeholder="Colle ton code Lua ici"></textarea>
+    <div class="row">
+      <button id="save">Créer</button>
+      <button id="cancel" class="sec hide">Annuler la modification</button>
+    </div>
+    <div id="result" class="hide">
+      <div class="muted" style="margin-top:10px">Ton loadstring :</div>
+      <div id="line" class="code"></div>
+      <button id="copyline">Copier</button>
+    </div>
   </div>
-</nav>
-
-<!-- Écran login / création de compte -->
-<section id="auth">
-  <div class="card glass">
-    <h1 id="authTitle">Bon retour</h1>
-    <p class="sub" id="authSub">Connecte-toi à ton compte</p>
-    <form id="authForm" onsubmit="return submitAuth(event)">
-      <label>Email</label>
-      <input type="email" id="email" required autocomplete="email">
-      <label>Mot de passe</label>
-      <input type="password" id="password" required autocomplete="current-password" minlength="8">
-      <div class="btn-wrapper">
-        <button class="btn" type="submit" id="submitBtn">Se connecter</button>
-      </div>
-      <div class="error" id="authError"></div>
-      <p class="switch-link" id="switchLink"></p>
-      <p class="terms">En continuant, tu acceptes les <a href="#">conditions d'utilisation</a> et la <a href="#">politique de confidentialité</a>.</p>
-    </form>
-  </div>
-</section>
-
-<!-- Écran chat -->
-<section id="chat">
-  <div class="app">
-    <div id="sidebarBackdrop" onclick="toggleSidebar(false)"></div>
-    <aside id="sidebar" class="glass">
-      <h2 class="aurora">SpyHub Agent</h2>
-      <p class="tagline">Assistant IA dev</p>
-      <label class="side-label">Modèle</label>
-      <select id="modelSelect">
-        <option value="openai/gpt-oss-120b" selected>GPT-OSS 120B (free plan)</option>
-        <option value="llama-3.3-70b-versatile">Llama 3.3 70B</option>
-        <option value="groq/compound-mini">Compound Mini (plan payant)</option>
-        <option value="groq/compound">Compound (plan payant)</option>
-      </select>
-      <label class="side-label">Connecté en tant que</label>
-      <p class="who" id="whoami"></p>
-      <div class="spacer"></div>
-      <button class="logout" onclick="logout()">Déconnexion</button>
-    </aside>
-
-    <main class="main">
-      <header class="top glass">
-        <button id="menuBtn" onclick="toggleSidebar()">☰</button>
-        <span class="apptitle">Chat</span>
-      </header>
-      <div id="messages"></div>
-      <span id="attachedName"></span>
-      <div class="composer glass">
-        <button class="iconbtn" onclick="document.getElementById('fileInput').click()" title="Joindre un fichier">📎</button>
-        <input type="file" id="fileInput" style="display:none" onchange="onFileChosen(event)">
-        <textarea id="input" rows="1" placeholder="Écris ton message... (Python, Lua, JS, etc.)"></textarea>
-        <button class="send" onclick="sendMessage()">Envoyer</button>
-      </div>
-    </main>
-  </div>
-</section>
+  <div class="card"><b>Mes scripts</b><div id="list" style="margin-top:6px"></div></div>
+</div>
+<div id="msg"></div>
 
 <script>
-  const API_BASE = "https://ai.spyuhq.workers.dev";
-  const SIZE_LIMIT = 20 * 1024; // 20 Ko -> devient un fichier .txt joint
+// ⚠️ Mets ici l'adresse de ton Worker (sans "/" à la fin)
+var WORKER = "https://TON-WORKER.workers.dev";
 
-  let mode = "login";
-  const els = (id) => document.getElementById(id);
+var pw = localStorage.getItem("pw") || "", editId = "";
+var $ = function (s) { return document.querySelector(s); };
+function msg(t) { $("#msg").textContent = t || ""; }
 
-  function setBtnText(idle){
-    els("submitBtn").textContent = idle;
-  }
-
-  function switchTab(next){
-    mode = next;
-    if(next === "login"){
-      els("authTitle").textContent = "Bon retour";
-      els("authSub").textContent = "Connecte-toi à ton compte";
-      els("switchLink").innerHTML = `Pas encore de compte ? <a onclick="switchTab('register')">S'inscrire</a>`;
-      setBtnText("Se connecter");
-    }else{
-      els("authTitle").textContent = "Créer un compte";
-      els("authSub").textContent = "Rejoins la communauté SpyHub";
-      els("switchLink").innerHTML = `Déjà un compte ? <a onclick="switchTab('login')">Se connecter</a>`;
-      setBtnText("Créer le compte");
-    }
-    els("authError").textContent = "";
-  }
-
-  async function submitAuth(e){
-    e.preventDefault();
-    els("authError").textContent = "";
-    const email = els("email").value.trim();
-    const password = els("password").value;
-    const route = mode === "login" ? "/auth/login" : "/auth/register";
-    const btn = els("submitBtn");
-    const originalLabel = btn.textContent;
-    btn.disabled = true;
-    btn.textContent = "...";
-    try{
-      const res = await fetch(API_BASE + route, {
-        method:"POST", headers:{"Content-Type":"application/json"},
-        body: JSON.stringify({email, password})
-      });
-      const data = await res.json();
-      if(!res.ok) throw new Error(data.error || "Erreur");
-      localStorage.setItem("spyhub_token", data.token);
-      localStorage.setItem("spyhub_email", data.email);
-      enterChat(data.email);
-    }catch(err){
-      els("authError").textContent = err.message;
-    }finally{
-      btn.disabled = false;
-      btn.textContent = originalLabel;
-    }
-    return false;
-  }
-
-  function toggleSidebar(force){
-    const open = typeof force === "boolean" ? force : !els("sidebar").classList.contains("open");
-    els("sidebar").classList.toggle("open", open);
-    els("sidebarBackdrop").classList.toggle("open", open);
-  }
-
-  function enterChat(email){
-    els("whoami").textContent = email;
-    document.getElementById("auth").style.display = "none";
-    document.getElementById("chat").style.display = "flex";
-    toggleSidebar(true);
-  }
-
-  function logout(){
-    localStorage.removeItem("spyhub_token");
-    localStorage.removeItem("spyhub_email");
-    document.getElementById("chat").style.display = "none";
-    document.getElementById("auth").style.display = "flex";
-    document.getElementById("messages").innerHTML = "";
-  }
-
-  // Affiche un message dans le chat. Si le contenu dépasse SIZE_LIMIT,
-  // il est transformé en pièce jointe .txt téléchargeable au lieu de texte brut.
-  function renderMessage(role, content){
-    const box = els("messages");
-    const bytes = new Blob([content]).size;
-
-    if(bytes > SIZE_LIMIT){
-      const blob = new Blob([content], {type:"text/plain"});
-      const url = URL.createObjectURL(blob);
-      const div = document.createElement("div");
-      div.className = `msg ${role} file`;
-      div.innerHTML = `📎 <a href="${url}" download="message.txt">message.txt</a> <span style="color:var(--muted);font-size:0.8em">(${(bytes/1024).toFixed(1)} Ko)</span>`;
-      box.appendChild(div);
-    }else{
-      const div = document.createElement("div");
-      div.className = `msg ${role}`;
-      div.textContent = content;
-      box.appendChild(div);
-    }
-    box.scrollTop = box.scrollHeight;
-  }
-
-  let attachedContent = "";
-
-  function onFileChosen(e){
-    const file = e.target.files[0];
-    if(!file) return;
-    if(file.type.startsWith("image/")){
-      els("attachedName").textContent = "⚠️ Les images ne sont pas encore analysées par l'IA, seuls les fichiers texte/code sont lus.";
-      return;
-    }
-    const reader = new FileReader();
-    reader.onload = () => {
-      attachedContent = `\n\n--- Fichier joint: ${file.name} ---\n${reader.result}`;
-      els("attachedName").textContent = `📎 ${file.name} prêt à être envoyé`;
-    };
-    reader.readAsText(file);
-  }
-
-  async function sendMessage(){
-    const input = els("input");
-    const text = input.value.trim() + attachedContent;
-    if(!text.trim()) return;
-    input.value = "";
-    renderMessage("user", text);
-    attachedContent = "";
-    els("attachedName").textContent = "";
-
-    const token = localStorage.getItem("spyhub_token");
-    const model = els("modelSelect").value;
-    try{
-      const res = await fetch(API_BASE + "/chat", {
-        method:"POST",
-        headers:{"Content-Type":"application/json", "Authorization":"Bearer " + token},
-        body: JSON.stringify({message: text, model})
-      });
-      const data = await res.json();
-      if(!res.ok) throw new Error(data.error || "Erreur");
-      renderMessage("assistant", data.reply);
-    }catch(err){
-      renderMessage("assistant", "⚠️ " + err.message);
-    }
-  }
-
-  els("input")?.addEventListener("keydown", (e) => {
-    if(e.key === "Enter" && !e.shiftKey){ e.preventDefault(); sendMessage(); }
+// Appel de l'API du Worker (mot de passe envoyé dans un en-tête)
+function api(path, body) {
+  return fetch(WORKER + "/api/" + path, {
+    method: "POST",
+    headers: { "x-admin": pw, "content-type": "application/json" },
+    body: JSON.stringify(body || {})
+  }).then(function (r) {
+    if (r.status === 401) { pw = ""; localStorage.removeItem("pw"); show(false); throw new Error("Mot de passe refusé"); }
+    return r.json();
   });
+}
+function show(on) { $("#login").classList.toggle("hide", on); $("#app").classList.toggle("hide", !on); }
+function lineOf(id) { return 'loadstring(game:HttpGet("' + WORKER + '/raw/' + id + '"))()'; }
+function copy(t) {
+  if (navigator.clipboard) navigator.clipboard.writeText(t).then(function () { msg("Copié !"); }, function () { prompt("Copie :", t); });
+  else prompt("Copie :", t);
+}
+function resetForm() {
+  editId = ""; $("#name").value = ""; $("#code").value = "";
+  $("#save").textContent = "Créer"; $("#cancel").classList.add("hide");
+}
 
-  // Reconnexion auto si un token est déjà en localStorage
-  (function init(){
-    switchTab("login");
-    const token = localStorage.getItem("spyhub_token");
-    const email = localStorage.getItem("spyhub_email");
-    if(token && email) enterChat(email);
-  })();
-</script>
-<script src="//cdn.jsdelivr.net/npm/eruda"></script>
-<script>eruda.init();</script>
-</body>
-</html>
+// Liste des scripts
+function refresh() {
+  return api("list").then(function (d) {
+    var box = $("#list"); box.innerHTML = "";
+    if (!d.list || !d.list.length) { box.innerHTML = '<div class="muted">Aucun script pour le moment.</div>'; return; }
+    d.list.forEach(function (s) {
+      var it = document.createElement("div"); it.className = "item";
+      var t = document.createElement("div"); t.textContent = s.name || "(sans nom)";
+      var m = document.createElement("div"); m.className = "muted"; m.textContent = new Date(s.ts).toLocaleString();
+      var r = document.createElement("div"); r.className = "row"; r.style.marginTop = "6px";
+      [["Copier le loadstring", "sec", function () { copy(lineOf(s.id)); }],
+       ["Modifier", "sec", function () { edit(s.id); }],
+       ["Supprimer", "del", function () { if (confirm("Supprimer ce script ?")) api("delete", { id: s.id }).then(refresh); }]
+      ].forEach(function (b) {
+        var bt = document.createElement("button"); bt.textContent = b[0]; bt.className = b[1]; bt.onclick = b[2]; r.appendChild(bt);
+      });
+      it.appendChild(t); it.appendChild(m); it.appendChild(r); box.appendChild(it);
+    });
+  });
+}
+function edit(id) {
+  api("get", { id: id }).then(function (d) {
+    editId = id; $("#name").value = d.name || ""; $("#code").value = d.code || "";
+    $("#save").textContent = "Enregistrer"; $("#cancel").classList.remove("hide");
+    $("#result").classList.add("hide"); window.scrollTo(0, 0);
+  });
+}
+
+$("#go").onclick = function () {
+  pw = $("#pw").value; msg("");
+  api("list").then(function () { localStorage.setItem("pw", pw); show(true); refresh(); }).catch(function (e) { msg(e.message); });
+};
+$("#save").onclick = function () {
+  msg("");
+  api("save", { id: editId, name: $("#name").value, code: $("#code").value }).then(function (d) {
+    if (!d.ok) return msg(d.error || "Erreur");
+    $("#line").textContent = lineOf(d.id); $("#result").classList.remove("hide"); $("#copyline").onclick = function () { copy(lineOf(d.id)); };
+    resetForm(); refresh();
+  }).catch(function (e) { msg(e.message); });
+};
+$("#cancel").onclick = resetForm;
+
+if (WORKER.indexOf("T") > -1) {
+  msg("Ouvre loader.html et remplace TON-WORKER par l'adresse de ton Worker (ligne WORKER).");
+} else if (pw) {
+  api("list").then(function () { show(true); refresh(); }).catch(function () {});
+}
+</script></body></html>
